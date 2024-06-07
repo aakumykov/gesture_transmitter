@@ -3,7 +3,7 @@ package com.github.aakumykov.server.ktor_server
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.github.aakumykov.kotlin_playground.Gesture
+import com.github.aakumykov.kotlin_playground.UserGesture
 import com.google.gson.Gson
 import io.ktor.server.application.install
 import io.ktor.server.engine.embeddedServer
@@ -68,7 +68,7 @@ class KtorServer(private val gson: Gson) {
     }
 
     // TODO: выдавать поток с ошибками
-    suspend fun send(gesture: Gesture) {
+    suspend fun send(gesture: UserGesture) {
 
         val gestureJson = gson.toJson(gesture)
         val textFrame = Frame.Text(gestureJson)

@@ -3,8 +3,7 @@ package com.github.aakumykov.kotlin_playground
 import android.accessibilityservice.GestureDescription
 import android.graphics.Path
 
-@Deprecated("переименовать в UserGesture")
-class Gesture private constructor(
+class UserGesture private constructor(
     private val pointList: List<UserGesturePoint>,
     private val startingTime: Long,
     private val endingTime: Long
@@ -43,13 +42,13 @@ class Gesture private constructor(
     }
 
     override fun toString(): String {
-        return Gesture::class.java.simpleName + " { ${pointList.size} точек, длительность ${endingTime-startingTime} мс }"
+        return UserGesture::class.java.simpleName + " { ${pointList.size} точек, длительность ${endingTime-startingTime} мс }"
     }
 
     companion object {
-        fun create(pointList: List<UserGesturePoint>, startingTime: Long, endingTime: Long): Gesture? {
+        fun create(pointList: List<UserGesturePoint>, startingTime: Long, endingTime: Long): UserGesture? {
             return if (pointList.size > 1) {
-                Gesture(
+                UserGesture(
                     ArrayList(pointList),
                     startingTime,
                     endingTime

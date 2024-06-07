@@ -2,7 +2,7 @@ package com.github.aakumykov.server
 
 import android.view.MotionEvent
 import com.github.aakumykov.kotlin_playground.UserGesturePoint
-import com.github.aakumykov.kotlin_playground.Gesture
+import com.github.aakumykov.kotlin_playground.UserGesture
 import com.github.aakumykov.single_live_event.SingleLiveEvent
 
 object GestureRecorder {
@@ -10,9 +10,9 @@ object GestureRecorder {
     private var initialEvent: MotionEvent? = null
     private var pointList: MutableList<UserGesturePoint> = ArrayList()
     private var startingTime: Long? = null
-    private var laseRecordedGesture: Gesture? = null
+    private var laseRecordedGesture: UserGesture? = null
 
-    val recordedGesture: SingleLiveEvent<Gesture> = SingleLiveEvent()
+    val recordedGesture: SingleLiveEvent<UserGesture> = SingleLiveEvent()
 
     fun startRecording(initialMotionEvent: MotionEvent) {
         resetState()
@@ -29,7 +29,7 @@ object GestureRecorder {
     fun finishRecording(event: MotionEvent) {
         recordEvent(event)
         if (null != startingTime)
-                laseRecordedGesture = Gesture.create(pointList, startingTime!!, event.eventTime)
+                laseRecordedGesture = UserGesture.create(pointList, startingTime!!, event.eventTime)
         eraseTempData()
         recordedGesture.value = laseRecordedGesture
     }
@@ -38,7 +38,7 @@ object GestureRecorder {
         resetState()
     }
 
-    fun getLastRecord(): Gesture? = laseRecordedGesture
+    fun getLastRecord(): UserGesture? = laseRecordedGesture
 
     private fun eraseTempData() {
         startingTime = null

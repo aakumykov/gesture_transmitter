@@ -8,7 +8,7 @@ import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import com.github.aakumykov.kotlin_playground.Gesture
+import com.github.aakumykov.kotlin_playground.UserGesture
 import com.github.aakumykov.server.databinding.FragmentServerBinding
 import com.github.aakumykov.server.ktor_server.DEFAULT_SERVER_ADDRESS
 import com.github.aakumykov.server.ktor_server.DEFAULT_SERVER_PORT
@@ -53,7 +53,7 @@ class ServerFragment : Fragment(R.layout.fragment_server), View.OnTouchListener 
         binding.stopServerButton.setOnClickListener { stopServer() }
     }
 
-    private fun onNewGesture(gesture: Gesture?) {
+    private fun onNewGesture(gesture: UserGesture?) {
         gesture?.also {
             Log.d(TAG, "Новый записанный жест: $gesture")
             lifecycleScope.launch(Dispatchers.IO) {
