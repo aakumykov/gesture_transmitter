@@ -1,14 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ServerFragment">
+    android:orientation="vertical"
+    tools:context=".ServerFragment" >
 
-    <!-- TODO: Update blank fragment layout -->
     <TextView
+        android:id="@+id/serverStateView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:layout_height="wrap_content"
+        android:text="@string/server_state_not_running"
+        android:gravity="center_horizontal"/>
 
-</FrameLayout>
+    <Button
+        android:id="@+id/startServerButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/start_server_button" />
+
+    <Button
+        android:id="@+id/stopServerButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/stop_server_button" />
+
+    <Button
+        android:id="@+id/startRecordingButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:backgroundTint="#afa"
+        android:text="@string/start_recording_button"
+        android:visibility="gone" />
+
+    <Button
+        android:id="@+id/stopRecordingButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:backgroundTint="#FFEE58"
+        android:text="@string/stop_recording_button"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/touchRecordingArea"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_margin="8dp"
+        android:text="@string/touches_recording_area"
+        android:gravity="center"
+        android:background="@color/touch_recording_area"
+        android:layout_weight="1"/>
+
+</LinearLayout>

@@ -1,4 +1,10 @@
 <resources>
     <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Сервер</string>
+    <string name="server_state_not_running">Сервер не запущен</string>
+    <string name="start_server_button">Запустить сервер</string>
+    <string name="stop_server_button">Остановить сервер</string>
+    <string name="server_state_running">Сервер запущен</string>
+    <string name="touches_recording_area">Водите пальцем для записи движений</string>
+    <string name="start_recording_button">Начать запись</string>
+    <string name="stop_recording_button">Остановить запись</string>
 </resources>
