@@ -63,7 +63,7 @@ fun Application.configureWebsockets(
             coroutineDispatcher = coroutineDispatcher,
             gestureRecorder = gestureRecorder,
             lifecycleOwner = lifecycleOwner,
-            gson = Gson()
+            gson = gson
         )
     }
 }
