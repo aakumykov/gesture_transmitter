@@ -22,6 +22,8 @@ class KtorServer(
     private val lifecycleOwner: LifecycleOwner,
     private val coroutineScope: CoroutineScope,
     private val coroutineDispatcher: CoroutineDispatcher = Dispatchers.IO,
+    private val gson: Gson,
+    private val gestureRecorder: GestureRecorder,
 ) {
 
     private var runningServer: JettyApplicationEngine? = null
@@ -39,8 +41,8 @@ class KtorServer(
                     coroutineScope = coroutineScope,
                     coroutineDispatcher = coroutineDispatcher,
                     lifecycleOwner = lifecycleOwner,
-                    gestureRecorder = GestureRecorder,
-                    gson = Gson()
+                    gestureRecorder = gestureRecorder,
+                    gson = gson
                 )
             }.start(wait = true) // TODO: попробовать wait = false
 
