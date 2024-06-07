@@ -8,28 +8,37 @@ import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import com.github.aakumykov.kotlin_playground.Gesture
 import com.github.aakumykov.server.databinding.FragmentServerBinding
 import com.github.aakumykov.server.ktor_server.DEFAULT_SERVER_ADDRESS
 import com.github.aakumykov.server.ktor_server.DEFAULT_SERVER_PORT
+import com.github.aakumykov.server.ktor_server.KtorServer
+import com.gitlab.aakumykov.exception_utils_module.ExceptionUtils
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class ServerFragment : Fragment(R.layout.fragment_server), View.OnTouchListener {
 
     private var _binding: FragmentServerBinding? = null
     private val binding get() = _binding!!
+
     private val gestureRecorder by lazy { GestureRecorder }
-    private val ktorGestureServer: KtorGestureServer by lazy {
-        KtorGestureServer
-            .init(
-                serverAddress = DEFAULT_SERVER_ADDRESS,
-                serverPort = DEFAULT_SERVER_PORT,
-                lifecycleOwner = viewLifecycleOwner,
-                coroutineScope = lifecycleScope,
-                coroutineDispatcher = Dispatchers.IO,
-                gson = Gson(),
-                gestureRecorder = GestureRecorder,
-            )
+
+    private val ktorServer: KtorServer by lazy { KtorServer(Gson()) }
+
+    private fun showError(throwable: Throwable) {
+        binding.serverErrorView.apply {
+            text = ExceptionUtils.getErrorMessage(throwable)
+            visibility = View.VISIBLE
+        }
+    }
+
+    private fun hideError() {
+        binding.serverErrorView.apply {
+            text = ""
+            visibility = View.GONE
+        }
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -37,22 +46,27 @@ class ServerFragment : Fragment(R.layout.fragment_server), View.OnTouchListener 
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentServerBinding.bind(view)
 
-        KtorGestureServer.state.observe(viewLifecycleOwner) { isActive ->
-            binding.serverStateView.setText(if (isActive) R.string.server_state_running else R.string.server_state_not_running)
-        }
-
-        GestureRecorder.recordedGesture.observe(viewLifecycleOwner) { newGesture ->
-            Log.d(TAG, "Новый записанный жест: $newGesture")
-            ktorGestureServer.send(newGesture)
-        }
+        GestureRecorder.recordedGesture.observe(viewLifecycleOwner, ::onNewGesture)
 
         binding.touchRecordingArea.setOnTouchListener(this)
         binding.startServerButton.setOnClickListener { startServer() }
         binding.stopServerButton.setOnClickListener { stopServer() }
     }
 
-    private fun startServer() {
+    private fun onNewGesture(gesture: Gesture?) {
+        gesture?.also {
+            Log.d(TAG, "Новый записанный жест: $gesture")
+            lifecycleScope.launch(Dispatchers.IO) {
+                ktorServer.send(gesture)
+            }
+        }
+    }
 
+    private fun startServer() {
+        hideError()
+        lifecycleScope.launch(Dispatchers.IO) {
+            ktorServer.run(DEFAULT_SERVER_ADDRESS, DEFAULT_SERVER_PORT)
+        }
     }
 
     private fun stopServer() {

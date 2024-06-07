@@ -17,13 +17,17 @@ import io.ktor.server.routing.Routing
 import io.ktor.server.routing.routing
 import io.ktor.server.websocket.DefaultWebSocketServerSession
 import io.ktor.server.websocket.WebSockets
+import io.ktor.server.websocket.pingPeriod
+import io.ktor.server.websocket.timeout
 import io.ktor.server.websocket.webSocket
+import io.ktor.websocket.Frame
 import io.ktor.websocket.send
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
+import java.time.Duration
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
@@ -37,24 +41,33 @@ class KtorServer(private val gson: Gson) {
     val isRunning: LiveData<Result<Boolean>> = _isRunning
 
     suspend fun run(address: String, port: Int) {
-        suspendCoroutine<Boolean> { continuation ->
+//        suspendCoroutine<Boolean> { continuation ->
             try {
                 runningServer = embeddedServer(Jetty, host = address, port = port) {
-                    install(WebSockets)
+
+                    install(WebSockets) {
+                        pingPeriod = Duration.ofSeconds(15)
+                        timeout = Duration.ofSeconds(15)
+                        maxFrameSize = Long.MAX_VALUE
+                        masking = false
+                    }
+
                     routing {
                         webSocket(path = "/gestures") {
                             // TODO: выдавать на гора статус "готов"
 
-                            send("Вы подключились к серверу $TAG")
+                            Log.d(TAG, "Новое подключение.")
+
+                            outgoing.send(Frame.Text("Вы подключились к серверу $TAG"))
 
                             serverSession = this
 
                             _isRunning.value = Result.success(true)
                         }
                     }
-                }.start(wait = false)
+                }.start(wait = true)
 
-                continuation.resume(true)
+//                continuation.resume(true)
 
             } catch (e: Exception) {
                 // FIXME: это сообщение нигде не наблюдается.
@@ -63,16 +76,16 @@ class KtorServer(private val gson: Gson) {
                     _isRunning.value = Result.failure(e)
                 }
 
-                continuation.resumeWithException(e)
+//                continuation.resumeWithException(e)
             }
-        }
+//        }
     }
 
     // TODO: выдавать поток с ошибками
     suspend fun send(gesture: Gesture) {
 
         val gestureJson = gson.toJson(gesture)
-        val textFrame = io.ktor.websocket.Frame.Text(gestureJson)
+        val textFrame = Frame.Text(gestureJson)
 
         try {
             serverSession?.apply {
