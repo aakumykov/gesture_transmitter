@@ -1,19 +1,14 @@
 package com.github.aakumykov.server.ktor_server
 
 import android.util.Log
-import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.github.aakumykov.kotlin_playground.Gesture
-import com.github.aakumykov.server.GestureRecorder
-import com.gitlab.aakumykov.exception_utils_module.ExceptionUtils
 import com.google.gson.Gson
-import io.ktor.server.application.Application
 import io.ktor.server.application.install
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.jetty.Jetty
 import io.ktor.server.jetty.JettyApplicationEngine
-import io.ktor.server.routing.Routing
 import io.ktor.server.routing.routing
 import io.ktor.server.websocket.DefaultWebSocketServerSession
 import io.ktor.server.websocket.WebSockets
@@ -21,16 +16,7 @@ import io.ktor.server.websocket.pingPeriod
 import io.ktor.server.websocket.timeout
 import io.ktor.server.websocket.webSocket
 import io.ktor.websocket.Frame
-import io.ktor.websocket.send
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
 import java.time.Duration
-import kotlin.coroutines.resume
-import kotlin.coroutines.resumeWithException
-import kotlin.coroutines.suspendCoroutine
 
 class KtorServer(private val gson: Gson) {
 
@@ -42,7 +28,7 @@ class KtorServer(private val gson: Gson) {
 
     suspend fun run(address: String, port: Int) {
 //        suspendCoroutine<Boolean> { continuation ->
-            try {
+//            try {
                 runningServer = embeddedServer(Jetty, host = address, port = port) {
 
                     install(WebSockets) {
@@ -69,7 +55,7 @@ class KtorServer(private val gson: Gson) {
 
 //                continuation.resume(true)
 
-            } catch (e: Exception) {
+          /*  } catch (e: Exception) {
                 // FIXME: это сообщение нигде не наблюдается.
                 ExceptionUtils.getErrorMessage(e).also { errorMsg ->
                     Log.e(TAG, errorMsg, e)
@@ -77,7 +63,7 @@ class KtorServer(private val gson: Gson) {
                 }
 
 //                continuation.resumeWithException(e)
-            }
+            }*/
 //        }
     }
 
@@ -87,15 +73,15 @@ class KtorServer(private val gson: Gson) {
         val gestureJson = gson.toJson(gesture)
         val textFrame = Frame.Text(gestureJson)
 
-        try {
+//        try {
             serverSession?.apply {
                 outgoing.send(textFrame)
                 Log.d(TAG, "Жест отправлен: $gesture")
             } ?: Log.e(TAG, "Жест не отправлен, так как ещё никто не подключился.")
 
-        } catch (e: Exception) {
+        /*} catch (e: Exception) {
             Log.e(TAG, ExceptionUtils.getErrorMessage(e), e)
-        }
+        }*/
     }
 
     companion object {
