@@ -56,4 +56,6 @@ dependencies {
     implementation "io.ktor:ktor-server-websockets-jvm:$ktor_version" //?
     implementation "io.ktor:ktor-server-jetty:$ktor_version"
     implementation "io.ktor:ktor-server-jetty-jvm:$ktor_version"
+
+    implementation 'com.github.aakumykov:exception_utils:0.4'
 }
