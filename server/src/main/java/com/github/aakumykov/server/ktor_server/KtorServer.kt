@@ -1,6 +1,7 @@
 package com.github.aakumykov.server.ktor_server
 
 import androidx.lifecycle.LifecycleOwner
+import com.github.aakumykov.kotlin_playground.Gesture
 import com.github.aakumykov.server.GestureRecorder
 import com.google.gson.Gson
 import io.ktor.server.application.Application
@@ -25,7 +26,6 @@ class KtorServer(
     private val gson: Gson,
     private val gestureRecorder: GestureRecorder,
 ) {
-
     private var runningServer: JettyApplicationEngine? = null
 
     fun run(address: String, port: Int) {
@@ -47,6 +47,10 @@ class KtorServer(
             }.start(wait = true) // TODO: попробовать wait = false
 
         }
+    }
+
+    fun send(gesture: Gesture) {
+
     }
 }
 
