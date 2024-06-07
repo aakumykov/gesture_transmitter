@@ -28,7 +28,7 @@ class KtorServer(
 
     private var runningServer: JettyApplicationEngine? = null
 
-    fun run(address: String = DEFAULT_SERVER_ADDRESS, port: Int = DEFAULT_SERVER_PORT) {
+    fun run(address: String, port: Int) {
 
         coroutineScope.launch(coroutineDispatcher) {
 
