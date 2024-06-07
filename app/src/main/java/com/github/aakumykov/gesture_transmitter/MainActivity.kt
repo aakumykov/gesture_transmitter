@@ -7,6 +7,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
 import com.github.aakumykov.gesture_transmitter.databinding.ActivityMainBinding
+import com.github.aakumykov.server.ServerFragment
 
 class MainActivity : AppCompatActivity() {
 
@@ -24,7 +25,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         supportFragmentManager.beginTransaction()
-            .replace(R.id.fragmentContainer, MainFragment.newInstance(), null)
+            .replace(R.id.fragmentContainer, ServerFragment.newInstance(), null)
             .commit()
     }
 }
