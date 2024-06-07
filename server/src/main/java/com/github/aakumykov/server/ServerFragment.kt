@@ -83,10 +83,7 @@ class ServerFragment : Fragment(R.layout.fragment_server), View.OnTouchListener 
         when(event?.action) {
             MotionEvent.ACTION_DOWN -> gestureRecorder.startRecording(event)
             MotionEvent.ACTION_MOVE -> gestureRecorder.recordEvent(event)
-            MotionEvent.ACTION_UP -> {
-                gestureRecorder.finishRecording(event)
-                Log.d("TAG", gestureRecorder.getLastRecord()?.toString() ?: "Нет записанных жестов")
-            }
+            MotionEvent.ACTION_UP -> gestureRecorder.finishRecording(event)
             MotionEvent.ACTION_CANCEL -> gestureRecorder.cancelRecording()
             MotionEvent.ACTION_OUTSIDE -> { Toast.makeText(requireContext(), "ACTION_OUTSIDE", Toast.LENGTH_SHORT).show() }
             else -> {}
