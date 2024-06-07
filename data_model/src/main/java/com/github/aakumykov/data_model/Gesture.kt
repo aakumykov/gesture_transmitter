@@ -5,7 +5,7 @@ import android.graphics.Path
 
 @Deprecated("переименовать в UserGesture")
 class Gesture private constructor(
-    private val pointList: List<GesturePoint>,
+    private val pointList: List<UserGesturePoint>,
     private val startingTime: Long,
     private val endingTime: Long
 ) {
@@ -47,7 +47,7 @@ class Gesture private constructor(
     }
 
     companion object {
-        fun create(pointList: List<GesturePoint>, startingTime: Long, endingTime: Long): Gesture? {
+        fun create(pointList: List<UserGesturePoint>, startingTime: Long, endingTime: Long): Gesture? {
             return if (pointList.size > 1) {
                 Gesture(
                     ArrayList(pointList),

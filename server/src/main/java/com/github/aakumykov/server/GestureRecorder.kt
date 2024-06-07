@@ -1,15 +1,14 @@
 package com.github.aakumykov.server
 
 import android.view.MotionEvent
-import androidx.lifecycle.LiveData
-import com.github.aakumykov.kotlin_playground.GesturePoint
+import com.github.aakumykov.kotlin_playground.UserGesturePoint
 import com.github.aakumykov.kotlin_playground.Gesture
 import com.github.aakumykov.single_live_event.SingleLiveEvent
 
 object GestureRecorder {
 
     private var initialEvent: MotionEvent? = null
-    private var pointList: MutableList<GesturePoint> = ArrayList()
+    private var pointList: MutableList<UserGesturePoint> = ArrayList()
     private var startingTime: Long? = null
     private var laseRecordedGesture: Gesture? = null
 
@@ -23,7 +22,7 @@ object GestureRecorder {
 
     fun recordEvent(event: MotionEvent) {
         initialEvent?.also {
-            pointList.add(GesturePoint.fromMotionEvent(it, event))
+            pointList.add(UserGesturePoint.fromMotionEvent(it, event))
         }
     }
 
