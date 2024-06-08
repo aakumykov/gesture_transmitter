@@ -3,5 +3,6 @@
     <string name="hello_blank_fragment">Клиент</string>
     <string name="gesture_recording_service_label">Служба записи жестов</string>
     <string name="gesture_recording_service_description">Служба записи жестов записывает и передаёт жесты пользователя на другие устройства.</string>
+    <string name="init_client">Подготовить клиента</string>
 
 </resources>
