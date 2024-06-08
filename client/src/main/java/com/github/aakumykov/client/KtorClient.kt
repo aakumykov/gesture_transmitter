@@ -1,6 +1,5 @@
 package com.github.aakumykov.client
 
-import android.net.http.HttpResponseCache.install
 import android.util.Log
 import com.gitlab.aakumykov.exception_utils_module.ExceptionUtils
 import io.ktor.client.HttpClient
@@ -27,7 +26,7 @@ class KtorClient {
         }
     }
 
-    suspend fun init(
+    suspend fun connect(
         serverAddress: String,
         serverPort: Int,
         serverPath: String,

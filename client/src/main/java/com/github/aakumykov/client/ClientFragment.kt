@@ -2,9 +2,7 @@ package com.github.aakumykov.client
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import androidx.lifecycle.lifecycleScope
 import com.github.aakumykov.client.databinding.FragmentClientBinding
 import com.github.aakumykov.common.showToast
@@ -28,7 +26,7 @@ class ClientFragment : Fragment(R.layout.fragment_client) {
         hideError()
 
         lifecycleScope.launch {
-            KtorClient().init(
+            KtorClient().connect(
                 "192.168.0.171",
                 8081,
                 "/chat"
