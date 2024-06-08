@@ -1,6 +1,7 @@
 package com.github.aakumykov.client
 
 import android.accessibilityservice.AccessibilityService
+import android.util.Log
 import android.view.accessibility.AccessibilityEvent
 
 class GesturePlayingService : AccessibilityService() {
@@ -27,7 +28,7 @@ class GesturePlayingService : AccessibilityService() {
     }
 
     private fun debugLog(text: String) {
-        TODO("Not yet implemented")
+        Log.d(TAG, text)
     }
 
     override fun onInterrupt() {
