@@ -15,12 +15,7 @@
 
     <TextView
         android:id="@+id/serverErrorView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textColor="#f00"
-        android:gravity="center_horizontal"
-        android:visibility="gone"
-        tools:text="@string/error_message_stub"
+        style="@style/error_view"
         tools:visibility="visible"/>
 
     <Button
