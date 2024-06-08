@@ -3,7 +3,7 @@
 <!--com.github.aakumykov.kotlin_playground,de.baumann.browser,de.baumann-->
 
 <accessibility-service xmlns:android="http://schemas.android.com/apk/res/android"
-    android:description="@string/gesture_recording_service_description"
+    android:description="@string/gesture_playing_service_description"
     android:packageNames="@null"
     android:accessibilityEventTypes="typeWindowStateChanged|typeWindowContentChanged"
     android:accessibilityFlags="flagDefault|flagReportViewIds|flagRetrieveInteractiveWindows"

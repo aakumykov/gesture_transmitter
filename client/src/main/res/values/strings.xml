@@ -2,13 +2,13 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Клиент</string>
     <string name="gesture_playing_service_label">Служба повторения жестов</string>
-    <string name="gesture_recording_service_description">Служба повторения жестов получает жесты пользователя от другого устройства и повторяет их.</string>
+    <string name="gesture_playing_service_description">Служба повторения жестов получает жесты пользователя от другого устройства и повторяет их.</string>
     <string name="button_connect_to_server">Подключиться к серверу</string>
     <string name="button_disconnect_from_server">Отключиться от сервера</string>
     <string name="toast_disconnected_from_server">Клиент отключен от сервера</string>
     <string name="toast_connected_to_server">Подключен к серверу</string>
     <string name="button_read_gestures">Читать жесты</string>
-    <string name="button_acc_service_disabled">Включите службу поддержки доступности</string>
-    <string name="button_acc_service_enabled">Настроить службу поддержки доступности</string>
+    <string name="button_acc_service_disabled">Включите службу повторения жестов</string>
+    <string name="button_acc_service_enabled">Настроить службу повторения жестов</string>
 
 </resources>
