@@ -1,9 +1,13 @@
 package com.github.aakumykov.client
 
+import android.accessibilityservice.AccessibilityService
+import android.accessibilityservice.AccessibilityServiceInfo
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.View
+import android.view.accessibility.AccessibilityManager
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.github.aakumykov.client.databinding.FragmentClientBinding
 import com.github.aakumykov.client.extensions.isAccessibilityServiceEnabled
@@ -16,6 +20,7 @@ import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
+
 class ClientFragment : Fragment(R.layout.fragment_client) {
 
     private var _binding: FragmentClientBinding? = null
@@ -26,29 +31,32 @@ class ClientFragment : Fragment(R.layout.fragment_client) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentClientBinding.bind(view)
 
-        displayAccessibilityServiceState()
-
         binding.accessibilityServiceButton.setOnClickListener { onAccessibilityButtonClicked() }
         binding.connectButton.setOnClickListener { connectToServer() }
         binding.disconnectButton.setOnClickListener { disconnectFromServer() }
         binding.readGesturesButton.setOnClickListener { readGesturesFromServer() }
     }
 
+    override fun onResume() {
+        super.onResume()
+        displayAccessibilityServiceState()
+    }
+
     private fun displayAccessibilityServiceState() {
         binding.accessibilityServiceButton.setText(getString(
             if (isAccessibilityServiceEnabled())
-                R.string.button_acc_service_disabled
-            else
                 R.string.button_acc_service_enabled
+            else
+                R.string.button_acc_service_disabled
         ))
     }
 
     private fun isAccessibilityServiceEnabled(): Boolean {
-        return requireActivity().isAccessibilityServiceEnabled(ACCESSIBILITY_SERVICE_ID)
+        return requireContext().isAccessibilityServiceEnabled(GesturePlayingService::class.java)
     }
 
     private fun onAccessibilityButtonClicked() {
-        requireActivity().openAccessibilitySettings()
+        requireContext().openAccessibilitySettings()
     }
 
     private fun readGesturesFromServer() {
