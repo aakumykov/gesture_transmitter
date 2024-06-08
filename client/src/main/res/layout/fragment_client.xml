@@ -7,10 +7,18 @@
     tools:context=".ClientFragment">
 
     <Button
-        android:id="@+id/clientPrepareButton"
+        android:id="@+id/connectButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/init_client" />
+        android:backgroundTint="#66BB6A"
+        android:text="@string/button_connect_to_server" />
+
+    <Button
+        android:id="@+id/disconnectButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:backgroundTint="#FF7043"
+        android:text="@string/button_disconnect_from_server" />
 
     <TextView
         android:id="@+id/errorView"
