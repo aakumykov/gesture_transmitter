@@ -38,14 +38,14 @@ class KtorServer(private val gson: Gson) {
                     // TODO: выдавать на гора статус "готов"
 
                     /*serverSession = this
-                    Log.d(TAG, "Новое подключение.")
+                    Log.d(TAG, "Новое подключение.")*/
 
-                    outgoing.send(Frame.Text("Вы подключились к серверу $TAG"))*/
+                    outgoing.send(Frame.Text("$TAG приветствует вас!"))
 
                     for (frame in incoming) {
                         (frame as? Frame.Text)?.let { textFrame ->
                             val incomingText = textFrame.readText()
-                            outgoing.send(Frame.Text("Вы прислали: $incomingText"))
+                            outgoing.send(Frame.Text("И вам '$incomingText'"))
                         }
                     }
                 }
