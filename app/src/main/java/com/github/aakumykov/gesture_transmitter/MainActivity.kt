@@ -22,8 +22,8 @@ class MainActivity : AppCompatActivity() {
             insets
         }
 
-        supportFragmentManager.beginTransaction()
-            .replace(R.id.fragmentContainer, ClientFragment.newInstance(), null)
-            .commit()
+//        supportFragmentManager.beginTransaction()
+//            .replace(R.id.fragmentContainer, ClientFragment.newInstance(), null)
+//            .commit()
     }
 }

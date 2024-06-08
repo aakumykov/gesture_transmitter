@@ -32,6 +32,19 @@ android {
     kotlinOptions {
         jvmTarget = '1.8'
     }
+    flavorDimensions 'mode'
+    productFlavors {
+        client {
+            dimension "mode"
+            applicationId "my.app.client"
+            applicationIdSuffix ".client"
+        }
+        server {
+            dimension "mode"
+            applicationId "my.app.server"
+            applicationIdSuffix ".server"
+        }
+    }
 }
 
 dependencies {

@@ -11,6 +11,6 @@
         android:id="@+id/fragmentContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:name="com.github.aakumykov.server.MainFragment" />
+        android:name="com.github.aakumykov.server.ServerFragment" />
 
 </FrameLayout>
