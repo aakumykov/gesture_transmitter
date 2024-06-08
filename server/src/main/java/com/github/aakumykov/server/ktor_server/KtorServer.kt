@@ -2,7 +2,9 @@ package com.github.aakumykov.server.ktor_server
 
 import android.util.Log
 import com.github.aakumykov.kotlin_playground.UserGesture
+import com.gitlab.aakumykov.exception_utils_module.ExceptionUtils
 import com.google.gson.Gson
+import com.google.gson.JsonSyntaxException
 import io.ktor.server.application.install
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.jetty.Jetty
@@ -37,15 +39,29 @@ class KtorServer(private val gson: Gson) {
                 webSocket(path = "/gestures") {
                     // TODO: выдавать на гора статус "готов"
 
-                    /*serverSession = this
-                    Log.d(TAG, "Новое подключение.")*/
+                    serverSession = this
+                    Log.d(TAG, "Новое подключение, ${serverSession.hashCode()}")
 
                     outgoing.send(Frame.Text("$TAG приветствует вас!"))
 
                     for (frame in incoming) {
                         (frame as? Frame.Text)?.let { textFrame ->
-                            val incomingText = textFrame.readText()
-                            outgoing.send(Frame.Text("И вам '$incomingText'"))
+
+                            val incomingText: String = textFrame.readText()
+
+                            val gesture: UserGesture? = try {
+                                gson.fromJson(incomingText, UserGesture::class.java)
+                            } catch (e: JsonSyntaxException) {
+                                Log.e(TAG, ExceptionUtils.getErrorMessage(e), e)
+                                null
+                            }
+
+                            outgoing.send(
+                                Frame.Text(
+                                    gesture?.let { "Получен жест: $it" }
+                                        ?: "Получен текст: $incomingText"
+                                )
+                            )
                         }
                     }
                 }
@@ -65,6 +81,8 @@ class KtorServer(private val gson: Gson) {
         }
             ?: Log.e(TAG, "Жест не отправлен, так как ещё никто не подключился.")
     }
+
+
 
     companion object {
         val TAG: String = KtorServer::class.java.simpleName
