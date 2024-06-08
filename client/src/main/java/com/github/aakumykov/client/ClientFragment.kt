@@ -109,7 +109,8 @@ class ClientFragment : Fragment(R.layout.fragment_client) {
         _binding = null
     }
 
-    private val ACCESSIBILITY_SERVICE_ID = requireContext().packageName + "/." + GesturePlayingService::class.simpleName
+    private val ACCESSIBILITY_SERVICE_ID: String
+        get() = requireContext().packageName + "/." + GesturePlayingService::class.simpleName
 
     companion object {
         val TAG: String = ClientFragment::class.java.simpleName
