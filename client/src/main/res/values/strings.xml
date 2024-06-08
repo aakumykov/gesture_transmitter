@@ -7,5 +7,6 @@
     <string name="button_disconnect_from_server">Отключиться от сервера</string>
     <string name="toast_disconnected_from_server">Клиент отключен от сервера</string>
     <string name="toast_connected_to_server">Подключен к серверу</string>
+    <string name="button_read_gestures">Читать жесты</string>
 
 </resources>

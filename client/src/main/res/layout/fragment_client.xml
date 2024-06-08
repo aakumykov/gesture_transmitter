@@ -20,6 +20,13 @@
         android:backgroundTint="#FF7043"
         android:text="@string/button_disconnect_from_server" />
 
+    <Button
+        android:id="@+id/readGesturesButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:backgroundTint="#26C6DA"
+        android:text="@string/button_read_gestures" />
+
     <TextView
         android:id="@+id/errorView"
         style="@style/error_view"

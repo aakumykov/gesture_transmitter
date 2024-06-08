@@ -4,19 +4,24 @@ import android.net.Uri
 import android.util.Log
 import com.github.aakumykov.kotlin_playground.UserGesture
 import com.gitlab.aakumykov.exception_utils_module.ExceptionUtils
+import com.google.gson.Gson
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.plugins.websocket.ClientWebSocketSession
 import io.ktor.client.plugins.websocket.WebSockets
 import io.ktor.client.plugins.websocket.webSocketSession
 import io.ktor.http.HttpMethod
+import io.ktor.websocket.Frame
 import io.ktor.websocket.close
+import io.ktor.websocket.readText
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.receiveAsFlow
 import okhttp3.OkHttpClient
-import java.net.URL
 import java.util.concurrent.TimeUnit
 
-class KtorClient {
+class KtorClient(private val gson: Gson) {
 
     private var clientWebSocketSession: ClientWebSocketSession? = null
     private var currentServerUri: Uri? = null
@@ -61,9 +66,17 @@ class KtorClient {
         }
     }
 
-    /*suspend fun listenForGestures(): Flow<UserGesture> {
-        clientWebSocketSession?.incoming?.receive()
-    }*/
+    fun getGesturesFlow(): Flow<UserGesture>? {
+        return clientWebSocketSession?.incoming?.receiveAsFlow()
+            ?.filter { it is Frame.Text }
+            ?.map { it as Frame.Text }
+            ?.map { textFrame ->
+                val json = textFrame.readText()
+                gson.fromJson(json,UserGesture::class.java).also { userGesture ->
+                    Log.d(TAG, "Получен жест: $userGesture")
+                }
+            }
+    }
 
     suspend fun disconnect() {
         clientWebSocketSession?.close()

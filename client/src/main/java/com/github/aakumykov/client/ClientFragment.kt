@@ -1,6 +1,7 @@
 package com.github.aakumykov.client
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.View
 import androidx.lifecycle.lifecycleScope
@@ -8,6 +9,7 @@ import com.github.aakumykov.client.databinding.FragmentClientBinding
 import com.github.aakumykov.common.inMainThread
 import com.github.aakumykov.common.showToast
 import com.gitlab.aakumykov.exception_utils_module.ExceptionUtils
+import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -23,6 +25,15 @@ class ClientFragment : Fragment(R.layout.fragment_client) {
 
         binding.connectButton.setOnClickListener { connectToServer() }
         binding.disconnectButton.setOnClickListener { disconnectFromServer() }
+        binding.readGesturesButton.setOnClickListener { readGesturesFromServer() }
+    }
+
+    private fun readGesturesFromServer() {
+        lifecycleScope.launch(Dispatchers.IO) { 
+            client?.getGesturesFlow()?.collect { userGesture ->
+                Log.d(TAG, "Жест во фрагменте: $userGesture")
+            } ?: inMainThread { showToast("Клиент не подключен") }
+        }
     }
 
     private fun disconnectFromServer() {
@@ -41,7 +52,7 @@ class ClientFragment : Fragment(R.layout.fragment_client) {
     private fun connectToServer() {
         hideError()
         lifecycleScope.launch {
-            KtorClient().connect(
+            KtorClient(Gson()).connect(
                 "192.168.0.171",
                 8081,
                 "chat"
@@ -76,6 +87,7 @@ class ClientFragment : Fragment(R.layout.fragment_client) {
     }
 
     companion object {
+        val TAG: String = ClientFragment::class.java.simpleName
         @JvmStatic
         fun newInstance(): ClientFragment {
             return ClientFragment()
