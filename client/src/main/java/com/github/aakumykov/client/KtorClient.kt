@@ -5,6 +5,7 @@ import android.util.Log
 import com.github.aakumykov.kotlin_playground.UserGesture
 import com.gitlab.aakumykov.exception_utils_module.ExceptionUtils
 import com.google.gson.Gson
+import com.google.gson.JsonSyntaxException
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.plugins.websocket.ClientWebSocketSession
@@ -66,14 +67,19 @@ class KtorClient(private val gson: Gson) {
         }
     }
 
-    fun getGesturesFlow(): Flow<UserGesture>? {
+    fun getGesturesFlow(): Flow<UserGesture?>? {
         return clientWebSocketSession?.incoming?.receiveAsFlow()
             ?.filter { it is Frame.Text }
             ?.map { it as Frame.Text }
             ?.map { textFrame ->
-                val json = textFrame.readText()
-                gson.fromJson(json,UserGesture::class.java).also { userGesture ->
-                    Log.d(TAG, "Получен жест: $userGesture")
+                return@map try {
+                    val json = textFrame.readText()
+                    gson.fromJson(json, UserGesture::class.java).also { userGesture ->
+                        Log.d(TAG, "Получен жест: $userGesture")
+                    }
+                } catch (e: JsonSyntaxException) {
+                    Log.e(TAG, ExceptionUtils.getErrorMessage(e), e)
+                    null
                 }
             }
     }
