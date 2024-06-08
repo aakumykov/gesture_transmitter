@@ -2,6 +2,7 @@ package com.github.aakumykov.client
 
 import android.net.Uri
 import android.util.Log
+import com.github.aakumykov.kotlin_playground.UserGesture
 import com.gitlab.aakumykov.exception_utils_module.ExceptionUtils
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
@@ -10,6 +11,7 @@ import io.ktor.client.plugins.websocket.WebSockets
 import io.ktor.client.plugins.websocket.webSocketSession
 import io.ktor.http.HttpMethod
 import io.ktor.websocket.close
+import kotlinx.coroutines.flow.Flow
 import okhttp3.OkHttpClient
 import java.net.URL
 import java.util.concurrent.TimeUnit
@@ -59,9 +61,14 @@ class KtorClient {
         }
     }
 
+    /*suspend fun listenForGestures(): Flow<UserGesture> {
+        clientWebSocketSession?.incoming?.receive()
+    }*/
+
     suspend fun disconnect() {
         clientWebSocketSession?.close()
         clientWebSocketSession = null
+        client.close()
         Log.d(TAG, "Отсоединён от сервера")
     }
 
