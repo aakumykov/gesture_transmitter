@@ -59,15 +59,11 @@ class KtorServer(private val gson: Gson) {
         val gestureJson = gson.toJson(gesture)
         val textFrame = Frame.Text(gestureJson)
 
-//        try {
-            serverSession?.apply {
-                outgoing.send(textFrame)
-                Log.d(TAG, "Жест отправлен: $gesture")
-            } ?: Log.e(TAG, "Жест не отправлен, так как ещё никто не подключился.")
-
-        /*} catch (e: Exception) {
-            Log.e(TAG, ExceptionUtils.getErrorMessage(e), e)
-        }*/
+        serverSession?.apply {
+            outgoing.send(textFrame)
+            Log.d(TAG, "Жест отправлен: $gesture")
+        }
+            ?: Log.e(TAG, "Жест не отправлен, так как ещё никто не подключился.")
     }
 
     companion object {
