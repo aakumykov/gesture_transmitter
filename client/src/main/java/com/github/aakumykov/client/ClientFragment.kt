@@ -6,6 +6,8 @@ import androidx.fragment.app.Fragment
 import android.view.View
 import androidx.lifecycle.lifecycleScope
 import com.github.aakumykov.client.databinding.FragmentClientBinding
+import com.github.aakumykov.client.extensions.isAccessibilityServiceEnabled
+import com.github.aakumykov.client.extensions.openAccessibilitySettings
 import com.github.aakumykov.common.inMainThread
 import com.github.aakumykov.common.showToast
 import com.github.aakumykov.kotlin_playground.UserGesture
@@ -24,9 +26,29 @@ class ClientFragment : Fragment(R.layout.fragment_client) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentClientBinding.bind(view)
 
+        displayAccessibilityServiceState()
+
+        binding.accessibilityServiceButton.setOnClickListener { onAccessibilityButtonClicked() }
         binding.connectButton.setOnClickListener { connectToServer() }
         binding.disconnectButton.setOnClickListener { disconnectFromServer() }
         binding.readGesturesButton.setOnClickListener { readGesturesFromServer() }
+    }
+
+    private fun displayAccessibilityServiceState() {
+        binding.accessibilityServiceButton.setText(getString(
+            if (isAccessibilityServiceEnabled())
+                R.string.button_acc_service_disabled
+            else
+                R.string.button_acc_service_enabled
+        ))
+    }
+
+    private fun isAccessibilityServiceEnabled(): Boolean {
+        return requireActivity().isAccessibilityServiceEnabled(ACCESSIBILITY_SERVICE_ID)
+    }
+
+    private fun onAccessibilityButtonClicked() {
+        requireActivity().openAccessibilitySettings()
     }
 
     private fun readGesturesFromServer() {
@@ -86,6 +108,8 @@ class ClientFragment : Fragment(R.layout.fragment_client) {
         super.onDestroyView()
         _binding = null
     }
+
+    private val ACCESSIBILITY_SERVICE_ID = requireContext().packageName + "/." + GesturePlayingService::class.simpleName
 
     companion object {
         val TAG: String = ClientFragment::class.java.simpleName

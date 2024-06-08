@@ -8,5 +8,7 @@
     <string name="toast_disconnected_from_server">Клиент отключен от сервера</string>
     <string name="toast_connected_to_server">Подключен к серверу</string>
     <string name="button_read_gestures">Читать жесты</string>
+    <string name="button_acc_service_disabled">Включите службу поддержки доступности</string>
+    <string name="button_acc_service_enabled">Настроить службу поддержки доступности</string>
 
 </resources>

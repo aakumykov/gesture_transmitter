@@ -7,6 +7,12 @@
     tools:context=".ClientFragment">
 
     <Button
+        android:id="@+id/accessibilityServiceButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:text="Состояние службы поддержки доступности" />
+
+    <Button
         android:id="@+id/connectButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
