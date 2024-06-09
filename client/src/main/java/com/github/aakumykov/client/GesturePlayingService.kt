@@ -1,12 +1,9 @@
 package com.github.aakumykov.client
 
 import android.accessibilityservice.AccessibilityService
-import android.accessibilityservice.AccessibilityServiceInfo
-import android.content.Context
-import android.content.pm.ServiceInfo
 import android.util.Log
 import android.view.accessibility.AccessibilityEvent
-import android.view.accessibility.AccessibilityManager
+import com.github.aakumykov.common.dateTimeString
 
 class GesturePlayingService : AccessibilityService() {
 
@@ -17,18 +14,32 @@ class GesturePlayingService : AccessibilityService() {
     }
 
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
-        /*event?.also { e ->
-            when(e.eventType) {
-                AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED -> debugWindowEvent(e)
-                AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED -> debugWindowContentEvent(e)
-                else -> {}
+        if (null != event) {
+            if (event.isWindowStateChanged()) {
+                if (isAppWindow(CHROME_PACKAGE_NAME)) {
+                    debugLog("Гоголь Хром детектед, $dateTimeString")
+                }
             }
-        }*/
-        rootInActiveWindow?.also { rootView ->
-            debugLog("--------------")
-            debugLog("rootView.packageName: ${rootView.packageName}, childCount: ${rootView.childCount}")
-//            showChildrenRecursively(0, rootView.getChildren())
         }
+
+//        rootInActiveWindow?.also { rootView ->
+
+            /*val pn = rootView.packageName
+            val chCnt = rootView.childCount
+
+            val evTypeString = when(event?.eventType) {
+                AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED -> {
+                    val et = "WINDOW_STATE_CHANGED"
+                    debugLog("$et: package: $pn")
+                    et
+                }
+                AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED -> "WINDOW_CONTENT_CHANGED"
+                else -> "Другое событие"
+            }*/
+//            debugLog("--------------")
+//            debugLog("$evTypeString: package: $pn, child: $chCnt")
+//            showChildrenRecursively(0, rootView.getChildren())
+//        }
     }
 
     private fun debugLog(text: String) {
@@ -41,5 +52,14 @@ class GesturePlayingService : AccessibilityService() {
 
     companion object {
         val TAG: String = GesturePlayingService::class.java.simpleName
+        const val CHROME_PACKAGE_NAME = "com.android.chrome"
     }
+}
+
+fun AccessibilityEvent.isWindowStateChanged(): Boolean {
+    return AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED == eventType
+}
+
+fun AccessibilityService.isAppWindow(checkedPackageName: String): Boolean {
+    return rootInActiveWindow?.packageName?.let { it == checkedPackageName } ?: false
 }
