@@ -66,4 +66,6 @@ dependencies {
 //    implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1"
 
     implementation "com.github.permissions-dispatcher:ktx:1.1.4"
+
+    implementation "androidx.media:media:1.7.0"
 }
