@@ -1,4 +1,4 @@
-package com.github.aakumykov.client
+package com.github.aakumykov.client.gesture_player
 
 import android.accessibilityservice.AccessibilityService
 import android.app.Notification
@@ -11,7 +11,11 @@ import android.util.Log
 import android.view.accessibility.AccessibilityEvent
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import com.github.aakumykov.client.R
 import com.github.aakumykov.client.extensions.showToast
+import com.github.aakumykov.client.ktor_client.KtorClient
+import com.github.aakumykov.client.ktor_client.KtorClientState
+import com.github.aakumykov.client.ktor_client.KtorStateProvider
 import com.github.aakumykov.client.utils.NotificationChannelHelper
 import com.github.aakumykov.common.dateTimeString
 import com.github.aakumykov.kotlin_playground.UserGesture

@@ -1,4 +1,4 @@
-package com.github.aakumykov.client
+package com.github.aakumykov.client.ktor_client
 
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow

@@ -4,7 +4,7 @@
     <application>
 
         <service
-            android:name="com.github.aakumykov.client.GesturePlayingService"
+            android:name="com.github.aakumykov.client.gesture_player.GesturePlayingService"
             android:exported="true"
             android:label="@string/gesture_playing_service_label"
             android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">

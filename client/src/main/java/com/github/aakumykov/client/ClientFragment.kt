@@ -1,6 +1,5 @@
 package com.github.aakumykov.client
 
-import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -9,6 +8,9 @@ import androidx.lifecycle.lifecycleScope
 import com.github.aakumykov.client.databinding.FragmentClientBinding
 import com.github.aakumykov.client.extensions.isAccessibilityServiceEnabled
 import com.github.aakumykov.client.extensions.openAccessibilitySettings
+import com.github.aakumykov.client.gesture_player.GesturePlayingService
+import com.github.aakumykov.client.ktor_client.KtorClientState
+import com.github.aakumykov.client.ktor_client.KtorStateProvider
 import com.github.aakumykov.common.showToast
 import com.gitlab.aakumykov.exception_utils_module.ExceptionUtils
 import kotlinx.coroutines.launch

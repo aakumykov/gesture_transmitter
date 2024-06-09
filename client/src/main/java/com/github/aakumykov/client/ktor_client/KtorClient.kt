@@ -1,4 +1,4 @@
-package com.github.aakumykov.client
+package com.github.aakumykov.client.ktor_client
 
 import android.net.Uri
 import android.util.Log
@@ -27,11 +27,11 @@ class KtorClient(private val gson: Gson,
 ): ClientStateProvider by ktorStateProvider {
 
     private suspend fun publishState(ktorClientState: KtorClientState) {
-        ktorStateProvider.setState(ktorClientState)
+        KtorStateProvider.setState(ktorClientState)
     }
 
     private suspend fun publishError(e: Exception) {
-        ktorStateProvider.setError(e)
+        KtorStateProvider.setError(e)
     }
 
     private var clientWebSocketSession: ClientWebSocketSession? = null

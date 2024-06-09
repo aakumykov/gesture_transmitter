@@ -1,4 +1,4 @@
-package com.github.aakumykov.client
+package com.github.aakumykov.client.gesture_player
 
 import android.accessibilityservice.AccessibilityService
 import android.accessibilityservice.GestureDescription
