@@ -137,6 +137,8 @@ class KtorServer(private val gson: Gson) {
     // TODO: выдавать поток с ошибками
     suspend fun sendUserGesture(gesture: UserGesture) {
 
+        Log.d(TAG, "sendUserGesture(), $gesture")
+
         val gestureJson = gson.toJson(gesture)
         val textFrame = Frame.Text(gestureJson)
 
