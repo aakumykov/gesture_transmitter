@@ -101,8 +101,8 @@ class GesturePlayingService : AccessibilityService() {
         )
     }
 
-    private val notificationBuilder: NotificationCompat.Builder by lazy {
-        NotificationCompat.Builder(this, notificationChannelId)
+    private fun notificationBuilder(): NotificationCompat.Builder {
+        return NotificationCompat.Builder(this, notificationChannelId)
             .setSmallIcon(R.drawable.ic_gesture_playing_service)
             .setPriority(NOTIFICATION_PRIORITY)
             .setStyle(androidx.media.app.NotificationCompat.MediaStyle()
@@ -165,7 +165,7 @@ class GesturePlayingService : AccessibilityService() {
 
 
     private val workingNotification: Notification by lazy {
-        notificationBuilder
+        notificationBuilder()
             .setContentTitle(getString(R.string.gesture_playing_service_duty_notification_title))
             .setContentText(getString(R.string.gesture_playing_service_notification_text_working))
             .addAction(pauseServiceAction)
@@ -173,7 +173,7 @@ class GesturePlayingService : AccessibilityService() {
     }
 
     private val pausedNotification: Notification by lazy {
-        notificationBuilder
+        notificationBuilder()
             .setContentTitle(getString(R.string.gesture_playing_service_duty_notification_title))
             .setContentText(getString(R.string.gesture_playing_service_notification_text_paused))
             .addAction(resumeServiceAction)
