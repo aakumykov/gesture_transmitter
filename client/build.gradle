@@ -37,6 +37,15 @@ android {
             excludes += ['META-INF/*', 'META-INF/licenses/*', '**/attach_hotspot_windows.dll']
         }
     }
+    flavorDimensions 'mode'
+    productFlavors {
+        client {
+            dimension 'mode'
+        }
+        server {
+            dimension 'mode'
+        }
+    }
 }
 
 dependencies {
