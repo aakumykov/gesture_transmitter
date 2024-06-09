@@ -15,7 +15,9 @@ import io.ktor.server.websocket.WebSockets
 import io.ktor.server.websocket.pingPeriod
 import io.ktor.server.websocket.timeout
 import io.ktor.server.websocket.webSocket
+import io.ktor.websocket.CloseReason
 import io.ktor.websocket.Frame
+import io.ktor.websocket.FrameType
 import io.ktor.websocket.close
 import io.ktor.websocket.readText
 import java.time.Duration
@@ -24,6 +26,8 @@ class KtorServer(private val gson: Gson) {
 
     private var runningServer: JettyApplicationEngine? = null
     private var serverSession: DefaultWebSocketServerSession? = null
+    private val sessionHashCode: String
+        get() = "session.hashCode: ${(serverSession?.hashCode() ?: "[нет сессии]")}"
 
     suspend fun run(address: String, port: Int) {
 
@@ -44,28 +48,59 @@ class KtorServer(private val gson: Gson) {
                     Log.d(TAG, "Новое подключение, ${serverSession.hashCode()}")
 
                     for (frame in incoming) {
-                        (frame as? Frame.Text)?.let { textFrame ->
 
-                            val incomingText: String = textFrame.readText()
-
-                            val gesture: UserGesture? = try {
-                                gson.fromJson(incomingText, UserGesture::class.java)
-                            } catch (e: JsonSyntaxException) {
-                                Log.e(TAG, ExceptionUtils.getErrorMessage(e), e)
-                                null
-                            }
-
-                            outgoing.send(
-                                Frame.Text(
-                                    gesture?.let { "Получен жест: $it" }
-                                        ?: "Получен текст: $incomingText"
-                                )
-                            )
+                        when(frame.frameType) {
+                            FrameType.PING -> debugPing()
+                            FrameType.PONG -> debugPong()
+                            FrameType.CLOSE -> closeCurrentSession()
+                            FrameType.TEXT -> processTextFrame(frame as? Frame.Text)
+                            FrameType.BINARY -> {}
                         }
                     }
                 }
             }
         }.start(wait = true)
+    }
+
+    private fun debugPing() {
+        Log.d(TAG, "--> Пинг сервера, $sessionHashCode")
+    }
+
+    private fun debugPong() {
+        Log.d(TAG, "<-- Понг от сервера, $sessionHashCode")
+    }
+
+    private suspend fun processTextFrame(textFrame: Frame.Text?) {
+
+        /*if (null == textFrame) {
+            Log.e(TAG, "textFrame равна  null")
+            return
+        }
+
+        val incomingText: String = textFrame.readText()
+
+        val gesture: UserGesture? = try {
+            gson.fromJson(incomingText, UserGesture::class.java)
+        } catch (e: JsonSyntaxException) {
+            Log.e(TAG, ExceptionUtils.getErrorMessage(e), e)
+            null
+        }
+
+        serverSession?.outgoing?.send(
+            Frame.Text(
+                gesture?.let { "Получен жест: $it" }
+                    ?: "Получен текст: $incomingText"
+            )
+        ) ?: Log.e(TAG, "Нет текущей сессии для отправки эхо-ответа.")*/
+    }
+
+    private suspend fun closeCurrentSession() {
+        serverSession?.apply {
+            val sessionHashCode = this.hashCode()
+            close(
+                CloseReason(CloseReason.Codes.NORMAL,"Закрыта сессия $sessionHashCode")
+            )
+        }
     }
 
     // TODO: выдавать поток с ошибками
