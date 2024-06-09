@@ -41,9 +41,12 @@ class ClientFragment : Fragment(R.layout.fragment_client) {
 
         binding.startGoogleChromeButton.setOnClickListener {
             requireContext().packageManager
-                .getLaunchIntentForPackage(GesturePlayingService.GOOGLE_CHROME_PACKAGE_NAME)
-                ?.also { startActivity(it) }
-                ?: showToast(R.string.google_chrome_not_found)
+                ?.also {pm ->
+                    pm.getLaunchIntentForPackage(GesturePlayingService.GOOGLE_CHROME_PACKAGE_NAME)
+                        ?.also { chromeIntent ->
+                            startActivity(chromeIntent)
+                        } ?: showToast(R.string.google_chrome_not_found)
+                } ?: showToast("Ошибка поиска Google Chrome")
         }
     }
 
