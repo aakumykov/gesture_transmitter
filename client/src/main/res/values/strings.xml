@@ -10,5 +10,9 @@
     <string name="button_read_gestures">Читать жесты</string>
     <string name="button_acc_service_disabled">Включите службу повторения жестов</string>
     <string name="button_acc_service_enabled">Настроить службу повторения жестов</string>
+    <string name="gesture_playing_service_notification_channel_name">Служба повторения жестов</string>
+    <string name="gesture_playing_service_notification_channel_description">Уведомления службы повторения жестов</string>
+    <string name="gesture_playing_service_duty_notification_title">Служба повторения жестов</string>
+    <string name="gesture_playing_service_duty_notification_text">работает</string>
 
 </resources>
