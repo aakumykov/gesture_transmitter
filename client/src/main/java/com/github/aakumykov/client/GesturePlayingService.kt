@@ -25,6 +25,10 @@ const val KEY_SERVER_ADDRESS = "SERVER_ADDRESS"
 const val KEY_SERVER_PORT = "SERVER_PORT"
 const val KEY_SERVER_PATH = "SERVER_PATH"
 
+const val DEFAULT_SERVER_ADDRESS = "0.0.0.0"
+const val DEFAULT_SERVER_PORT = 8081
+const val DEFAULT_SERVER_PATH = "gestures"
+
 class GesturePlayingService : AccessibilityService() {
 
     private val gesturePlayer: GesturePlayer by lazy {
@@ -37,13 +41,13 @@ class GesturePlayingService : AccessibilityService() {
 
 
     private val serverAddress: String?
-        get() = sharedPreferences.getString(KEY_SERVER_ADDRESS, "192.168.232.2")
+        get() = sharedPreferences.getString(KEY_SERVER_ADDRESS, DEFAULT_SERVER_ADDRESS)
 
     private val serverPort: Int
-        get() = sharedPreferences.getInt(KEY_SERVER_PORT, 8081)
+        get() = sharedPreferences.getInt(KEY_SERVER_PORT, DEFAULT_SERVER_PORT)
 
     private val serverPath: String?
-        get() = sharedPreferences.getString(KEY_SERVER_PATH, "gestures")
+        get() = sharedPreferences.getString(KEY_SERVER_PATH, DEFAULT_SERVER_PATH)
 
 
     private val ktorClient: KtorClient by lazy {
