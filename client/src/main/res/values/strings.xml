@@ -13,7 +13,10 @@
     <string name="gesture_playing_service_notification_channel_name">Служба повторения жестов</string>
     <string name="gesture_playing_service_notification_channel_description">Уведомления службы повторения жестов</string>
     <string name="gesture_playing_service_duty_notification_title">Служба повторения жестов</string>
-    <string name="gesture_playing_service_duty_notification_text">работает</string>
+    <string name="gesture_playing_service_notification_text_working">работает</string>
+    <string name="gesture_playing_service_notification_text_paused">приостановлена</string>
     <string name="gesture_playing_service_action_stop">Остановить</string>
+    <string name="gesture_playing_service_action_pause">Приостановить</string>
+    <string name="gesture_playing_service_action_resume">Возобновить</string>
 
 </resources>

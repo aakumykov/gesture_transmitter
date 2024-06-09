@@ -9,11 +9,12 @@ import android.util.Log
 import android.view.accessibility.AccessibilityEvent
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import com.github.aakumykov.client.extensions.openAccessibilitySettings
 import com.github.aakumykov.client.utils.NotificationChannelHelper
 import com.github.aakumykov.common.dateTimeString
 
 class GesturePlayingService : AccessibilityService() {
+
+    private var isPaused: Boolean = false
 
     // TODO: убрать by lazy для ускорения работы
 
@@ -26,16 +27,69 @@ class GesturePlayingService : AccessibilityService() {
         )
     }*/
 
+    private val thisServiceIntent
+        get() = Intent(applicationContext, GesturePlayingService::class.java)
+
+
+    private val pauseServiceIntent: Intent by lazy {
+        thisServiceIntent.apply { action = ACTION_PAUSE }
+    }
+
+
+    private val resumeServiceIntent: Intent by lazy {
+        thisServiceIntent.apply { action = ACTION_RESUME }
+    }
+
+
+    // FIXME: прямо или косвенно останавливать службу?
     private val stopServiceIntent: Intent by lazy {
         Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
     }
 
+
+    // TODO: FLAG_CANCEL_CURRENT
+    private val pauseServicePendingIntent: PendingIntent by lazy {
+        PendingIntent.getService(
+            applicationContext,
+            CODE_ACTION_PAUSE,
+            pauseServiceIntent,
+            PendingIntent.FLAG_IMMUTABLE
+        )
+    }
+
+    private val resumeServicePendingIntent: PendingIntent by lazy {
+        PendingIntent.getService(
+            applicationContext,
+            CODE_ACTION_RESUME,
+            resumeServiceIntent,
+            PendingIntent.FLAG_IMMUTABLE
+        )
+    }
+
+
+    // TODO: FLAG_CANCEL_CURRENT
     private val stopServicePendingIntent: PendingIntent by lazy {
         PendingIntent.getActivity(
             applicationContext,
             CODE_ACTION_STOP,
             stopServiceIntent,
             PendingIntent.FLAG_IMMUTABLE
+        )
+    }
+
+    private val pauseServiceAction: NotificationCompat.Action by lazy {
+        NotificationCompat.Action(
+            R.drawable.ic_gesture_playing_service_pause,
+            getString(R.string.gesture_playing_service_action_pause),
+            pauseServicePendingIntent
+        )
+    }
+
+    private val resumeServiceAction: NotificationCompat.Action by lazy {
+        NotificationCompat.Action(
+            R.drawable.ic_gesture_playing_service_resume,
+            getString(R.string.gesture_playing_service_action_resume),
+            resumeServicePendingIntent
         )
     }
 
@@ -47,54 +101,82 @@ class GesturePlayingService : AccessibilityService() {
         )
     }
 
-    private lateinit var notificationBuilder: NotificationCompat.Builder
+    private val notificationBuilder: NotificationCompat.Builder by lazy {
+        NotificationCompat.Builder(this, notificationChannelId)
+            .setSmallIcon(R.drawable.ic_gesture_playing_service)
+            .setPriority(NOTIFICATION_PRIORITY)
+            .setStyle(androidx.media.app.NotificationCompat.MediaStyle()
+                .setShowActionsInCompactView(0,1))
+            .addAction(stopServiceAction)
+    }
 
     override fun onCreate() {
         super.onCreate()
         debugStartStop("onCreate()")
         prepareNotificationChannel()
-        prepareNotification()
-        showDutyNotification()
+        showWorkingNotification()
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        intent?.action?.also {
-            if (ACTION_STOP == it)
-                openAccessibilitySettings()
+
+        when(intent?.action) {
+            ACTION_STOP -> { onStopWorkRequested() }
+            ACTION_RESUME -> { onResumeWorkRequested() }
+            ACTION_PAUSE -> { onPauseWorkRequested() }
+            null -> { debugLog("Нет действия в Intent") }
+            else -> { errorLog("Неизвестное действие в Intent: '${intent.action}'") }
         }
+
         return super.onStartCommand(intent, flags, startId)
+    }
+
+    private fun onPauseWorkRequested() {
+        isPaused = true
+        showPausedNotification()
+    }
+
+    private fun onResumeWorkRequested() {
+        isPaused = false
+        showWorkingNotification()
+    }
+
+    // TODO: реализовать останов и высвобождение клиента
+    private fun onStopWorkRequested() {
+        isPaused = false
     }
 
     override fun onDestroy() {
         super.onDestroy()
         debugStartStop("onDestroy()")
-        hideDutyNotification()
+        hideNotification()
     }
 
-    private fun showDutyNotification() {
-        startForeground(notificationId, dutyNotification)
+    private fun showWorkingNotification() {
+        startForeground(notificationId, workingNotification)
     }
 
-    private fun hideDutyNotification() {
+    private fun showPausedNotification() {
+        startForeground(notificationId, pausedNotification)
+    }
+
+    private fun hideNotification() {
         stopForeground(STOP_FOREGROUND_REMOVE)
     }
 
-    private fun prepareNotification() {
-        notificationBuilder = NotificationCompat.Builder(this, notificationChannelId)
-            .setSmallIcon(R.drawable.ic_gesture_playing_service)
-            .setPriority(NOTIFICATION_PRIORITY)
-//            .setContentIntent(pendingContentIntent)
-            .setStyle(
-                androidx.media.app.NotificationCompat.MediaStyle()
-                    .setShowActionsInCompactView(0)
-            )
-            .addAction(stopServiceAction)
-    }
 
-    private val dutyNotification: Notification by lazy {
+    private val workingNotification: Notification by lazy {
         notificationBuilder
             .setContentTitle(getString(R.string.gesture_playing_service_duty_notification_title))
-            .setContentText(getString(R.string.gesture_playing_service_duty_notification_text))
+            .setContentText(getString(R.string.gesture_playing_service_notification_text_working))
+            .addAction(pauseServiceAction)
+            .build()
+    }
+
+    private val pausedNotification: Notification by lazy {
+        notificationBuilder
+            .setContentTitle(getString(R.string.gesture_playing_service_duty_notification_title))
+            .setContentText(getString(R.string.gesture_playing_service_notification_text_paused))
+            .addAction(resumeServiceAction)
             .build()
     }
 
@@ -139,6 +221,7 @@ class GesturePlayingService : AccessibilityService() {
 
     private fun debugLog(text: String) { Log.d(TAG, text) }
     private fun debugStartStop(text: String) { Log.d(TAG_START_STOP, text) }
+    private fun errorLog(text: String) { Log.e(TAG, text) }
 
     override fun onInterrupt() {
 
@@ -158,6 +241,11 @@ class GesturePlayingService : AccessibilityService() {
         const val NOTIFICATION_CHANNEL_IMPORTANCE = NotificationManagerCompat.IMPORTANCE_LOW
 
         const val CODE_ACTION_STOP: Int = 10
+        const val CODE_ACTION_PAUSE: Int = 20
+        const val CODE_ACTION_RESUME: Int = 30
+
+        const val ACTION_PAUSE = "ACTION_PAUSE"
+        const val ACTION_RESUME = "ACTION_RESUME"
         const val ACTION_STOP = "ACTION_STOP"
     }
 }
