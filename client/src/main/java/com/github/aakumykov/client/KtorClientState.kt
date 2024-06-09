@@ -4,5 +4,6 @@ enum class KtorClientState {
     INACTIVE,
     RUNNING,
     PAUSED,
-    STOPPED
+    STOPPED,
+    ERROR
 }

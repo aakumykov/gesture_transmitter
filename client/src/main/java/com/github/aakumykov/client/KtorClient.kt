@@ -28,6 +28,10 @@ class KtorClient(private val gson: Gson, private val clientStateProvider: KtorSt
         clientStateProvider.setState(ktorClientState)
     }
 
+    private suspend fun publishError(e: Exception) {
+        clientStateProvider.setError(e)
+    }
+
     private var clientWebSocketSession: ClientWebSocketSession? = null
     private var currentServerUri: Uri? = null
 
@@ -41,6 +45,7 @@ class KtorClient(private val gson: Gson, private val clientStateProvider: KtorSt
             install(WebSockets)
         }
     }
+
 
     suspend fun connect(
         serverAddress: String,
@@ -63,13 +68,25 @@ class KtorClient(private val gson: Gson, private val clientStateProvider: KtorSt
 
             Log.d(TAG, "Соединение установлено: $currentServerUri")
 
+            publishState(KtorClientState.RUNNING)
+
             Result.success(this)
 
         } catch (e: Exception) {
-            Log.e(TAG, ExceptionUtils.getErrorMessage(e), e);
+            publishState(KtorClientState.STOPPED)
+            publishError(e)
             return Result.failure(e)
         }
     }
+
+
+    suspend fun disconnect() {
+        clientWebSocketSession?.close()
+        clientWebSocketSession = null
+        client.close()
+        Log.d(TAG, "Отсоединён от сервера")
+    }
+
 
     fun getGesturesFlow(): Flow<UserGesture?>? {
         return clientWebSocketSession?.incoming?.receiveAsFlow()
@@ -86,13 +103,6 @@ class KtorClient(private val gson: Gson, private val clientStateProvider: KtorSt
                     null
                 }
             }
-    }
-
-    suspend fun disconnect() {
-        clientWebSocketSession?.close()
-        clientWebSocketSession = null
-        client.close()
-        Log.d(TAG, "Отсоединён от сервера")
     }
 
     private fun isConnected(): Boolean = null != clientWebSocketSession

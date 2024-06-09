@@ -31,6 +31,10 @@ class ClientFragment : Fragment(R.layout.fragment_client) {
             KtorStateProvider.state.collect(::onClientStateChanged)
         }
 
+        lifecycleScope.launch {
+            KtorStateProvider.error.collect(::onClientError)
+        }
+
         binding.accessibilityServiceButton.setOnClickListener { onAccessibilityButtonClicked() }
         binding.connectButton.setOnClickListener { connectToServer() }
         binding.disconnectButton.setOnClickListener { disconnectFromServer() }
@@ -38,14 +42,28 @@ class ClientFragment : Fragment(R.layout.fragment_client) {
     }
 
     private fun onClientStateChanged(state: KtorClientState) {
+
         binding.clientStateView.setText(
             when(state) {
                 KtorClientState.INACTIVE -> R.string.ktor_client_state_inactive
                 KtorClientState.RUNNING -> R.string.ktor_client_state_running
                 KtorClientState.PAUSED -> R.string.ktor_client_state_paused
                 KtorClientState.STOPPED -> R.string.ktor_client_state_stopped
+                KtorClientState.ERROR -> R.string.ktor_client_state_error
             }
         )
+
+        when(state) {
+            KtorClientState.ERROR -> binding.clientErrorView.visibility = View.VISIBLE
+            else -> binding.clientErrorView.visibility = View.GONE
+        }
+    }
+
+    private fun onClientError(e: Exception) {
+        ExceptionUtils.getErrorMessage(e).also { errorMsg ->
+            binding.clientErrorView.text = errorMsg
+            Log.e(TAG, errorMsg, e)
+        }
     }
 
     override fun onResume() {

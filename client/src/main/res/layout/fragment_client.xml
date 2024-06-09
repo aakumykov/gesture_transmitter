@@ -11,6 +11,12 @@
         style="@style/info_view"
         android:text="@string/ktor_client_state_inactive" />
 
+    <TextView
+        android:id="@+id/clientErrorView"
+        style="@style/error_view"
+        tools:text="Ошибка Ktor-клиента"
+        tools:visibility="visible"/>
+
     <Button
         android:id="@+id/accessibilityServiceButton"
         android:layout_width="match_parent"
