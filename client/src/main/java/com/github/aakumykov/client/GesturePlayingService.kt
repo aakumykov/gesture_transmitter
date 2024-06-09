@@ -338,6 +338,7 @@ class GesturePlayingService : AccessibilityService() {
         val TAG: String = GesturePlayingService::class.java.simpleName
         const val TAG_START_STOP: String = "START_STOP"
 
+        // TODO: вынести в отдельный файл
         const val GOOGLE_CHROME_PACKAGE_NAME = "com.android.chrome"
 
         // TODO: вынести это в файл настроек?

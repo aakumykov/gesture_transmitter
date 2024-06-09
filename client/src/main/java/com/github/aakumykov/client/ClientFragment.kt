@@ -1,5 +1,6 @@
 package com.github.aakumykov.client
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -8,6 +9,7 @@ import androidx.lifecycle.lifecycleScope
 import com.github.aakumykov.client.databinding.FragmentClientBinding
 import com.github.aakumykov.client.extensions.isAccessibilityServiceEnabled
 import com.github.aakumykov.client.extensions.openAccessibilitySettings
+import com.github.aakumykov.common.showToast
 import com.gitlab.aakumykov.exception_utils_module.ExceptionUtils
 import kotlinx.coroutines.launch
 
@@ -20,6 +22,7 @@ class ClientFragment : Fragment(R.layout.fragment_client) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         _binding = FragmentClientBinding.bind(view)
 
         lifecycleScope.launch {
@@ -33,11 +36,19 @@ class ClientFragment : Fragment(R.layout.fragment_client) {
         binding.accessibilityServiceButton.setOnClickListener {
             requireContext().openAccessibilitySettings()
         }
+
+        binding.startGoogleChromeButton.setOnClickListener {
+            requireContext().packageManager
+                .getLaunchIntentForPackage(GesturePlayingService.GOOGLE_CHROME_PACKAGE_NAME)
+                ?.also { startActivity(it) }
+                ?: showToast(R.string.google_chrome_not_found)
+        }
     }
 
     override fun onResume() {
         super.onResume()
         displayAccessibilityServiceState()
+        binding.startGoogleChromeButton.isEnabled = isAccessibilityServiceEnabled()
     }
 
     override fun onDestroyView() {
@@ -76,11 +87,15 @@ class ClientFragment : Fragment(R.layout.fragment_client) {
 
     private fun displayAccessibilityServiceState() {
         binding.accessibilityServiceButton.setText(getString(
-            if (requireContext().isAccessibilityServiceEnabled(GesturePlayingService::class.java))
+            if (isAccessibilityServiceEnabled())
                 R.string.button_acc_service_enabled
             else
                 R.string.button_acc_service_disabled
         ))
+    }
+
+    private fun isAccessibilityServiceEnabled(): Boolean {
+        return requireContext().isAccessibilityServiceEnabled(GesturePlayingService::class.java)
     }
 
 

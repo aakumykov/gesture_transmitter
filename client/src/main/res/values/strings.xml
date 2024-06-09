@@ -6,7 +6,7 @@
     <string name="toast_disconnected_from_server">Клиент отключен от сервера</string>
     <string name="toast_connected_to_server">Подключен к серверу</string>
     <string name="button_read_gestures">Читать жесты</string>
-    <string name="button_acc_service_disabled">Включите службу повторения жестов</string>
+    <string name="button_acc_service_disabled">Для начала работы включите Службу повторения жестов</string>
     <string name="button_acc_service_enabled">Настроить службу повторения жестов</string>
     <string name="gesture_playing_service_notification_channel_name">Служба повторения жестов</string>
     <string name="gesture_playing_service_notification_channel_description">Уведомления службы повторения жестов</string>
@@ -23,5 +23,7 @@
     <string name="ktor_client_state_stopped">Ktor-клиент остановлен</string>
     <string name="ktor_client_state_error">Ошибка Ktor-клиента</string>
     <string name="gesture_playing_service_error_incomplete_server_config">Неполные данные для подключения</string>
+    <string name="start_google_chrome_button">Запустить Google Chrome</string>
+    <string name="google_chrome_not_found">Google Chrome не найден</string>
 
 </resources>
