@@ -1,12 +1,8 @@
 package com.github.aakumykov.client
 
-import android.accessibilityservice.AccessibilityService
-import android.accessibilityservice.AccessibilityServiceInfo
-import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.view.accessibility.AccessibilityManager
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.github.aakumykov.client.databinding.FragmentClientBinding
@@ -31,10 +27,25 @@ class ClientFragment : Fragment(R.layout.fragment_client) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentClientBinding.bind(view)
 
+        lifecycleScope.launch {
+            KtorStateProvider.state.collect(::onClientStateChanged)
+        }
+
         binding.accessibilityServiceButton.setOnClickListener { onAccessibilityButtonClicked() }
         binding.connectButton.setOnClickListener { connectToServer() }
         binding.disconnectButton.setOnClickListener { disconnectFromServer() }
         binding.readGesturesButton.setOnClickListener { readGesturesFromServer() }
+    }
+
+    private fun onClientStateChanged(state: KtorClientState) {
+        binding.clientStateView.setText(
+            when(state) {
+                KtorClientState.INACTIVE -> R.string.ktor_client_state_inactive
+                KtorClientState.RUNNING -> R.string.ktor_client_state_running
+                KtorClientState.PAUSED -> R.string.ktor_client_state_paused
+                KtorClientState.STOPPED -> R.string.ktor_client_state_stopped
+            }
+        )
     }
 
     override fun onResume() {
@@ -83,7 +94,7 @@ class ClientFragment : Fragment(R.layout.fragment_client) {
     private fun connectToServer() {
         hideError()
         lifecycleScope.launch {
-            KtorClient(Gson()).connect(
+            KtorClient(Gson(), KtorStateProvider).connect(
                 "192.168.0.171",
                 8081,
                 "gestures"

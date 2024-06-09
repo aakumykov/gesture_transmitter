@@ -22,7 +22,11 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import okhttp3.OkHttpClient
 import java.util.concurrent.TimeUnit
 
-class KtorClient(private val gson: Gson) {
+class KtorClient(private val gson: Gson, private val clientStateProvider: KtorStateProvider) {
+
+    private suspend fun publishState(ktorClientState: KtorClientState) {
+        clientStateProvider.setState(ktorClientState)
+    }
 
     private var clientWebSocketSession: ClientWebSocketSession? = null
     private var currentServerUri: Uri? = null

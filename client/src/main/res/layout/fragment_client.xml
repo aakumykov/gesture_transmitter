@@ -6,6 +6,11 @@
     android:orientation="vertical"
     tools:context=".ClientFragment">
 
+    <TextView
+        android:id="@+id/clientStateView"
+        style="@style/info_view"
+        android:text="@string/ktor_client_state_inactive" />
+
     <Button
         android:id="@+id/accessibilityServiceButton"
         android:layout_width="match_parent"
