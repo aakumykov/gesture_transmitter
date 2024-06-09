@@ -16,6 +16,7 @@ import io.ktor.server.websocket.pingPeriod
 import io.ktor.server.websocket.timeout
 import io.ktor.server.websocket.webSocket
 import io.ktor.websocket.Frame
+import io.ktor.websocket.close
 import io.ktor.websocket.readText
 import java.time.Duration
 
@@ -41,8 +42,6 @@ class KtorServer(private val gson: Gson) {
 
                     serverSession = this
                     Log.d(TAG, "Новое подключение, ${serverSession.hashCode()}")
-
-                    outgoing.send(Frame.Text("$TAG приветствует вас!"))
 
                     for (frame in incoming) {
                         (frame as? Frame.Text)?.let { textFrame ->
