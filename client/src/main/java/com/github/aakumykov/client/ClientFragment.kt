@@ -59,10 +59,12 @@ class ClientFragment : Fragment(R.layout.fragment_client) {
         }
     }
 
-    private fun onClientError(e: Exception) {
-        ExceptionUtils.getErrorMessage(e).also { errorMsg ->
-            binding.clientErrorView.text = errorMsg
-            Log.e(TAG, errorMsg, e)
+    private fun onClientError(e: Exception?) {
+        e?.also {
+            ExceptionUtils.getErrorMessage(e).also { errorMsg ->
+                binding.clientErrorView.text = errorMsg
+                Log.e(TAG, errorMsg, e)
+            }
         }
     }
 

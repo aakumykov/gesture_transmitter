@@ -8,16 +8,16 @@ interface ClientStateProvider {
     suspend fun setError(e: Exception)
     suspend fun setState(ktorClientState: KtorClientState)
     val state: SharedFlow<KtorClientState>
-    val error: SharedFlow<Exception>
+    val error: SharedFlow<Exception?>
 }
 
 object KtorStateProvider : ClientStateProvider {
 
     private val _stateFlow: MutableSharedFlow<KtorClientState> = MutableStateFlow(KtorClientState.INACTIVE)
-    private val _errorFlow: MutableSharedFlow<Exception> = MutableStateFlow(Exception())
+    private val _errorFlow: MutableSharedFlow<Exception?> = MutableStateFlow(null)
 
     override val state: SharedFlow<KtorClientState> get() = _stateFlow
-    override val error: SharedFlow<Exception> get() = _errorFlow
+    override val error: SharedFlow<Exception?> get() = _errorFlow
 
     override suspend fun setState(ktorClientState: KtorClientState) {
         _stateFlow.emit(ktorClientState)
