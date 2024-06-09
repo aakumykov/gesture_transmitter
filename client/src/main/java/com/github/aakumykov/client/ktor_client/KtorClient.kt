@@ -83,15 +83,19 @@ class KtorClient(private val gson: Gson,
 
 
     suspend fun disconnect() {
-        clientWebSocketSession?.close()
-        clientWebSocketSession = null
-        client.close()
-        Log.d(TAG, "Отсоединён от сервера")
+        try {
+            clientWebSocketSession?.close()
+            clientWebSocketSession = null
+            client.close()
+            publishState(KtorClientState.STOPPED)
+        } catch (e: Exception) {
+            publishState(KtorClientState.ERROR)
+            publishError(e)
+        }
     }
 
 
-    @Deprecated("Переименовать в gestures")
-    fun getGesturesFlow(): Flow<UserGesture?>? {
+    fun gesturesFlow(): Flow<UserGesture?>? {
         return clientWebSocketSession?.incoming?.receiveAsFlow()
             ?.filter { it is Frame.Text }
             ?.map { it as Frame.Text }

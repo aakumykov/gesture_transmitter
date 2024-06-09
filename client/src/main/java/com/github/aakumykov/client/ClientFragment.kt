@@ -61,15 +61,16 @@ class ClientFragment : Fragment(R.layout.fragment_client) {
 
     private fun onKtorClientStateChanged(state: KtorClientState) {
 
-        binding.clientStateView.setText(
-            when(state) {
-                KtorClientState.INACTIVE -> R.string.ktor_client_state_inactive
-                KtorClientState.RUNNING -> R.string.ktor_client_state_running
-                KtorClientState.PAUSED -> R.string.ktor_client_state_paused
-                KtorClientState.STOPPED -> R.string.ktor_client_state_stopped
-                KtorClientState.ERROR -> R.string.ktor_client_state_error
-            }
-        )
+        when(state) {
+            KtorClientState.INACTIVE -> R.string.ktor_client_state_inactive
+            KtorClientState.RUNNING -> R.string.ktor_client_state_running
+            KtorClientState.PAUSED -> R.string.ktor_client_state_paused
+            KtorClientState.STOPPED -> R.string.ktor_client_state_stopped
+            KtorClientState.ERROR -> R.string.ktor_client_state_error
+        }.also {
+            binding.clientStateView.setText(it)
+            Log.d(TAG, "Состояние Ktor-клиента: ${getString(it)}")
+        }
 
         when(state) {
             KtorClientState.ERROR -> binding.clientErrorView.visibility = View.VISIBLE

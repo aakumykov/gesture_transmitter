@@ -24,6 +24,7 @@ import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.util.concurrent.atomic.AtomicBoolean
 
 const val KEY_SERVER_ADDRESS = "SERVER_ADDRESS"
 const val KEY_SERVER_PORT = "SERVER_PORT"
@@ -34,6 +35,9 @@ const val DEFAULT_SERVER_PORT = 8081
 const val DEFAULT_SERVER_PATH = "gestures"
 
 class GesturePlayingService : AccessibilityService() {
+
+    private val trackedWindowHasAppeared: AtomicBoolean = AtomicBoolean(false)
+    private val trackedWindowNotVisible: Boolean get() = !trackedWindowHasAppeared.get()
 
     private val gesturePlayer: GesturePlayer by lazy {
         GesturePlayer(this)
@@ -175,7 +179,7 @@ class GesturePlayingService : AccessibilityService() {
     private fun startListeningForGestures() {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                ktorClient.getGesturesFlow()?.collect { userGesture: UserGesture? ->
+                ktorClient.gesturesFlow()?.collect { userGesture: UserGesture? ->
                     gesturePlayer.playGesture(userGesture)
                 }
             } catch (e: Exception) {
@@ -187,8 +191,8 @@ class GesturePlayingService : AccessibilityService() {
     override fun onServiceConnected() {
         super.onServiceConnected()
         /*getServiceInfo().apply {
-            eventTypes = AccessibilityEvent.TYPE_VIEW_CLICKED or AccessibilityEvent.TYPE_VIEW_FOCUSED
-            packageNames = arrayOf("com.example.android.myFirstApp", "com.example.android.mySecondApp")
+            eventTypes = AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED //or AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED
+            packageNames = arrayOf("com.android.chrome")
             // flags = AccessibilityServiceInfo.DEFAULT;
             notificationTimeout = 100
         }.also {
@@ -282,18 +286,21 @@ class GesturePlayingService : AccessibilityService() {
     }
 
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
-        if (null != event) {
-            if (event.isWindowStateChanged()) {
-                if (isAppWindow(GOOGLE_CHROME_PACKAGE_NAME)) {
-                    debugLog("Гоголь Хром детектед, $dateTimeString")
-                    startListeningGestures()
-                }
+        if (null != event && event.isWindowStateChanged()) {
+            if (isAppWindow(GOOGLE_CHROME_PACKAGE_NAME, true)/* && trackedWindowNotVisible*/) {
+                debugLog("Гоголь Хром детектед, $dateTimeString")
+                trackedWindowHasAppeared.set(true)
+                connectToServer()
+            } else {
+                debugLog("Гоголь Хром ушёл в фон, $dateTimeString")
+                trackedWindowHasAppeared.set(false)
+                disconnectFromServer()
             }
         }
 
-//        rootInActiveWindow?.also { rootView ->
+        /*rootInActiveWindow?.also { rootView ->
 
-            /*val pn = rootView.packageName
+            val pn = rootView.packageName
             val chCnt = rootView.childCount
 
             val evTypeString = when(event?.eventType) {
@@ -304,14 +311,15 @@ class GesturePlayingService : AccessibilityService() {
                 }
                 AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED -> "WINDOW_CONTENT_CHANGED"
                 else -> "Другое событие"
-            }*/
-//            debugLog("--------------")
-//            debugLog("$evTypeString: package: $pn, child: $chCnt")
+            }
+
+            debugLog("--------------")
+            debugLog("$evTypeString: package: $pn, child: $chCnt")
 //            showChildrenRecursively(0, rootView.getChildren())
-//        }
+        }*/
     }
 
-    private fun startListeningGestures() {
+    private fun connectToServer() {
 
         if (null == serverAddress || null == serverPath || serverPort <= 0) {
             errorLog("Неполные настройки сервера: $serverAddress:$serverPort/$serverPath")
@@ -325,6 +333,12 @@ class GesturePlayingService : AccessibilityService() {
                 serverPort,
                 serverPath!!
             )
+        }
+    }
+
+    private fun disconnectFromServer() {
+        CoroutineScope(Dispatchers.IO).launch {
+            ktorClient.disconnect()
         }
     }
 
@@ -367,6 +381,25 @@ fun AccessibilityEvent.isWindowStateChanged(): Boolean {
     return AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED == eventType
 }
 
-fun AccessibilityService.isAppWindow(checkedPackageName: String): Boolean {
-    return rootInActiveWindow?.packageName?.let { it == checkedPackageName } ?: false
+/**
+ * Проверяет, соответствует ли свойство rootInActiveWindow.packageName
+ * аргументу [checkedPackageName], т.о. выясняя, принадлежит ли окно, вызвавшее
+ * событие [AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED] интересующему приложению.
+ *
+ * @param checkedPackageName Имя пакета приложение, на принадлежность которому проверяется окно,
+ * вызвавшее событие [AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED].
+ *
+ * @param windowMustBeWithContent Дополнительное условие, согласно которому, окно должно быть с содержимым,
+ * т.е. иметь дочерние View.
+ */
+fun AccessibilityService.isAppWindow(checkedPackageName: String, windowMustBeWithContent: Boolean): Boolean {
+    return when(rootInActiveWindow) {
+        null -> false
+        else -> {
+            val isPackageNameMatches = (rootInActiveWindow.packageName == checkedPackageName)
+            val hasChild = (rootInActiveWindow.childCount > 0)
+            if (windowMustBeWithContent) isPackageNameMatches && hasChild
+            else isPackageNameMatches
+        }
+    }
 }
