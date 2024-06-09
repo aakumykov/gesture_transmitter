@@ -7,6 +7,8 @@ import android.content.Intent
 import android.content.pm.ServiceInfo
 import android.provider.Settings
 import android.view.accessibility.AccessibilityManager
+import android.widget.Toast
+import androidx.annotation.StringRes
 import androidx.core.content.ContextCompat.startActivity
 
 fun Context.isAccessibilityServiceEnabled(serviceClass: Class<out AccessibilityService>): Boolean
@@ -24,6 +26,16 @@ fun Context.isAccessibilityServiceEnabled(serviceClass: Class<out AccessibilityS
     return false
 }
 
+
 fun Context.openAccessibilitySettings() {
     startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
+}
+
+
+fun Context.showToast(@StringRes stringRes: Int) {
+    showToast(getString(stringRes))
+}
+
+fun Context.showToast(text: String) {
+    Toast.makeText(this, text, Toast.LENGTH_SHORT).show()
 }

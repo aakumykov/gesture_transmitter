@@ -1,8 +1,6 @@
 <resources>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Клиент</string>
-    <string name="gesture_playing_service_label">Служба повторения жестов</string>
-    <string name="gesture_playing_service_description">Служба повторения жестов получает жесты пользователя от другого устройства и повторяет их.</string>
     <string name="button_connect_to_server">Подключиться к серверу</string>
     <string name="button_disconnect_from_server">Отключиться от сервера</string>
     <string name="toast_disconnected_from_server">Клиент отключен от сервера</string>
@@ -24,5 +22,6 @@
     <string name="ktor_client_state_paused">Ktor-клиент на паузе</string>
     <string name="ktor_client_state_stopped">Ktor-клиент остановлен</string>
     <string name="ktor_client_state_error">Ошибка Ktor-клиента</string>
+    <string name="gesture_playing_service_error_incomplete_server_config">Неполные данные для подключения</string>
 
 </resources>

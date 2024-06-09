@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="gesture_playing_service_label">Служба повторения жестов</string>
+    <string name="gesture_playing_service_description">Служба повторения жестов получает жесты пользователя от другого устройства и повторяет их.</string>
+</resources>

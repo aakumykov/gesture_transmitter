@@ -4,6 +4,8 @@ import android.accessibilityservice.AccessibilityService
 import android.app.Notification
 import android.app.PendingIntent
 import android.content.Intent
+import android.content.SharedPreferences
+import android.preference.PreferenceManager
 import android.provider.Settings
 import android.util.Log
 import android.view.accessibility.AccessibilityEvent
@@ -12,13 +14,37 @@ import androidx.core.app.NotificationManagerCompat
 import com.github.aakumykov.client.extensions.showToast
 import com.github.aakumykov.client.utils.NotificationChannelHelper
 import com.github.aakumykov.common.dateTimeString
+import com.github.aakumykov.kotlin_playground.UserGesture
 import com.gitlab.aakumykov.exception_utils_module.ExceptionUtils
 import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
+const val KEY_SERVER_ADDRESS = "SERVER_ADDRESS"
+const val KEY_SERVER_PORT = "SERVER_PORT"
+const val KEY_SERVER_PATH = "SERVER_PATH"
+
 class GesturePlayingService : AccessibilityService() {
+
+    private val gesturePlayer: GesturePlayer by lazy {
+        GesturePlayer(this)
+    }
+
+    private val sharedPreferences: SharedPreferences by lazy {
+        PreferenceManager.getDefaultSharedPreferences(this)
+    }
+
+
+    private val serverAddress: String?
+        get() = sharedPreferences.getString(KEY_SERVER_ADDRESS, "192.168.232.2")
+
+    private val serverPort: Int
+        get() = sharedPreferences.getInt(KEY_SERVER_PORT, 8081)
+
+    private val serverPath: String?
+        get() = sharedPreferences.getString(KEY_SERVER_PATH, "gestures")
+
 
     private val ktorClient: KtorClient by lazy {
         KtorClient(Gson(), KtorStateProvider)
@@ -116,8 +142,51 @@ class GesturePlayingService : AccessibilityService() {
         debugStartStop("onCreate()")
         prepareNotificationChannel()
         showWorkingNotification()
+        prepareKtorClient()
     }
 
+    private fun prepareKtorClient() {
+        CoroutineScope(Dispatchers.Main).launch {
+            ktorClient.state.collect(::onClientStateChanged)
+        }
+    }
+
+    private fun onClientStateChanged(ktorClientState: KtorClientState) {
+
+        debugLog("Состояние Ktor-клиента: $ktorClientState")
+
+        when(ktorClientState) {
+            KtorClientState.INACTIVE -> {}
+            KtorClientState.RUNNING -> startListeningForGestures()
+            KtorClientState.PAUSED -> {}
+            KtorClientState.STOPPED -> {}
+            KtorClientState.ERROR -> {}
+        }
+    }
+
+    private fun startListeningForGestures() {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                ktorClient.getGesturesFlow()?.collect { userGesture: UserGesture? ->
+                    gesturePlayer.playGesture(userGesture)
+                }
+            } catch (e: Exception) {
+                errorLog(e)
+            }
+        }
+    }
+
+    override fun onServiceConnected() {
+        super.onServiceConnected()
+        /*getServiceInfo().apply {
+            eventTypes = AccessibilityEvent.TYPE_VIEW_CLICKED or AccessibilityEvent.TYPE_VIEW_FOCUSED
+            packageNames = arrayOf("com.example.android.myFirstApp", "com.example.android.mySecondApp")
+            // flags = AccessibilityServiceInfo.DEFAULT;
+            notificationTimeout = 100
+        }.also {
+            setServiceInfo(it)
+        }*/
+    }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
 
@@ -153,7 +222,7 @@ class GesturePlayingService : AccessibilityService() {
 
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                ktorClient?.disconnect()
+                ktorClient.disconnect()
             } catch (e: Exception) {
                 ExceptionUtils.getErrorMessage(e).also { errorMsg ->
                     showToast(getString(R.string.gesture_playing_service_error, errorMsg))
@@ -207,8 +276,9 @@ class GesturePlayingService : AccessibilityService() {
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
         if (null != event) {
             if (event.isWindowStateChanged()) {
-                if (isAppWindow(CHROME_PACKAGE_NAME)) {
+                if (isAppWindow(GOOGLE_CHROME_PACKAGE_NAME)) {
                     debugLog("Гоголь Хром детектед, $dateTimeString")
+                    startListeningGestures()
                 }
             }
         }
@@ -233,9 +303,27 @@ class GesturePlayingService : AccessibilityService() {
 //        }
     }
 
+    private fun startListeningGestures() {
+
+        if (null == serverAddress || null == serverPath || serverPort <= 0) {
+            errorLog("Неполные настройки сервера: $serverAddress:$serverPort/$serverPath")
+            showToast(R.string.gesture_playing_service_error_incomplete_server_config)
+            return
+        }
+
+        CoroutineScope(Dispatchers.IO).launch {
+            ktorClient.connect(
+                serverAddress!!,
+                serverPort,
+                serverPath!!
+            )
+        }
+    }
+
     private fun debugLog(text: String) { Log.d(TAG, text) }
     private fun debugStartStop(text: String) { Log.d(TAG_START_STOP, text) }
     private fun errorLog(text: String) { Log.e(TAG, text) }
+    private fun errorLog(throwable: Throwable) { Log.e(TAG, ExceptionUtils.getErrorMessage(throwable), throwable) }
     private fun errorLog(text: String, throwable: Throwable) { Log.e(TAG, text, throwable) }
 
     override fun onInterrupt() {
@@ -246,10 +334,11 @@ class GesturePlayingService : AccessibilityService() {
     private val notificationChannelId: String get() = "${packageName}_notifications"
 
     companion object {
+
         val TAG: String = GesturePlayingService::class.java.simpleName
         const val TAG_START_STOP: String = "START_STOP"
 
-        const val CHROME_PACKAGE_NAME = "com.android.chrome"
+        const val GOOGLE_CHROME_PACKAGE_NAME = "com.android.chrome"
 
         // TODO: вынести это в файл настроек?
         const val NOTIFICATION_PRIORITY = NotificationCompat.PRIORITY_LOW

@@ -22,14 +22,16 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import okhttp3.OkHttpClient
 import java.util.concurrent.TimeUnit
 
-class KtorClient(private val gson: Gson, private val clientStateProvider: KtorStateProvider) {
+class KtorClient(private val gson: Gson,
+                 private val ktorStateProvider: KtorStateProvider
+): ClientStateProvider by ktorStateProvider {
 
     private suspend fun publishState(ktorClientState: KtorClientState) {
-        clientStateProvider.setState(ktorClientState)
+        ktorStateProvider.setState(ktorClientState)
     }
 
     private suspend fun publishError(e: Exception) {
-        clientStateProvider.setError(e)
+        ktorStateProvider.setError(e)
     }
 
     private var clientWebSocketSession: ClientWebSocketSession? = null
@@ -88,6 +90,7 @@ class KtorClient(private val gson: Gson, private val clientStateProvider: KtorSt
     }
 
 
+    @Deprecated("Переименовать в gestures")
     fun getGesturesFlow(): Flow<UserGesture?>? {
         return clientWebSocketSession?.incoming?.receiveAsFlow()
             ?.filter { it is Frame.Text }

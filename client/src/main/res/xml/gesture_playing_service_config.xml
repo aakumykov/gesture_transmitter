@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<!--com.github.aakumykov.kotlin_playground,de.baumann.browser,de.baumann-->
+<!--de.baumann.browser-->
+<!--com.android.chrome-->
+
+<!--TODO: убрать flagReportViewIds|flagRetrieveInteractiveWindows -->
 
 <accessibility-service xmlns:android="http://schemas.android.com/apk/res/android"
     android:description="@string/gesture_playing_service_description"
