@@ -84,6 +84,10 @@ class GesturePlayingService : AccessibilityService() {
             .setSmallIcon(R.drawable.ic_gesture_playing_service)
             .setPriority(NOTIFICATION_PRIORITY)
 //            .setContentIntent(pendingContentIntent)
+            .setStyle(
+                androidx.media.app.NotificationCompat.MediaStyle()
+                    .setShowActionsInCompactView(0)
+            )
             .addAction(stopServiceAction)
     }
 
