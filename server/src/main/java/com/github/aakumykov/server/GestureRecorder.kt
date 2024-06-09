@@ -1,20 +1,28 @@
 package com.github.aakumykov.server
 
+import android.util.Log
 import android.view.MotionEvent
 import com.github.aakumykov.kotlin_playground.UserGesturePoint
 import com.github.aakumykov.kotlin_playground.UserGesture
-import com.github.aakumykov.single_live_event.SingleLiveEvent
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.launch
 
 object GestureRecorder {
 
+    private val TAG: String = GestureRecorder::class.java.simpleName
     private var initialEvent: MotionEvent? = null
     private var pointList: MutableList<UserGesturePoint> = ArrayList()
     private var startingTime: Long? = null
     private var laseRecordedGesture: UserGesture? = null
 
-    val recordedGesture: SingleLiveEvent<UserGesture> = SingleLiveEvent()
+    private val _recorderGestureFlow: MutableSharedFlow<UserGesture?> = MutableSharedFlow(0,0)
+    val recordedGestureFlow: SharedFlow<UserGesture?> = _recorderGestureFlow
 
     fun startRecording(initialMotionEvent: MotionEvent) {
+        Log.d(TAG, "startRecording(), $initialMotionEvent")
         resetState()
         initialEvent = initialMotionEvent
         startingTime = initialMotionEvent.eventTime
@@ -26,19 +34,32 @@ object GestureRecorder {
         }
     }
 
-    fun finishRecording(event: MotionEvent) {
-        recordEvent(event)
-        if (null != startingTime)
-                laseRecordedGesture = UserGesture.create(pointList, startingTime!!, event.eventTime)
+    fun finishRecording(endingMotionEvent: MotionEvent) {
+        Log.d(TAG, "finishRecording(), $endingMotionEvent")
+
+        recordEvent(endingMotionEvent)
+        composeUserGesture(endingMotionEvent.eventTime)
+        publishLastGesture()
         eraseTempData()
-        recordedGesture.value = laseRecordedGesture
+    }
+
+    private fun publishLastGesture() {
+        CoroutineScope(Dispatchers.Main).launch {
+            _recorderGestureFlow.emit(laseRecordedGesture)
+        }
     }
 
     fun cancelRecording() {
         resetState()
     }
 
-    fun getLastRecord(): UserGesture? = laseRecordedGesture
+
+    private fun composeUserGesture(endingEventTime: Long) {
+        startingTime?.also {
+            laseRecordedGesture = UserGesture.create(pointList, it, endingEventTime)
+        }
+    }
+
 
     private fun eraseTempData() {
         startingTime = null

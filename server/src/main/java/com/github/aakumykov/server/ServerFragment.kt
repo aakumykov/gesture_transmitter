@@ -19,6 +19,7 @@ import com.github.aakumykov.server.ktor_server.KtorServer
 import com.gitlab.aakumykov.exception_utils_module.ExceptionUtils
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 class ServerFragment : Fragment(R.layout.fragment_server), View.OnTouchListener {
@@ -49,7 +50,9 @@ class ServerFragment : Fragment(R.layout.fragment_server), View.OnTouchListener 
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentServerBinding.bind(view)
 
-        GestureRecorder.recordedGesture.observe(viewLifecycleOwner, ::onNewGesture)
+        lifecycleScope.launch {
+            GestureRecorder.recordedGestureFlow.collect(::onNewGesture)
+        }
 
         binding.touchRecordingArea.setOnTouchListener(this)
         binding.startServerButton.setOnClickListener { startServer() }
