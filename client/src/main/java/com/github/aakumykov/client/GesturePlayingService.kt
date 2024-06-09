@@ -9,23 +9,24 @@ import android.util.Log
 import android.view.accessibility.AccessibilityEvent
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import com.github.aakumykov.client.extensions.showToast
 import com.github.aakumykov.client.utils.NotificationChannelHelper
 import com.github.aakumykov.common.dateTimeString
+import com.gitlab.aakumykov.exception_utils_module.ExceptionUtils
+import com.google.gson.Gson
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class GesturePlayingService : AccessibilityService() {
 
+    private val ktorClient: KtorClient by lazy {
+        KtorClient(Gson(), KtorStateProvider)
+    }
+
+
     private var isPaused: Boolean = false
 
-    // TODO: убрать by lazy для ускорения работы
-
-    /*private val pendingContentIntent: PendingIntent by lazy {
-        PendingIntent.getActivity(
-            this,
-            CODE_ACTION_STOP,
-            Intent(this, MainActivity::class.java),
-            PendingIntent.FLAG_IMMUTABLE
-        )
-    }*/
 
     private val thisServiceIntent
         get() = Intent(applicationContext, GesturePlayingService::class.java)
@@ -117,6 +118,7 @@ class GesturePlayingService : AccessibilityService() {
         showWorkingNotification()
     }
 
+
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
 
         when(intent?.action) {
@@ -148,6 +150,18 @@ class GesturePlayingService : AccessibilityService() {
     override fun onDestroy() {
         super.onDestroy()
         debugStartStop("onDestroy()")
+
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                ktorClient?.disconnect()
+            } catch (e: Exception) {
+                ExceptionUtils.getErrorMessage(e).also { errorMsg ->
+                    showToast(getString(R.string.gesture_playing_service_error, errorMsg))
+                    errorLog(errorMsg, e)
+                }
+            }
+        }
+
         hideNotification()
     }
 
@@ -222,6 +236,7 @@ class GesturePlayingService : AccessibilityService() {
     private fun debugLog(text: String) { Log.d(TAG, text) }
     private fun debugStartStop(text: String) { Log.d(TAG_START_STOP, text) }
     private fun errorLog(text: String) { Log.e(TAG, text) }
+    private fun errorLog(text: String, throwable: Throwable) { Log.e(TAG, text, throwable) }
 
     override fun onInterrupt() {
 
