@@ -4,8 +4,9 @@ import android.util.Log
 import com.github.aakumykov.kotlin_playground.UserGesture
 import com.gitlab.aakumykov.exception_utils_module.ExceptionUtils
 import com.google.gson.Gson
-import com.google.gson.JsonSyntaxException
 import io.ktor.server.application.install
+import io.ktor.server.cio.CIO
+import io.ktor.server.engine.ApplicationEngine
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.jetty.Jetty
 import io.ktor.server.jetty.JettyApplicationEngine
@@ -19,19 +20,37 @@ import io.ktor.websocket.CloseReason
 import io.ktor.websocket.Frame
 import io.ktor.websocket.FrameType
 import io.ktor.websocket.close
-import io.ktor.websocket.readText
+import kotlinx.coroutines.channels.ClosedReceiveChannelException
+import kotlinx.coroutines.delay
 import java.time.Duration
+import java.util.concurrent.atomic.AtomicBoolean
 
 class KtorServer(private val gson: Gson) {
 
-    private var runningServer: JettyApplicationEngine? = null
+    private var runningServer: ApplicationEngine? = null
     private var serverSession: DefaultWebSocketServerSession? = null
     private val sessionHashCode: String
         get() = "session.hashCode: ${(serverSession?.hashCode() ?: "[нет сессии]")}"
+    private val _stopRequested: AtomicBoolean = AtomicBoolean(false)
+    private val stopRequested: Boolean get() = _stopRequested.get()
 
-    suspend fun run(address: String, port: Int) {
 
-        runningServer = embeddedServer(Jetty, host = address, port = port) {
+    suspend fun start(address: String, port: Int, path: String) {
+
+        if (runningServer != null) {
+            Log.w(TAG, "Сервер уже запущен")
+            return
+        } else {
+            Log.d(TAG, "Запуск сервера на $address:$port/$path")
+        }
+
+        _stopRequested.set(false)
+
+        runningServer = embeddedServer(
+            Jetty,
+            host = address,
+            port = port
+        ) {
 
             install(WebSockets) {
                 pingPeriod = Duration.ofSeconds(15)
@@ -41,25 +60,45 @@ class KtorServer(private val gson: Gson) {
             }
 
             routing {
-                webSocket(path = "/gestures") {
-                    // TODO: выдавать на гора статус "готов"
+                webSocket(path = path) {
+
+                    closeSession("Новое подключение закрывает старое")
 
                     serverSession = this
                     Log.d(TAG, "Новое подключение, ${serverSession.hashCode()}")
 
-                    for (frame in incoming) {
+                    try {
+                        for (frame in incoming) {
 
-                        when(frame.frameType) {
-                            FrameType.PING -> debugPing()
-                            FrameType.PONG -> debugPong()
-                            FrameType.CLOSE -> closeCurrentSession()
-                            FrameType.TEXT -> processTextFrame(frame as? Frame.Text)
-                            FrameType.BINARY -> {}
+                            if (stopRequested) {
+                                Log.e(TAG, "Запрошен останов сервера...")
+                                closeSession("Останов, запрошенный пользователем")
+                                return@webSocket
+                            }
+
+                            when (frame.frameType) {
+                                FrameType.PING -> debugPing()
+                                FrameType.PONG -> debugPong()
+                                FrameType.CLOSE -> closeSession("Клиент закрыл соединение")
+                                FrameType.TEXT -> processTextFrame(frame as? Frame.Text)
+                                FrameType.BINARY -> {}
+                            }
                         }
+                    }
+                    catch (e: ClosedReceiveChannelException) {
+                        Log.e(TAG, "Входящее соединение зкрыто.")
+                    }
+                    catch (t: Throwable) {
+                        Log.e(TAG, ExceptionUtils.getErrorMessage(t), t)
                     }
                 }
             }
-        }.start(wait = true)
+        }.start(wait = false)
+    }
+
+    private suspend fun closeSession(reasonMessage: String) {
+        serverSession?.close(CloseReason(CloseReason.Codes.NORMAL, reasonMessage))
+        serverSession = null
     }
 
     private fun debugPing() {
@@ -94,17 +133,9 @@ class KtorServer(private val gson: Gson) {
         ) ?: Log.e(TAG, "Нет текущей сессии для отправки эхо-ответа.")*/
     }
 
-    private suspend fun closeCurrentSession() {
-        serverSession?.apply {
-            val sessionHashCode = this.hashCode()
-            close(
-                CloseReason(CloseReason.Codes.NORMAL,"Закрыта сессия $sessionHashCode")
-            )
-        }
-    }
 
     // TODO: выдавать поток с ошибками
-    suspend fun send(gesture: UserGesture) {
+    suspend fun sendUserGesture(gesture: UserGesture) {
 
         val gestureJson = gson.toJson(gesture)
         val textFrame = Frame.Text(gestureJson)
@@ -116,6 +147,15 @@ class KtorServer(private val gson: Gson) {
             ?: Log.e(TAG, "Жест не отправлен, так как ещё никто не подключился.")
     }
 
+
+    suspend fun stop(gracePeriodMillis: Long = 1000, timeoutMillis: Long = 2000) {
+        Log.d(TAG, "Останов сервера с ожиданием ${timeoutMillis} мс...")
+        _stopRequested.set(true)
+        runningServer?.stop(gracePeriodMillis, timeoutMillis)
+        delay(gracePeriodMillis + timeoutMillis)
+        runningServer = null
+        Log.d(TAG, "...сервер, вероятно, остановлен.")
+    }
 
 
     companion object {

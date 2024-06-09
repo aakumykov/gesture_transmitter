@@ -8,9 +8,12 @@ import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import com.github.aakumykov.common.inMainThread
+import com.github.aakumykov.common.showToast
 import com.github.aakumykov.kotlin_playground.UserGesture
 import com.github.aakumykov.server.databinding.FragmentServerBinding
 import com.github.aakumykov.server.ktor_server.DEFAULT_SERVER_ADDRESS
+import com.github.aakumykov.server.ktor_server.DEFAULT_SERVER_PATH
 import com.github.aakumykov.server.ktor_server.DEFAULT_SERVER_PORT
 import com.github.aakumykov.server.ktor_server.KtorServer
 import com.gitlab.aakumykov.exception_utils_module.ExceptionUtils
@@ -57,7 +60,7 @@ class ServerFragment : Fragment(R.layout.fragment_server), View.OnTouchListener 
         gesture?.also {
             Log.d(TAG, "Новый записанный жест: $gesture")
             lifecycleScope.launch(Dispatchers.IO) {
-                ktorServer.send(gesture)
+                ktorServer.sendUserGesture(gesture)
             }
         }
     }
@@ -65,12 +68,26 @@ class ServerFragment : Fragment(R.layout.fragment_server), View.OnTouchListener 
     private fun startServer() {
         hideError()
         lifecycleScope.launch(Dispatchers.IO) {
-            ktorServer.run(DEFAULT_SERVER_ADDRESS, DEFAULT_SERVER_PORT)
+            try {
+                ktorServer.start(DEFAULT_SERVER_ADDRESS, DEFAULT_SERVER_PORT, DEFAULT_SERVER_PATH)
+            } catch (e: Exception) {
+                inMainThread { showError(e) }
+                Log.e(TAG, ExceptionUtils.getErrorMessage(e), e)
+            }
         }
     }
 
     private fun stopServer() {
-
+        lifecycleScope.launch(Dispatchers.IO) {
+            try {
+                ktorServer.stop()
+                // TODO: сообщать об останове, основываясь на статусе, полученном от сервера
+                inMainThread { showToast(R.string.server_was_stopped) }
+            } catch (e: Exception) {
+                inMainThread { showError(e) }
+                Log.e(TAG, ExceptionUtils.getErrorMessage(e), e)
+            }
+        }
     }
 
     override fun onDestroyView() {
