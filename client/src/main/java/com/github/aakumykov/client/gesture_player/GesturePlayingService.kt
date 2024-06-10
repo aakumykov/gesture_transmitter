@@ -53,12 +53,15 @@ class GesturePlayingService : AccessibilityService() {
 
     private fun prepareGestureClient() {
         CoroutineScope(Dispatchers.IO).launch {
-            gestureClient.userGestures.filterNotNull().collect(::onNewUserGesture)
+            gestureClient.userGestures
+                .filterNotNull()
+                .collect(::onNewUserGesture)
         }
     }
 
 
     private fun onNewUserGesture(userGesture: UserGesture) {
+        Log.d(TAG, "onNewUserGesture(), $userGesture")
         if (chromeIsRunAndVisible())
             gesturePlayer.playGesture(userGesture)
     }

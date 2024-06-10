@@ -8,17 +8,18 @@ import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import com.github.aakumykov.common.DEFAULT_SERVER_ADDRESS
+import com.github.aakumykov.common.DEFAULT_SERVER_PATH
+import com.github.aakumykov.common.DEFAULT_SERVER_PORT
 import com.github.aakumykov.common.inMainThread
 import com.github.aakumykov.common.showToast
 import com.github.aakumykov.kotlin_playground.UserGesture
 import com.github.aakumykov.server.databinding.FragmentServerBinding
-import com.github.aakumykov.common.DEFAULT_SERVER_ADDRESS
-import com.github.aakumykov.common.DEFAULT_SERVER_PATH
-import com.github.aakumykov.common.DEFAULT_SERVER_PORT
 import com.github.aakumykov.server.gesture_server.GestureServer
 import com.gitlab.aakumykov.exception_utils_module.ExceptionUtils
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 
 class ServerFragment : Fragment(R.layout.fragment_server), View.OnTouchListener {
@@ -50,7 +51,9 @@ class ServerFragment : Fragment(R.layout.fragment_server), View.OnTouchListener 
         _binding = FragmentServerBinding.bind(view)
 
         lifecycleScope.launch {
-            GestureRecorder.recordedGestureFlow.collect(::onNewGesture)
+            GestureRecorder.recordedGestureFlow
+                .filterNotNull()
+                .collect(::onNewGesture)
         }
 
         binding.touchRecordingArea.setOnTouchListener(this)
@@ -59,12 +62,10 @@ class ServerFragment : Fragment(R.layout.fragment_server), View.OnTouchListener 
 
     }
 
-    private fun onNewGesture(gesture: UserGesture?) {
-        gesture?.also {
-            Log.d(TAG, "Новый записанный жест: $gesture")
-            lifecycleScope.launch(Dispatchers.IO) {
-                mGestureServer.sendUserGesture(gesture)
-            }
+    private fun onNewGesture(gesture: UserGesture) {
+        Log.d(TAG, "Новый записанный жест: $gesture")
+        lifecycleScope.launch(Dispatchers.IO) {
+            mGestureServer.sendUserGesture(gesture)
         }
     }
 

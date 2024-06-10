@@ -33,15 +33,18 @@ import java.util.concurrent.atomic.AtomicBoolean
 class GestureServer(private val gson: Gson) {
 
     private var onPause: Boolean = false
+
     private var targetAppIsActive: Boolean = false
-    private val shouldTransmitGestures: Boolean = (!onPause && targetAppIsActive)
+
+    private val shouldTransmitGestures: Boolean
+        get() = (!onPause && targetAppIsActive)
 
     private var runningServer: ApplicationEngine? = null
+
     private var serverSession: WebSocketServerSession? = null
+
     private val sessionHashCode: String
         get() = "session.hashCode: [${(serverSession?.hashCode() ?: "нет сессии")}]"
-    private val _stopRequested: AtomicBoolean = AtomicBoolean(false)
-    private val stopRequested: Boolean get() = _stopRequested.get()
 
 
     suspend fun start(address: String, port: Int, path: String) {
@@ -52,8 +55,6 @@ class GestureServer(private val gson: Gson) {
         } else {
             Log.d(TAG, "Запуск сервера на $address:$port/$path")
         }
-
-        _stopRequested.set(false)
 
         runningServer = embeddedServer(
             CIO,
@@ -169,11 +170,13 @@ class GestureServer(private val gson: Gson) {
 
 
     suspend fun stop(gracePeriodMillis: Long = 1000, timeoutMillis: Long = 2000) {
+
         Log.d(TAG, "Останов сервера с ожиданием ${timeoutMillis} мс...")
-        _stopRequested.set(true)
+
         runningServer?.stop(gracePeriodMillis, timeoutMillis)
         delay(gracePeriodMillis + timeoutMillis)
         runningServer = null
+
         Log.d(TAG, "...сервер, вероятно, остановлен.")
     }
 

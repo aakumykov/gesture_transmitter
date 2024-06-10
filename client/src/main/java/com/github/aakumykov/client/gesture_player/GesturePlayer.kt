@@ -11,7 +11,7 @@ class GesturePlayer(private val accessibilityService: AccessibilityService) {
 
     fun playGesture(userGesture: UserGesture) {
 
-        Log.d(TAG, "Воспроизвожу $userGesture")
+        Log.d(TAG, "playGesture(), $userGesture")
 
         lastGesture = userGesture
 
