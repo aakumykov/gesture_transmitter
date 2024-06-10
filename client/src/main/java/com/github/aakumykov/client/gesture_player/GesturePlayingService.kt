@@ -3,8 +3,8 @@ package com.github.aakumykov.client.gesture_player
 import android.accessibilityservice.AccessibilityService
 import android.util.Log
 import android.view.accessibility.AccessibilityEvent
-import com.github.aakumykov.client.ktor_client.GestureClient
-import com.github.aakumykov.client.ktor_client.KtorStateProvider
+import com.github.aakumykov.client.gesture_client.GestureClient
+import com.github.aakumykov.client.gesture_client.KtorStateProvider
 import com.github.aakumykov.common.GOOGLE_CHROME_PACKAGE_NAME
 import com.github.aakumykov.kotlin_playground.UserGesture
 import com.gitlab.aakumykov.exception_utils_module.ExceptionUtils

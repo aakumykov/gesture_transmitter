@@ -1,4 +1,4 @@
-package com.github.aakumykov.client.ktor_client
+package com.github.aakumykov.client.gesture_client
 
 enum class ClientState {
     INACTIVE,
