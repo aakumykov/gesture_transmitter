@@ -16,6 +16,13 @@ import com.github.aakumykov.client.extensions.showToast
 import com.github.aakumykov.client.ktor_client.KtorClient
 import com.github.aakumykov.client.ktor_client.KtorClientState
 import com.github.aakumykov.client.ktor_client.KtorStateProvider
+import com.github.aakumykov.client.settings_provider.DEFAULT_SERVER_ADDRESS
+import com.github.aakumykov.client.settings_provider.DEFAULT_SERVER_PATH
+import com.github.aakumykov.client.settings_provider.DEFAULT_SERVER_PORT
+import com.github.aakumykov.client.settings_provider.KEY_SERVER_ADDRESS
+import com.github.aakumykov.client.settings_provider.KEY_SERVER_PATH
+import com.github.aakumykov.client.settings_provider.KEY_SERVER_PORT
+import com.github.aakumykov.client.settings_provider.SettingsProvider
 import com.github.aakumykov.client.utils.NotificationChannelHelper
 import com.github.aakumykov.common.dateTimeString
 import com.github.aakumykov.kotlin_playground.UserGesture
@@ -26,14 +33,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.concurrent.atomic.AtomicBoolean
 
-const val KEY_SERVER_ADDRESS = "SERVER_ADDRESS"
-const val KEY_SERVER_PORT = "SERVER_PORT"
-const val KEY_SERVER_PATH = "SERVER_PATH"
-
-const val DEFAULT_SERVER_ADDRESS = "192.168.0.119"
-const val DEFAULT_SERVER_PORT = 8081
-const val DEFAULT_SERVER_PATH = "gestures"
-
 class GesturePlayingService : AccessibilityService() {
 
     private val trackedWindowHasAppeared: AtomicBoolean = AtomicBoolean(false)
@@ -42,23 +41,18 @@ class GesturePlayingService : AccessibilityService() {
     private var chromeIsLaunched: Boolean = false
     private var chromeHasContent: Boolean = false
 
+
+    private val settingsProvider: SettingsProvider by lazy {
+        SettingsProvider.getInstance(applicationContext)
+    }
+
     private val gesturePlayer: GesturePlayer by lazy {
         GesturePlayer(this)
     }
 
-    private val sharedPreferences: SharedPreferences by lazy {
-        PreferenceManager.getDefaultSharedPreferences(this)
-    }
-
-
-    private val serverAddress: String?
-        get() = sharedPreferences.getString(KEY_SERVER_ADDRESS, DEFAULT_SERVER_ADDRESS)
-
-    private val serverPort: Int
-        get() = sharedPreferences.getInt(KEY_SERVER_PORT, DEFAULT_SERVER_PORT)
-
-    private val serverPath: String?
-        get() = sharedPreferences.getString(KEY_SERVER_PATH, DEFAULT_SERVER_PATH)
+    private val serverAddress: String? get() = settingsProvider.getIpAddress()
+    private val serverPort: Int get() = settingsProvider.getPort()
+    private val serverPath: String? get() = settingsProvider.getPath()
 
 
     private val ktorClient: KtorClient by lazy {
