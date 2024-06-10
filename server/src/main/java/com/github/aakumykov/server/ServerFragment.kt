@@ -12,7 +12,7 @@ import com.github.aakumykov.common.DEFAULT_SERVER_ADDRESS
 import com.github.aakumykov.common.DEFAULT_SERVER_PATH
 import com.github.aakumykov.common.DEFAULT_SERVER_PORT
 import com.github.aakumykov.common.inMainThread
-import com.github.aakumykov.common.showToast
+import com.github.aakumykov.common.extension_functions.showToast
 import com.github.aakumykov.kotlin_playground.UserGesture
 import com.github.aakumykov.server.databinding.FragmentServerBinding
 import com.github.aakumykov.server.gesture_server.GestureServer

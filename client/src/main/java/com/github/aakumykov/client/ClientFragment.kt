@@ -14,7 +14,7 @@ import com.github.aakumykov.client.ktor_client.ClientState
 import com.github.aakumykov.client.ktor_client.KtorStateProvider
 import com.github.aakumykov.client.settings_provider.SettingsProvider
 import com.github.aakumykov.common.GOOGLE_CHROME_PACKAGE_NAME
-import com.github.aakumykov.common.showToast
+import com.github.aakumykov.common.extension_functions.showToast
 import com.gitlab.aakumykov.exception_utils_module.ExceptionUtils
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers

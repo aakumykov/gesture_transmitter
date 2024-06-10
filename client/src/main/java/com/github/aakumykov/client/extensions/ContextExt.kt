@@ -30,12 +30,3 @@ fun Context.isAccessibilityServiceEnabled(serviceClass: Class<out AccessibilityS
 fun Context.openAccessibilitySettings() {
     startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
 }
-
-
-fun Context.showToast(@StringRes stringRes: Int) {
-    showToast(getString(stringRes))
-}
-
-fun Context.showToast(text: String) {
-    Toast.makeText(this, text, Toast.LENGTH_SHORT).show()
-}
