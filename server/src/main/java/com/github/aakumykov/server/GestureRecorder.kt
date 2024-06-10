@@ -9,10 +9,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-object GestureRecorder {
+class GestureRecorder @Inject constructor() {
 
-    private val TAG: String = GestureRecorder::class.java.simpleName
     private var initialEvent: MotionEvent? = null
     private var pointList: MutableList<UserGesturePoint> = ArrayList()
     private var startingTime: Long? = null
@@ -74,5 +74,9 @@ object GestureRecorder {
     private fun resetState() {
         eraseLaseRecord()
         eraseTempData()
+    }
+
+    companion object {
+        val TAG: String = GestureRecorder::class.java.simpleName
     }
 }

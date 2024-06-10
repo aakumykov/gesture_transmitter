@@ -8,9 +8,11 @@ import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import com.github.aakumykov.common.App
 import com.github.aakumykov.common.DEFAULT_SERVER_ADDRESS
 import com.github.aakumykov.common.DEFAULT_SERVER_PATH
 import com.github.aakumykov.common.DEFAULT_SERVER_PORT
+import com.github.aakumykov.common.appComponent
 import com.github.aakumykov.common.inMainThread
 import com.github.aakumykov.common.extension_functions.showToast
 import com.github.aakumykov.kotlin_playground.UserGesture
@@ -21,37 +23,27 @@ import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 class ServerFragment : Fragment(R.layout.fragment_server), View.OnTouchListener {
 
     private var _binding: FragmentServerBinding? = null
     private val binding get() = _binding!!
 
-    private val gestureRecorder by lazy { GestureRecorder }
+    @Inject lateinit var gestureRecorder: GestureRecorder
 
     private val mGestureServer: GestureServer by lazy { GestureServer(Gson()) }
 
-    private fun showError(throwable: Throwable) {
-        binding.serverErrorView.apply {
-            text = ExceptionUtils.getErrorMessage(throwable)
-            visibility = View.VISIBLE
-        }
-    }
-
-    private fun hideError() {
-        binding.serverErrorView.apply {
-            text = ""
-            visibility = View.GONE
-        }
-    }
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentServerBinding.bind(view)
 
+
+
         lifecycleScope.launch {
-            GestureRecorder.recordedGestureFlow
+            gestureRecorder.recordedGestureFlow
                 .filterNotNull()
                 .collect(::onNewGesture)
         }
@@ -61,6 +53,25 @@ class ServerFragment : Fragment(R.layout.fragment_server), View.OnTouchListener 
         binding.stopServerButton.setOnClickListener { stopServer() }
 
     }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    override fun onTouch(v: View?, event: MotionEvent?): Boolean {
+        when(event?.action) {
+            MotionEvent.ACTION_DOWN -> gestureRecorder.startRecording(event)
+            MotionEvent.ACTION_MOVE -> gestureRecorder.recordEvent(event)
+            MotionEvent.ACTION_UP -> gestureRecorder.finishRecording(event)
+            MotionEvent.ACTION_CANCEL -> gestureRecorder.cancelRecording()
+            MotionEvent.ACTION_OUTSIDE -> { Toast.makeText(requireContext(), "ACTION_OUTSIDE", Toast.LENGTH_SHORT).show() }
+            else -> {}
+        }
+        return true
+    }
+
 
     private fun onNewGesture(gesture: UserGesture) {
         Log.d(TAG, "Новый записанный жест: $gesture")
@@ -94,23 +105,20 @@ class ServerFragment : Fragment(R.layout.fragment_server), View.OnTouchListener 
         }
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
+    private fun showError(throwable: Throwable) {
+        binding.serverErrorView.apply {
+            text = ExceptionUtils.getErrorMessage(throwable)
+            visibility = View.VISIBLE
+        }
     }
 
-    @SuppressLint("ClickableViewAccessibility")
-    override fun onTouch(v: View?, event: MotionEvent?): Boolean {
-        when(event?.action) {
-            MotionEvent.ACTION_DOWN -> gestureRecorder.startRecording(event)
-            MotionEvent.ACTION_MOVE -> gestureRecorder.recordEvent(event)
-            MotionEvent.ACTION_UP -> gestureRecorder.finishRecording(event)
-            MotionEvent.ACTION_CANCEL -> gestureRecorder.cancelRecording()
-            MotionEvent.ACTION_OUTSIDE -> { Toast.makeText(requireContext(), "ACTION_OUTSIDE", Toast.LENGTH_SHORT).show() }
-            else -> {}
+    private fun hideError() {
+        binding.serverErrorView.apply {
+            text = ""
+            visibility = View.GONE
         }
-        return true
     }
+
 
     companion object {
         val TAG: String = ServerFragment::class.java.simpleName
