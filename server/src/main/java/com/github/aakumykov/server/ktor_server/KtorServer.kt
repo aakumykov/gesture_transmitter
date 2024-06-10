@@ -71,14 +71,14 @@ class KtorServer(private val gson: Gson) {
                     Log.d(TAG, "Новое подключение, ${serverSession.hashCode()}")
 
                     /*incoming.receiveAsFlow().onEach { frame ->
-                        Log.d("FRAME_TYPE", frame.frameType.name)
+                        Log.d(TAG, "FRAME_TYPE: "+frame.frameType.name)
                         *//*(frame as? Frame.Text)?.let { text ->
                             Log.d("INCOMING_FRAME", "text: text")
                         }*//*
                     }.launchIn(this)*/
 
                     for (frame in incoming) {
-                        Log.d("FRAME_TYPE", "FRAME_TYPE: "+frame.frameType.name)
+                        Log.d(TAG, "FRAME_TYPE: "+frame.frameType.name)
                     }
 
                     /*try {

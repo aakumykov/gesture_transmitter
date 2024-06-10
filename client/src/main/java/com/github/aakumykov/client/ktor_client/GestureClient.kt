@@ -70,10 +70,12 @@ class GestureClient private constructor(
             ) {
                 currentSession = this
 
-                startListeningForServer()
-            }
+                publishState(KtorClientState.CONNECTED)
 
-            publishState(KtorClientState.CONNECTED)
+                for (frame in incoming) {
+                    Log.d(TAG, "FRAME_TYPE: "+frame.frameType.name)
+                }
+            }
 
         } catch (e: Exception) {
             publishError(e)
@@ -88,7 +90,7 @@ class GestureClient private constructor(
 
                 for (frame in session.incoming) {
 
-                    Log.d("FRAME_TYPE", frame.frameType.name)
+                    Log.d(TAG, "FRAME_TYPE: "+frame.frameType.name)
 
                     when (frame.frameType) {
                         FrameType.PING -> {  }
