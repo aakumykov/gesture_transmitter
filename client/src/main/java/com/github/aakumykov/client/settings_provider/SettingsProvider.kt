@@ -47,7 +47,10 @@ class SettingsProvider private constructor(private val applicationContext: Conte
 
 
     companion object {
+
         private var _ouwInstance: SettingsProvider? = null
+
+        // TODO: передавать контекст через Dagger
         @JvmStatic
         fun getInstance(applicationContext: Context): SettingsProvider {
             if (null == _ouwInstance)

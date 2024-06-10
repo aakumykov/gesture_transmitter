@@ -32,6 +32,7 @@ class KtorClient private constructor(
     }
 
     private suspend fun publishError(e: Exception) {
+        KtorStateProvider.setState(KtorClientState.ERROR)
         KtorStateProvider.setError(e)
     }
 
@@ -51,10 +52,14 @@ class KtorClient private constructor(
 
 
     suspend fun connect(
-        serverAddress: String,
+        serverAddress: String?,
         serverPort: Int,
-        serverPath: String,
+        serverPath: String?,
     ): Result<KtorClient> {
+
+        if (null == serverAddress || serverPort <= 0 || null == serverPath) {
+            return Result.failure(IllegalArgumentException("Некорректные данные для подключения: ip=$serverAddress, port=$serverPort, path=$serverPath"))
+        }
 
         if (isConnected())
             disconnect()
@@ -79,7 +84,6 @@ class KtorClient private constructor(
             Result.success(this)
 
         } catch (e: Exception) {
-            publishState(KtorClientState.STOPPED)
             publishError(e)
             return Result.failure(e)
         }
@@ -88,12 +92,15 @@ class KtorClient private constructor(
 
     suspend fun disconnect() {
         try {
+            publishState(KtorClientState.DISCONNECTING)
+
             clientWebSocketSession?.close()
             clientWebSocketSession = null
             client.close()
+
             publishState(KtorClientState.STOPPED)
+
         } catch (e: Exception) {
-            publishState(KtorClientState.ERROR)
             publishError(e)
         }
     }

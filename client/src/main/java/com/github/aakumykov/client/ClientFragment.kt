@@ -12,9 +12,11 @@ import com.github.aakumykov.client.gesture_player.GesturePlayingService
 import com.github.aakumykov.client.ktor_client.KtorClient
 import com.github.aakumykov.client.ktor_client.KtorClientState
 import com.github.aakumykov.client.ktor_client.KtorStateProvider
+import com.github.aakumykov.client.settings_provider.SettingsProvider
 import com.github.aakumykov.common.showToast
 import com.gitlab.aakumykov.exception_utils_module.ExceptionUtils
 import com.google.gson.Gson
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 
@@ -27,39 +29,72 @@ class ClientFragment : Fragment(R.layout.fragment_client) {
         KtorClient.getInstance(Gson(), KtorStateProvider)
     }
 
+    private val settingsProvider: SettingsProvider by lazy {
+        SettingsProvider.getInstance(requireActivity().applicationContext)
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         _binding = FragmentClientBinding.bind(view)
+        subscribeToKtorClientState()
+        prepareButtons()
+    }
 
+    private fun subscribeToKtorClientState() {
         lifecycleScope.launch {
             KtorStateProvider.state.collect(::onKtorClientStateChanged)
         }
-
         lifecycleScope.launch {
             KtorStateProvider.error.collect(::onKtorClientError)
         }
+    }
+
+    private fun prepareButtons() {
 
         binding.accessibilityServiceButton.setOnClickListener {
             requireContext().openAccessibilitySettings()
         }
 
-        binding.startButton.setOnClickListener {
-            // TODO: соединяться с сервером
-            requireContext().packageManager
-                .getLaunchIntentForPackage(GesturePlayingService.GOOGLE_CHROME_PACKAGE_NAME)
-                ?.also { startActivity(it) }
-                ?: showToast(R.string.google_chrome_not_found)
-        }
+        binding.startButton.setOnClickListener { onStartButtonClicked() }
 
         binding.pauseButton.setOnClickListener {
-            // TODO: пауза
+
         }
 
-        binding.finishButton.setOnClickListener {
-            // TODO: отсоединяться от сервера
+        binding.finishButton.setOnClickListener { onFinishButtonClicked() }
+    }
+
+
+    private fun onFinishButtonClicked() {
+        disconnectFromServer()
+    }
+
+    private fun onStartButtonClicked() {
+        connectToServer()
+        /*requireContext().packageManager
+            .getLaunchIntentForPackage(GesturePlayingService.GOOGLE_CHROME_PACKAGE_NAME)
+            ?.also { startActivity(it) }
+            ?: showToast(R.string.google_chrome_not_found)*/
+    }
+
+    // TODO: наблюдать за ходом подключения
+    private fun connectToServer() {
+        lifecycleScope.launch(Dispatchers.IO) {
+            ktorClient.connect(
+                settingsProvider.getIpAddress(),
+                settingsProvider.getPort(),
+                settingsProvider.getPath()
+            )
         }
     }
+
+    // TODO: наблюдать за ходом отключения
+    private fun disconnectFromServer() {
+        lifecycleScope.launch(Dispatchers.IO) {
+            ktorClient.disconnect()
+        }
+    }
+
 
     override fun onResume() {
         super.onResume()
@@ -85,18 +120,46 @@ class ClientFragment : Fragment(R.layout.fragment_client) {
         })
 
         when(state) {
-            KtorClientState.ERROR -> binding.clientErrorView.visibility = View.VISIBLE
-            else -> binding.clientErrorView.visibility = View.GONE
+            KtorClientState.CONNECTING -> showProgressBar()
+            KtorClientState.DISCONNECTING -> showProgressBar()
+            else -> hideProgressBar()
+        }
+
+        when(state) {
+            KtorClientState.ERROR -> {}
+            else -> hideError()
         }
     }
 
     private fun onKtorClientError(e: Exception?) {
         e?.also {
             ExceptionUtils.getErrorMessage(e).also { errorMsg ->
-                binding.clientErrorView.text = errorMsg
-                Log.e(TAG, errorMsg, e)
+                showError(errorMsg)
+                Log.e(TAG, ExceptionUtils.getErrorMessage(e), e);
             }
         }
+    }
+
+    private fun showError(errorMsg: String) {
+        binding.clientErrorView.apply {
+            text = errorMsg
+            visibility = View.VISIBLE
+        }
+    }
+
+    private fun hideError() {
+        binding.clientErrorView.apply {
+            text = ""
+            visibility = View.GONE
+        }
+    }
+
+    private fun showProgressBar() {
+        binding.progressBar.visibility = View.VISIBLE
+    }
+
+    private fun hideProgressBar() {
+        binding.progressBar.visibility = View.INVISIBLE
     }
 
 

@@ -55,7 +55,17 @@
     <TextView
         android:id="@+id/clientErrorView"
         style="@style/error_view"
+        android:textColor="@color/error"
         tools:text="Ошибка Ktor-клиента"
-        tools:visibility="visible"/>
+        tools:visibility="visible" />
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:indeterminate="true"
+        android:visibility="invisible"
+        tools:visibility="visible" />
 
 </LinearLayout>
