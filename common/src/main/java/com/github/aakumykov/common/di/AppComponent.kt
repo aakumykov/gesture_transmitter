@@ -1,9 +1,8 @@
-package com.github.aakumykov.gesture_transmitter
+package com.github.aakumykov.common.di
 
-import com.github.aakumykov.client.di.ClientComponent
 import com.github.aakumykov.common.di.modules.ContextModule
 import com.github.aakumykov.common.di.modules.GsonModule
-import com.github.aakumykov.server.di.ServerComponent
+import com.google.gson.Gson
 import dagger.Component
 
 @Component(
@@ -13,6 +12,5 @@ import dagger.Component
     ],
 )
 interface AppComponent {
-//    fun getClientComponent(): ClientComponent
-//    fun getServerComponent(): ServerComponent
+    fun getClientComponent()
 }
