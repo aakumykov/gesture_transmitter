@@ -2,6 +2,10 @@ package com.github.aakumykov.client.ktor_client
 
 import android.util.Log
 import com.github.aakumykov.common.CLIENT_WANTS_TO_DISCONNECT
+import com.github.aakumykov.common.CLIENT_WANTS_TO_PAUSE
+import com.github.aakumykov.common.CLIENT_WANTS_TO_RESUME
+import com.github.aakumykov.common.SERVER_PAUSED
+import com.github.aakumykov.common.SERVER_RESUMED
 import com.gitlab.aakumykov.exception_utils_module.ExceptionUtils
 import com.google.gson.Gson
 import io.ktor.client.HttpClient
@@ -9,17 +13,13 @@ import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.websocket.ClientWebSocketSession
 import io.ktor.client.plugins.websocket.WebSockets
 import io.ktor.client.plugins.websocket.cio.webSocketRaw
-import io.ktor.client.plugins.websocket.webSocket
 import io.ktor.http.HttpMethod
 import io.ktor.websocket.Frame
 import io.ktor.websocket.FrameType
-import io.ktor.websocket.close
 import io.ktor.websocket.readText
-import io.ktor.websocket.send
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.ClosedReceiveChannelException
-import kotlinx.coroutines.channels.ClosedSendChannelException
 import kotlinx.coroutines.launch
 
 /**
@@ -31,12 +31,12 @@ class GestureClient private constructor(
     private val ktorStateProvider: KtorStateProvider
 ): ClientStateProvider by ktorStateProvider {
 
-    private suspend fun publishState(ktorClientState: KtorClientState) {
-        KtorStateProvider.setState(ktorClientState)
+    private suspend fun publishState(clientState: ClientState) {
+        KtorStateProvider.setState(clientState)
     }
 
     private suspend fun publishError(e: Exception) {
-        KtorStateProvider.setState(KtorClientState.ERROR)
+        KtorStateProvider.setState(ClientState.ERROR)
         KtorStateProvider.setError(e)
     }
 
@@ -62,7 +62,7 @@ class GestureClient private constructor(
     ) {
         try {
 
-            publishState(KtorClientState.CONNECTING)
+            publishState(ClientState.CONNECTING)
 
             client.webSocketRaw(
                 method = HttpMethod.Get,
@@ -73,7 +73,7 @@ class GestureClient private constructor(
 
                 currentSession = this
 
-                publishState(KtorClientState.CONNECTED)
+                publishState(ClientState.CONNECTED)
 
                 try {
                     for (frame in incoming) {
@@ -81,11 +81,11 @@ class GestureClient private constructor(
                         Log.d(TAG, "FRAME_TYPE (клиент): " + frame.frameType.name)
 
                         (frame as? Frame.Text)?.also {
-                            Log.d(TAG, it.readText())
+                            processTextFrame(it)
                         }
 
                         (frame as? Frame.Close)?.also {
-                            publishState(KtorClientState.DISCONNECTED)
+                            publishState(ClientState.DISCONNECTED)
                         }
                     }
                 }
@@ -101,6 +101,21 @@ class GestureClient private constructor(
         } catch (e: Exception) {
             publishError(e)
         }
+    }
+
+    private suspend fun processTextFrame(textFrame: Frame.Text) {
+        textFrame.readText().also { text ->
+            when(text) {
+                SERVER_PAUSED -> processServerPausedState()
+                SERVER_RESUMED -> publishState(ClientState.CONNECTED)
+                else -> Log.d(TAG, "Клиент получил текстовое сообщение: '$text'")
+            }
+        }
+    }
+
+    private suspend fun processServerPausedState() {
+        Log.d(TAG, "Сервер встал на пузу")
+        publishState(ClientState.PAUSED)
     }
 
 
@@ -138,16 +153,6 @@ class GestureClient private constructor(
         } else {
             publishError(IllegalStateException("Клиент не подключен к серверу"))
         }
-
-            /*clientWebSocketSession?.close()
-            clientWebSocketSession = null
-            client.close()*/
-
-//            publishState(KtorClientState.DISCONNECTED)
-
-//        } catch (e: Exception) {
-//            publishError(e)
-//        }
     }
 
 
@@ -168,17 +173,17 @@ class GestureClient private constructor(
             }
     }*/
 
-    fun isConnected(): Boolean = (null != currentSession && currentStateIs(KtorClientState.CONNECTED))
+    fun isConnected(): Boolean = (null != currentSession && currentStateIs(ClientState.CONNECTED))
 
-    fun isConnectingNow(): Boolean = currentStateIs(KtorClientState.CONNECTING)
+    fun isConnectingNow(): Boolean = currentStateIs(ClientState.CONNECTING)
 
     fun isNotConnected(): Boolean = !isConnected()
 
-    fun isNotConnectingNow(): Boolean  = !currentStateIs(KtorClientState.CONNECTING)
+    fun isNotConnectingNow(): Boolean  = !currentStateIs(ClientState.CONNECTING)
 
-    fun isNotDisconnectingNow(): Boolean = !currentStateIs(KtorClientState.DISCONNECTING)
+    fun isNotDisconnectingNow(): Boolean = !currentStateIs(ClientState.DISCONNECTING)
 
-    private fun currentStateIs(state: KtorClientState): Boolean {
+    private fun currentStateIs(state: ClientState): Boolean {
         return currentState == state
     }
 
@@ -204,7 +209,16 @@ class GestureClient private constructor(
         }
     }
 
-    val currentState: KtorClientState get() = KtorStateProvider.getState()
+    suspend fun pauseInteraction() {
+        sendTextMessage(CLIENT_WANTS_TO_PAUSE)
+    }
+
+    suspend fun resumeInteraction() {
+        sendTextMessage(CLIENT_WANTS_TO_RESUME)
+    }
+
+
+    val currentState: ClientState get() = KtorStateProvider.getState()
 
 
 

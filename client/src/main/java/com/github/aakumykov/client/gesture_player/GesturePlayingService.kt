@@ -11,7 +11,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.github.aakumykov.client.R
 import com.github.aakumykov.client.ktor_client.GestureClient
-import com.github.aakumykov.client.ktor_client.KtorClientState
+import com.github.aakumykov.client.ktor_client.ClientState
 import com.github.aakumykov.client.ktor_client.KtorStateProvider
 import com.github.aakumykov.client.settings_provider.SettingsProvider
 import com.github.aakumykov.client.utils.NotificationChannelHelper
@@ -155,18 +155,18 @@ class GesturePlayingService : AccessibilityService() {
         }
     }
 
-    private fun onClientStateChanged(ktorClientState: KtorClientState) {
+    private fun onClientStateChanged(clientState: ClientState) {
 
-        debugLog("Состояние Ktor-клиента: $ktorClientState")
+        debugLog("Состояние Ktor-клиента: $clientState")
 
-        when(ktorClientState) {
-            KtorClientState.INACTIVE -> {}
-            KtorClientState.CONNECTING -> {}
-            KtorClientState.DISCONNECTING -> {}
-            KtorClientState.CONNECTED -> startListeningForGestures()
-            KtorClientState.PAUSED -> {}
-            KtorClientState.DISCONNECTED -> {}
-            KtorClientState.ERROR -> {}
+        when(clientState) {
+            ClientState.INACTIVE -> {}
+            ClientState.CONNECTING -> {}
+            ClientState.DISCONNECTING -> {}
+            ClientState.CONNECTED -> startListeningForGestures()
+            ClientState.PAUSED -> {}
+            ClientState.DISCONNECTED -> {}
+            ClientState.ERROR -> {}
         }
     }
 

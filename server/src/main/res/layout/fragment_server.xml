@@ -31,18 +31,6 @@
         android:text="@string/stop_server_button" />
 
     <Button
-        android:id="@+id/sendTestMessageButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/send_test_message_button" />
-
-    <Button
-        android:id="@+id/sendCloseMessageButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/send_close_message_button" />
-
-    <Button
         android:id="@+id/startRecordingButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

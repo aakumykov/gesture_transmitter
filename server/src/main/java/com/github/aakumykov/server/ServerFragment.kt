@@ -57,24 +57,7 @@ class ServerFragment : Fragment(R.layout.fragment_server), View.OnTouchListener 
         binding.touchRecordingArea.setOnTouchListener(this)
         binding.startServerButton.setOnClickListener { startServer() }
         binding.stopServerButton.setOnClickListener { stopServer() }
-        binding.sendTestMessageButton.setOnClickListener { sendTestMessage() }
-        binding.sendCloseMessageButton.setOnClickListener { sendCloseMessage() }
-    }
 
-    private fun sendCloseMessage() {
-        Log.d(TAG, "sendCloseMessage()")
-        lifecycleScope.launch(Dispatchers.IO) {
-            ktorServer.sendCloseMessage()
-        }
-    }
-
-    private fun sendTestMessage() {
-        lifecycleScope.launch(Dispatchers.IO) {
-            "Привет от сервера-${Random.nextInt(100)}".also {
-                Log.d(TAG, "sendTestMessage('$it')")
-                ktorServer.sendTestMessage(it)
-            }
-        }
     }
 
     private fun onNewGesture(gesture: UserGesture?) {

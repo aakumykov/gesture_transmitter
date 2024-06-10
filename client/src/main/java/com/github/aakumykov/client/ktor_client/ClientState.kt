@@ -1,6 +1,6 @@
 package com.github.aakumykov.client.ktor_client
 
-enum class KtorClientState {
+enum class ClientState {
     INACTIVE,
 
     CONNECTING,

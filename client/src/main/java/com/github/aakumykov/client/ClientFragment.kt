@@ -10,7 +10,7 @@ import com.github.aakumykov.client.extensions.isAccessibilityServiceEnabled
 import com.github.aakumykov.client.extensions.openAccessibilitySettings
 import com.github.aakumykov.client.gesture_player.GesturePlayingService
 import com.github.aakumykov.client.ktor_client.GestureClient
-import com.github.aakumykov.client.ktor_client.KtorClientState
+import com.github.aakumykov.client.ktor_client.ClientState
 import com.github.aakumykov.client.ktor_client.KtorStateProvider
 import com.github.aakumykov.client.settings_provider.SettingsProvider
 import com.github.aakumykov.common.showToast
@@ -19,7 +19,6 @@ import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlin.random.Random
 
 
 class ClientFragment : Fragment(R.layout.fragment_client) {
@@ -44,7 +43,7 @@ class ClientFragment : Fragment(R.layout.fragment_client) {
 
     private fun subscribeToKtorClientState() {
         lifecycleScope.launch {
-            KtorStateProvider.state.collect(::onKtorClientStateChanged)
+            KtorStateProvider.state.collect(::onClientStateChanged)
         }
         lifecycleScope.launch {
             KtorStateProvider.error.collect(::onKtorClientError)
@@ -57,20 +56,19 @@ class ClientFragment : Fragment(R.layout.fragment_client) {
 
         binding.startButton.setOnClickListener { onStartButtonClicked() }
 
-        binding.pauseButton.setOnClickListener {  }
+        binding.pauseButton.setOnClickListener { onPauseButtonClicked() }
 
         binding.finishButton.setOnClickListener { onFinishButtonClicked() }
+    }
 
-
-        binding.testMessageButton.setOnClickListener {
-            lifecycleScope.launch(Dispatchers.IO) {
-                ktorClient.sendTextMessage("Привет от Клиента-${Random.nextInt(100)}")
-            }
-        }
-
-        binding.closeMessageButton.setOnClickListener {
-            lifecycleScope.launch(Dispatchers.IO) {
-                ktorClient.sendCloseMessage()
+    private fun onPauseButtonClicked() {
+        lifecycleScope.launch(Dispatchers.IO) {
+            ktorClient.currentState.also { state ->
+                when(state) {
+                    ClientState.PAUSED -> ktorClient.resumeInteraction()
+                    ClientState.CONNECTED -> ktorClient.pauseInteraction()
+                    else -> Log.w(TAG, "Пауза/возобновление недоступны в статусе '$state'")
+                }
             }
         }
     }
@@ -90,9 +88,9 @@ class ClientFragment : Fragment(R.layout.fragment_client) {
 
     private fun connectToServer() {
         when(ktorClient.currentState) {
-            KtorClientState.CONNECTED -> { showToast(R.string.toast_already_connected) }
-            KtorClientState.CONNECTING -> { showToast(R.string.toast_connecting_now) }
-            KtorClientState.DISCONNECTING -> { showToast(R.string.toast_disconnecting_now) }
+            ClientState.CONNECTED -> { showToast(R.string.toast_already_connected) }
+            ClientState.CONNECTING -> { showToast(R.string.toast_connecting_now) }
+            ClientState.DISCONNECTING -> { showToast(R.string.toast_disconnecting_now) }
             else -> connectToServerReal()
         }
     }
@@ -132,36 +130,46 @@ class ClientFragment : Fragment(R.layout.fragment_client) {
     }
 
 
-    private fun onKtorClientStateChanged(state: KtorClientState) {
+    private fun onClientStateChanged(state: ClientState) {
         displayClientState(state)
+        updatePauseButton(state)
         showHideProgressBar(state)
         hideErrorIfNotError(state)
     }
 
-    private fun hideErrorIfNotError(state: KtorClientState) {
+    private fun updatePauseButton(state: ClientState) {
+        binding.pauseButton.setText(getString(
+            when(state) {
+                ClientState.PAUSED -> R.string.pause_button_resume
+                else -> R.string.pause_button_pause
+            }
+        ))
+    }
+
+    private fun hideErrorIfNotError(state: ClientState) {
         when(state) {
-            KtorClientState.ERROR -> {}
+            ClientState.ERROR -> {}
             else -> hideError()
         }
     }
 
-    private fun showHideProgressBar(state: KtorClientState) {
+    private fun showHideProgressBar(state: ClientState) {
         when(state) {
-            KtorClientState.CONNECTING -> showProgressBar()
-            KtorClientState.DISCONNECTING -> showProgressBar()
+            ClientState.CONNECTING -> showProgressBar()
+            ClientState.DISCONNECTING -> showProgressBar()
             else -> hideProgressBar()
         }
     }
 
-    private fun displayClientState(state: KtorClientState) {
+    private fun displayClientState(state: ClientState) {
         binding.clientStateView.setText(when(state) {
-            KtorClientState.INACTIVE -> R.string.ktor_client_state_inactive
-            KtorClientState.CONNECTING -> R.string.ktor_client_state_connecting
-            KtorClientState.DISCONNECTING -> R.string.ktor_client_state_disconnecting
-            KtorClientState.CONNECTED -> R.string.ktor_client_state_running
-            KtorClientState.PAUSED -> R.string.ktor_client_state_paused
-            KtorClientState.DISCONNECTED -> R.string.ktor_client_state_disconnected
-            KtorClientState.ERROR -> R.string.ktor_client_state_error
+            ClientState.INACTIVE -> R.string.ktor_client_state_inactive
+            ClientState.CONNECTING -> R.string.ktor_client_state_connecting
+            ClientState.DISCONNECTING -> R.string.ktor_client_state_disconnecting
+            ClientState.CONNECTED -> R.string.ktor_client_state_running
+            ClientState.PAUSED -> R.string.ktor_client_server_state_paused
+            ClientState.DISCONNECTED -> R.string.ktor_client_state_disconnected
+            ClientState.ERROR -> R.string.ktor_client_state_error
         })
     }
 

@@ -21,12 +21,13 @@
     <string name="ktor_client_state_connecting">Ktor-клиент соединяется с сервером</string>
     <string name="ktor_client_state_disconnecting">Ktor-клиент отключается от сервера</string>
     <string name="ktor_client_state_running">Ktor-клиент активен</string>
-    <string name="ktor_client_state_paused">Ktor-клиент на паузе</string>
+    <string name="ktor_client_server_state_paused">Клиент (и сервер) на паузе</string>
     <string name="ktor_client_state_disconnected">Ktor-клиент остановлен</string>
     <string name="ktor_client_state_error">Ошибка Ktor-клиента</string>
     <string name="gesture_playing_service_error_incomplete_server_config">Неполные данные для подключения</string>
     <string name="start_button">Старт</string>
-    <string name="pause_button">Промежуточный отдых</string>
+    <string name="pause_button_pause">Отдохнуть</string>
+    <string name="pause_button_resume">Продолжить</string>
     <string name="stop_button">Фнинш</string>
     <string name="google_chrome_not_found">Google Chrome не найден</string>
     <string name="config_button">Настройки</string>

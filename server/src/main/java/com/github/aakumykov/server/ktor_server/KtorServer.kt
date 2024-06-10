@@ -2,6 +2,10 @@ package com.github.aakumykov.server.ktor_server
 
 import android.util.Log
 import com.github.aakumykov.common.CLIENT_WANTS_TO_DISCONNECT
+import com.github.aakumykov.common.CLIENT_WANTS_TO_PAUSE
+import com.github.aakumykov.common.CLIENT_WANTS_TO_RESUME
+import com.github.aakumykov.common.SERVER_PAUSED
+import com.github.aakumykov.common.SERVER_RESUMED
 import com.github.aakumykov.kotlin_playground.UserGesture
 import com.gitlab.aakumykov.exception_utils_module.ExceptionUtils
 import com.google.gson.Gson
@@ -9,31 +13,24 @@ import io.ktor.server.application.install
 import io.ktor.server.cio.CIO
 import io.ktor.server.engine.ApplicationEngine
 import io.ktor.server.engine.embeddedServer
-import io.ktor.server.jetty.Jetty
-import io.ktor.server.jetty.JettyApplicationEngine
 import io.ktor.server.routing.routing
-import io.ktor.server.websocket.DefaultWebSocketServerSession
 import io.ktor.server.websocket.WebSocketServerSession
 import io.ktor.server.websocket.WebSockets
 import io.ktor.server.websocket.pingPeriod
 import io.ktor.server.websocket.timeout
-import io.ktor.server.websocket.webSocket
 import io.ktor.server.websocket.webSocketRaw
 import io.ktor.websocket.CloseReason
 import io.ktor.websocket.Frame
-import io.ktor.websocket.FrameType
 import io.ktor.websocket.close
 import io.ktor.websocket.readText
 import kotlinx.coroutines.channels.ClosedReceiveChannelException
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.receiveAsFlow
 import java.time.Duration
 import java.util.concurrent.atomic.AtomicBoolean
 
 class KtorServer(private val gson: Gson) {
 
+    private var onPause: Boolean = false
     private var runningServer: ApplicationEngine? = null
     private var serverSession: WebSocketServerSession? = null
     private val sessionHashCode: String
@@ -92,31 +89,6 @@ class KtorServer(private val gson: Gson) {
                     catch (t: Throwable) {
                         Log.e(TAG, "ОШИБКА: "+ExceptionUtils.getErrorMessage(t), t);
                     }
-
-                    /*try {
-                        for (frame in incoming) {
-
-                            *//*if (stopRequested) {
-                                Log.e(TAG, "Запрошен останов сервера...")
-                                closeSession("Останов, запрошенный пользователем")
-                                return@webSocket
-                            }*//*
-
-                            when (frame.frameType) {
-                                FrameType.PING -> debugPing()
-                                FrameType.PONG -> debugPong()
-                                FrameType.CLOSE -> closeSession("Клиент закрыл соединение")
-                                FrameType.TEXT -> processTextFrame(frame as? Frame.Text)
-                                FrameType.BINARY -> {}
-                            }
-                        }
-                    }
-                    catch (e: ClosedReceiveChannelException) {
-                        Log.e(TAG, "Входящее соединение зкрыто.")
-                    }
-                    catch (t: Throwable) {
-                        Log.e(TAG, ExceptionUtils.getErrorMessage(t), t)
-                    }*/
                 }
             }
         }.start(wait = true)
@@ -128,20 +100,15 @@ class KtorServer(private val gson: Gson) {
         serverSession = null
     }
 
-    private fun debugPing() {
-        Log.d(TAG, "--> Пинг сервера, $sessionHashCode")
-    }
 
-    private fun debugPong() {
-        Log.d(TAG, "<-- Понг от сервера, $sessionHashCode")
-    }
-
-    private suspend fun processTextFrame(textFrame: Frame.Text?) {
-        textFrame?.readText()?.also { text ->
-            if (CLIENT_WANTS_TO_DISCONNECT == text)
-                closeSession(CLIENT_WANTS_TO_DISCONNECT)
-            else
-                Log.d(TAG, "Входящий текст: '$text'")
+    private suspend fun processTextFrame(textFrame: Frame.Text) {
+        textFrame.readText().also { text ->
+            when(text) {
+                CLIENT_WANTS_TO_DISCONNECT -> closeSession(CLIENT_WANTS_TO_DISCONNECT)
+                CLIENT_WANTS_TO_PAUSE -> { processPauseRequest() }
+                CLIENT_WANTS_TO_RESUME -> { processResumeRequest() }
+                else -> Log.d(TAG, "Сервер получил текстовое сообщение: '$text'")
+            }
         }
 
         /*if (null == textFrame) {
@@ -166,6 +133,26 @@ class KtorServer(private val gson: Gson) {
         ) ?: Log.e(TAG, "Нет текущей сессии для отправки эхо-ответа.")*/
     }
 
+    private suspend fun processResumeRequest() {
+        onPause = false
+        sendText(SERVER_RESUMED)
+    }
+
+    private suspend fun processPauseRequest() {
+        onPause = true
+        sendText(SERVER_PAUSED)
+    }
+
+    private suspend fun sendText(text: String) {
+        try {
+            serverSession?.outgoing?.send(Frame.Text(text))
+                ?: throw IllegalStateException("serverSession == null")
+        }
+        catch (e: Exception) {
+            Log.e(TAG, ExceptionUtils.getErrorMessage(e), e)
+        }
+    }
+
 
     // TODO: выдавать поток с ошибками
     suspend fun sendUserGesture(gesture: UserGesture) {
@@ -173,13 +160,12 @@ class KtorServer(private val gson: Gson) {
         Log.d(TAG, "sendUserGesture(), $gesture")
 
         val gestureJson = gson.toJson(gesture)
-        val textFrame = Frame.Text(gestureJson)
+
 
         serverSession?.apply {
-            outgoing.send(textFrame)
+            sendText(gestureJson)
             Log.d(TAG, "Жест отправлен: $gesture")
-        }
-            ?: Log.e(TAG, "Жест не отправлен, так как ещё никто не подключился.")
+        } ?: Log.e(TAG, "Жест не отправлен: ещё никто не подключился.")
     }
 
 
@@ -192,15 +178,6 @@ class KtorServer(private val gson: Gson) {
         Log.d(TAG, "...сервер, вероятно, остановлен.")
     }
 
-    suspend fun sendTestMessage(text: String) {
-        serverSession?.outgoing?.send(Frame.Text(text))
-    }
-
-    suspend fun sendCloseMessage() {
-        serverSession?.outgoing?.send(Frame.Close(
-            CloseReason(CloseReason.Codes.NORMAL, "Тестовое Close-сообщение")
-        ))
-    }
 
 
     companion object {
