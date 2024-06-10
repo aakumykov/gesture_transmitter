@@ -34,7 +34,7 @@ class GestureServer(private val gson: Gson) {
     private var runningServer: ApplicationEngine? = null
     private var serverSession: WebSocketServerSession? = null
     private val sessionHashCode: String
-        get() = "session.hashCode: ${(serverSession?.hashCode() ?: "[нет сессии]")}"
+        get() = "session.hashCode: [${(serverSession?.hashCode() ?: "нет сессии")}]"
     private val _stopRequested: AtomicBoolean = AtomicBoolean(false)
     private val stopRequested: Boolean get() = _stopRequested.get()
 
@@ -67,7 +67,7 @@ class GestureServer(private val gson: Gson) {
                 webSocketRaw(path = path) {
 
                     serverSession = this
-                    Log.d(TAG, "Новое подключение, ${serverSession.hashCode()}")
+                    Log.d(TAG, "Новое подключение $sessionHashCode")
 
                     try {
                         for (frame in incoming) {
@@ -157,10 +157,9 @@ class GestureServer(private val gson: Gson) {
     // TODO: выдавать поток с ошибками
     suspend fun sendUserGesture(gesture: UserGesture) {
 
-        Log.d(TAG, "sendUserGesture(), $gesture")
+        Log.d(TAG, "sendUserGesture() [$sessionHashCode], $gesture")
 
         val gestureJson = gson.toJson(gesture)
-
 
         serverSession?.apply {
             sendText(gestureJson)
