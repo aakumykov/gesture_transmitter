@@ -46,6 +46,7 @@ dependencies {
     implementation libs.material
     implementation project(':server')
     implementation project(':client')
+    implementation project(':common')
     testImplementation libs.junit
     androidTestImplementation libs.androidx.junit
     androidTestImplementation libs.androidx.espresso.core

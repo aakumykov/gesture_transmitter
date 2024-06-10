@@ -1,4 +1,4 @@
-package com.github.aakumykov.gesture_transmitter
+package com.github.aakumykov.common
 
 import android.app.Application
 import android.content.Context
@@ -8,8 +8,6 @@ import com.github.aakumykov.common.di.annotations.AppContext
 import com.github.aakumykov.common.di.modules.ContextModule
 import com.github.aakumykov.common.di.DaggerAppComponent
 import com.github.aakumykov.common.di.DaggerAbcComponent
-import com.github.aakumykov.qwerty.QwertyComponent
-import com.github.aakumykov.qwerty.DaggerQwertyComponent
 
 val appComponent: AppComponent get() = App.getAppComponent()
 val qwertyComponent: QwertyComponent get() = App.getQwertyComponent()
