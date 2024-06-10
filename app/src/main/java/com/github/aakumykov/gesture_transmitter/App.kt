@@ -7,6 +7,7 @@ import com.github.aakumykov.common.di.AppComponent
 import com.github.aakumykov.common.di.annotations.AppContext
 import com.github.aakumykov.common.di.modules.ContextModule
 import com.github.aakumykov.common.di.DaggerAppComponent
+import com.github.aakumykov.common.di.DaggerAbcComponent
 import com.github.aakumykov.qwerty.QwertyComponent
 
 val appComponent: AppComponent get() = App.getAppComponent()
