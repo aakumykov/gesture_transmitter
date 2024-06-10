@@ -1,20 +1,10 @@
 package com.github.aakumykov.client.gesture_player
 
 import android.accessibilityservice.AccessibilityService
-import android.app.Notification
-import android.app.PendingIntent
-import android.content.Intent
-import android.provider.Settings
 import android.util.Log
 import android.view.accessibility.AccessibilityEvent
-import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationManagerCompat
-import com.github.aakumykov.client.R
 import com.github.aakumykov.client.ktor_client.GestureClient
-import com.github.aakumykov.client.ktor_client.ClientState
 import com.github.aakumykov.client.ktor_client.KtorStateProvider
-import com.github.aakumykov.client.settings_provider.SettingsProvider
-import com.github.aakumykov.client.utils.NotificationChannelHelper
 import com.github.aakumykov.common.GOOGLE_CHROME_PACKAGE_NAME
 import com.github.aakumykov.kotlin_playground.UserGesture
 import com.gitlab.aakumykov.exception_utils_module.ExceptionUtils
@@ -34,7 +24,7 @@ class GesturePlayingService : AccessibilityService() {
     private val trackedWindowNotVisible: Boolean get() = !trackedWindowHasAppeared.get()
 
     private var chromeIsLaunched: Boolean = false
-    private var chromeHasContent: Boolean = false
+    private var currentWindowHasContent: Boolean = false
 
 
     private val gesturePlayer: GesturePlayer by lazy {
@@ -62,10 +52,6 @@ class GesturePlayingService : AccessibilityService() {
 
 
     private fun prepareGestureClient() {
-        CoroutineScope(Dispatchers.Main).launch {
-            gestureClient.state.collect(::onClientStateChanged)
-        }
-
         CoroutineScope(Dispatchers.IO).launch {
             gestureClient.userGestures.filterNotNull().collect(::onNewUserGesture)
         }
@@ -73,39 +59,17 @@ class GesturePlayingService : AccessibilityService() {
 
 
     private fun onNewUserGesture(userGesture: UserGesture) {
-        Log.d(TAG, userGesture.toString())
-        gesturePlayer.playGesture(userGesture)
+        if (chromeIsRunAndVisible())
+            gesturePlayer.playGesture(userGesture)
     }
 
 
-    private fun onClientStateChanged(clientState: ClientState) {
-
-        debugLog("Состояние GestureClient-а: $clientState")
-
-        when(clientState) {
-            ClientState.INACTIVE -> {}
-            ClientState.CONNECTING -> {}
-            ClientState.DISCONNECTING -> {}
-            ClientState.CONNECTED -> startListeningForGestures()
-            ClientState.PAUSED -> {}
-            ClientState.DISCONNECTED -> {}
-            ClientState.ERROR -> {}
-        }
-    }
-
-    private fun startListeningForGestures() {
-        /*CoroutineScope(Dispatchers.IO).launch {
-            try {
-                ktorClient.gesturesFlow()?.collect { userGesture: UserGesture? ->
-                    gesturePlayer.playGesture(userGesture)
-                }
-            } catch (e: Exception) {
-                errorLog(e)
-            }
-        }*/
+    private fun chromeIsRunAndVisible(): Boolean {
+        return chromeIsLaunched
     }
 
 
+    // Место для динамической настройки AccessibilityService
     override fun onServiceConnected() {
         super.onServiceConnected()
         /*getServiceInfo().apply {
@@ -118,23 +82,33 @@ class GesturePlayingService : AccessibilityService() {
         }*/
     }
 
+
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
+        if (null != event) {
 
-        event?.also { ev ->
-            chromeIsLaunched = currentWindowIsChromeWindow()
-            chromeHasContent = currentWindowHasChild()
-
-//            debugLog("windows_check","хром запущен: $chromeIsLaunched, содержимое: $chromeHasContent")
-
-            /*CoroutineScope(Dispatchers.IO).launch {
-                if (chromeIsLaunched && chromeHasContent) {
-                    if (ktorClient.isNotConnected() && ktorClient.isNotConnectingNow())
-                        connectToServer()
-                } else {
-                    if (ktorClient.isConnected() && ktorClient.isNotDisconnectingNow())
-                        disconnectFromServer()
+            if (currentWindowIsChromeWindow()) {
+                if (!chromeIsLaunched) {
+                    chromeIsLaunched = true
+                    reportServerChromeIsActive(chromeIsLaunched)
                 }
-            }*/
+            } else {
+                if (chromeIsLaunched) {
+                    chromeIsLaunched = false
+                    reportServerChromeIsActive(chromeIsLaunched)
+                }
+            }
+
+//            chromeIsLaunched = currentWindowIsChromeWindow()
+//            currentWindowHasContent = currentWindowHasChild()
+
+            /*debugLog(TAG,
+                "Хром "
+                    + (if(chromeIsLaunched) "" else "не")
+                    + " запущен. "
+                    + "Текущее окно "
+                    + (if (currentWindowHasContent) "имеет содержимое" else "без содержимого")
+                    + "."
+            )*/
         }
 
         /*if (null != event && event.isWindowStateChanged()) {
@@ -148,26 +122,13 @@ class GesturePlayingService : AccessibilityService() {
                 disconnectFromServer()
             }
         }*/
+    }
 
-        /*rootInActiveWindow?.also { rootView ->
-
-            val pn = rootView.packageName
-            val chCnt = rootView.childCount
-
-            val evTypeString = when(event?.eventType) {
-                AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED -> {
-                    val et = "WINDOW_STATE_CHANGED"
-                    debugLog("$et: package: $pn")
-                    et
-                }
-                AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED -> "WINDOW_CONTENT_CHANGED"
-                else -> "Другое событие"
-            }
-
-            debugLog("window_state","--------------")
-            debugLog("window_state","$evTypeString: package: $pn, child: $chCnt")
-//            showChildrenRecursively(0, rootView.getChildren())
-        }*/
+    private fun reportServerChromeIsActive(isActive: Boolean) {
+        Log.d(TAG, "reportServerChromeLaunched()")
+        CoroutineScope(Dispatchers.IO).launch {
+            gestureClient.reportServerTargetAppIsActive(isActive)
+        }
     }
 
     private fun currentWindowIsChromeWindow(): Boolean {

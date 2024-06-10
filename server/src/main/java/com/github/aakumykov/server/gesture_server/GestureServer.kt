@@ -6,6 +6,8 @@ import com.github.aakumykov.common.CLIENT_WANTS_TO_PAUSE
 import com.github.aakumykov.common.CLIENT_WANTS_TO_RESUME
 import com.github.aakumykov.common.SERVER_PAUSED
 import com.github.aakumykov.common.SERVER_RESUMED
+import com.github.aakumykov.common.TARGET_APP_IS_ACTIVE
+import com.github.aakumykov.common.TARGET_APP_IS_INACTIVE
 import com.github.aakumykov.kotlin_playground.UserGesture
 import com.gitlab.aakumykov.exception_utils_module.ExceptionUtils
 import com.google.gson.Gson
@@ -31,6 +33,9 @@ import java.util.concurrent.atomic.AtomicBoolean
 class GestureServer(private val gson: Gson) {
 
     private var onPause: Boolean = false
+    private var targetAppIsActive: Boolean = false
+    private val shouldTransmitGestures: Boolean = (!onPause && targetAppIsActive)
+
     private var runningServer: ApplicationEngine? = null
     private var serverSession: WebSocketServerSession? = null
     private val sessionHashCode: String
@@ -107,30 +112,21 @@ class GestureServer(private val gson: Gson) {
                 CLIENT_WANTS_TO_DISCONNECT -> closeSession(CLIENT_WANTS_TO_DISCONNECT)
                 CLIENT_WANTS_TO_PAUSE -> { processPauseRequest() }
                 CLIENT_WANTS_TO_RESUME -> { processResumeRequest() }
+                TARGET_APP_IS_ACTIVE -> { onTargetAppActivated() }
+                TARGET_APP_IS_INACTIVE -> { onTargetAppDeactivated() }
                 else -> Log.d(TAG, "Сервер получил текстовое сообщение: '$text'")
             }
         }
+    }
 
-        /*if (null == textFrame) {
-            Log.e(TAG, "textFrame равна  null")
-            return
-        }
+    private fun onTargetAppActivated() {
+        Log.d(TAG, "onTargetAppActivated()")
+        targetAppIsActive = true
+    }
 
-        val incomingText: String = textFrame.readText()
-
-        val gesture: UserGesture? = try {
-            gson.fromJson(incomingText, UserGesture::class.java)
-        } catch (e: JsonSyntaxException) {
-            Log.e(TAG, ExceptionUtils.getErrorMessage(e), e)
-            null
-        }
-
-        serverSession?.outgoing?.send(
-            Frame.Text(
-                gesture?.let { "Получен жест: $it" }
-                    ?: "Получен текст: $incomingText"
-            )
-        ) ?: Log.e(TAG, "Нет текущей сессии для отправки эхо-ответа.")*/
+    private fun onTargetAppDeactivated() {
+        Log.d(TAG, "onTargetAppDeactivated()")
+        targetAppIsActive = false
     }
 
     private suspend fun processResumeRequest() {
@@ -154,17 +150,23 @@ class GestureServer(private val gson: Gson) {
     }
 
 
-    // TODO: выдавать поток с ошибками
     suspend fun sendUserGesture(gesture: UserGesture) {
-
         Log.d(TAG, "sendUserGesture() [$sessionHashCode], $gesture")
 
-        val gestureJson = gson.toJson(gesture)
+        if (shouldTransmitGestures) {
+            val gestureJson = gson.toJson(gesture)
 
-        serverSession?.apply {
-            sendText(gestureJson)
-            Log.d(TAG, "Жест отправлен: $gesture")
-        } ?: Log.e(TAG, "Жест не отправлен: ещё никто не подключился.")
+            if (null != serverSession) {
+                sendText(gestureJson)
+                Log.d(TAG, "Жест отправлен: $gesture")
+            } else {
+                Log.e(TAG, "Жест не отправлен: некому отправлять.")
+            }
+        }
+        else {
+            // TODO: писать в журнал
+            Log.d(TAG, "Нет условий для передачи жеста: targetAppIsActive=$targetAppIsActive, onPause=$onPause")
+        }
     }
 
 

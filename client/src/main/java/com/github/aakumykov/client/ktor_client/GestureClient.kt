@@ -6,6 +6,8 @@ import com.github.aakumykov.common.CLIENT_WANTS_TO_PAUSE
 import com.github.aakumykov.common.CLIENT_WANTS_TO_RESUME
 import com.github.aakumykov.common.SERVER_PAUSED
 import com.github.aakumykov.common.SERVER_RESUMED
+import com.github.aakumykov.common.TARGET_APP_IS_ACTIVE
+import com.github.aakumykov.common.TARGET_APP_IS_INACTIVE
 import com.github.aakumykov.kotlin_playground.UserGesture
 import com.gitlab.aakumykov.exception_utils_module.ExceptionUtils
 import com.google.gson.Gson
@@ -35,8 +37,12 @@ class GestureClient private constructor(
 
     private var currentSession: ClientWebSocketSession? = null
 
+
     private val _userGestureFlow: MutableSharedFlow<UserGesture?> = MutableStateFlow(null)
     val userGestures: SharedFlow<UserGesture?> = _userGestureFlow
+
+
+    val currentState: ClientState get() = KtorStateProvider.getState()
 
 
     private val client by lazy {
@@ -94,11 +100,6 @@ class GestureClient private constructor(
         }
     }
 
-    private suspend fun processCloseFrame(closeFrame: Frame.Close) {
-        publishState(ClientState.DISCONNECTED)
-        currentSession = null
-    }
-
 
     suspend fun requestDisconnection() {
 
@@ -121,6 +122,21 @@ class GestureClient private constructor(
 
     suspend fun resumeInteraction() {
         sendTextMessage(CLIENT_WANTS_TO_RESUME)
+    }
+
+
+    suspend fun reportServerTargetAppIsActive(isActive: Boolean) {
+        sendTextMessage(
+            if (isActive) TARGET_APP_IS_ACTIVE
+            else TARGET_APP_IS_INACTIVE
+        )
+    }
+
+
+
+    private suspend fun processCloseFrame(closeFrame: Frame.Close) {
+        publishState(ClientState.DISCONNECTED)
+        currentSession = null
     }
 
 
@@ -188,11 +204,6 @@ class GestureClient private constructor(
             publishError(e)
         }
     }
-
-
-
-    val currentState: ClientState get() = KtorStateProvider.getState()
-
 
 
     companion object {
