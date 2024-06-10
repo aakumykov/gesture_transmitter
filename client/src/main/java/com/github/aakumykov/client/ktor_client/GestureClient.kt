@@ -6,8 +6,10 @@ import com.github.aakumykov.common.CLIENT_WANTS_TO_PAUSE
 import com.github.aakumykov.common.CLIENT_WANTS_TO_RESUME
 import com.github.aakumykov.common.SERVER_PAUSED
 import com.github.aakumykov.common.SERVER_RESUMED
+import com.github.aakumykov.kotlin_playground.UserGesture
 import com.gitlab.aakumykov.exception_utils_module.ExceptionUtils
 import com.google.gson.Gson
+import com.google.gson.JsonSyntaxException
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.websocket.ClientWebSocketSession
@@ -15,12 +17,11 @@ import io.ktor.client.plugins.websocket.WebSockets
 import io.ktor.client.plugins.websocket.cio.webSocketRaw
 import io.ktor.http.HttpMethod
 import io.ktor.websocket.Frame
-import io.ktor.websocket.FrameType
 import io.ktor.websocket.readText
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.ClosedReceiveChannelException
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 
 /**
  * Получает [UserGesture] от GestureServer-а,
@@ -28,28 +29,18 @@ import kotlinx.coroutines.launch
  */
 class GestureClient private constructor(
     private val gson: Gson,
-    private val ktorStateProvider: KtorStateProvider
+    private val ktorStateProvider: KtorStateProvider,
+//    private val gestureLogger: GestureLogger
 ): ClientStateProvider by ktorStateProvider {
 
-    private suspend fun publishState(clientState: ClientState) {
-        KtorStateProvider.setState(clientState)
-    }
-
-    private suspend fun publishError(e: Exception) {
-        KtorStateProvider.setState(ClientState.ERROR)
-        KtorStateProvider.setError(e)
-    }
-
     private var currentSession: ClientWebSocketSession? = null
+
+    private val _userGestureFlow: MutableSharedFlow<UserGesture?> = MutableStateFlow(null)
+    val userGestures: SharedFlow<UserGesture?> = _userGestureFlow
 
 
     private val client by lazy {
         HttpClient(CIO) {
-            /*engine {
-                preconfigured = OkHttpClient.Builder()
-                    .pingInterval(20, TimeUnit.SECONDS)
-                    .build()
-            }*/
             install(WebSockets)
         }
     }
@@ -85,7 +76,7 @@ class GestureClient private constructor(
                         }
 
                         (frame as? Frame.Close)?.also {
-                            publishState(ClientState.DISCONNECTED)
+                            processCloseFrame(it)
                         }
                     }
                 }
@@ -101,6 +92,11 @@ class GestureClient private constructor(
         } catch (e: Exception) {
             publishError(e)
         }
+    }
+
+    private suspend fun processCloseFrame(closeFrame: Frame.Close) {
+        publishState(ClientState.DISCONNECTED)
+        currentSession = null
     }
 
 
@@ -133,50 +129,40 @@ class GestureClient private constructor(
             when(text) {
                 SERVER_PAUSED -> publishState(ClientState.PAUSED)
                 SERVER_RESUMED -> publishState(ClientState.CONNECTED)
-                else -> Log.d(TAG, "Клиент получил текстовое сообщение: '$text'")
+                else -> processSerializedUserGesture(text)
             }
         }
     }
 
 
-    private fun startListeningForServer() {
-        CoroutineScope(Dispatchers.IO).launch {
-
-            currentSession?.also { session ->
-
-                for (frame in session.incoming) {
-
-                    Log.d(TAG, "FRAME_TYPE (клиент): "+frame.frameType.name)
-
-                    when (frame.frameType) {
-                        FrameType.PING -> {  }
-                        FrameType.PONG -> {  }
-                        FrameType.TEXT -> {  }
-                        FrameType.BINARY -> {  }
-                        FrameType.CLOSE -> {  }
-                    }
-                }
+    private suspend fun processSerializedUserGesture(text: String) {
+        try {
+            gson.fromJson(text, UserGesture::class.java)?.also {userGesture ->
+                Log.d(TAG, userGesture.toString())
+                publishUserGesture(userGesture)
             }
+        } catch (e: JsonSyntaxException) {
+            // TODO: отчитаться серверу
+            Log.e(TAG, ExceptionUtils.getErrorMessage(e), e);
         }
     }
 
 
-    /*fun gesturesFlow(): Flow<UserGesture?>? {
-        return webSocketSession?.incoming?.receiveAsFlow()
-            ?.filter { it is Frame.Text }
-            ?.map { it as Frame.Text }
-            ?.map { textFrame ->
-                return@map try {
-                    val json = textFrame.readText()
-                    gson.fromJson(json, UserGesture::class.java).also { userGesture ->
-                        Log.d(TAG, "Получен жест: $userGesture")
-                    }
-                } catch (e: JsonSyntaxException) {
-                    Log.e(TAG, ExceptionUtils.getErrorMessage(e), e)
-                    null
-                }
-            }
-    }*/
+    private suspend fun publishUserGesture(userGesture: UserGesture) {
+        _userGestureFlow.emit(userGesture)
+    }
+
+
+    private suspend fun publishState(clientState: ClientState) {
+        KtorStateProvider.setState(clientState)
+    }
+
+
+    private suspend fun publishError(e: Exception) {
+        KtorStateProvider.setState(ClientState.ERROR)
+        KtorStateProvider.setError(e)
+    }
+
 
     fun isConnected(): Boolean = (null != currentSession && currentStateIs(ClientState.CONNECTED))
 

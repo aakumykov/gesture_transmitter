@@ -9,12 +9,9 @@ class GesturePlayer(private val accessibilityService: AccessibilityService) {
 
     private var lastGesture: UserGesture? = null
 
-    fun playGesture(userGesture: UserGesture?) {
+    fun playGesture(userGesture: UserGesture) {
 
-        if (null == userGesture) {
-            Log.e(TAG, "UserGesture == null")
-            return
-        }
+        Log.d(TAG, "Воспроизвожу $userGesture")
 
         lastGesture = userGesture
 

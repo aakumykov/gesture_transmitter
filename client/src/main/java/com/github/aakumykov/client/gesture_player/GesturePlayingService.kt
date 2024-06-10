@@ -15,10 +15,12 @@ import com.github.aakumykov.client.ktor_client.ClientState
 import com.github.aakumykov.client.ktor_client.KtorStateProvider
 import com.github.aakumykov.client.settings_provider.SettingsProvider
 import com.github.aakumykov.client.utils.NotificationChannelHelper
+import com.github.aakumykov.kotlin_playground.UserGesture
 import com.gitlab.aakumykov.exception_utils_module.ExceptionUtils
 import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -44,7 +46,7 @@ class GesturePlayingService : AccessibilityService() {
     private val serverPath: String? get() = settingsProvider.getPath()
 
 
-    private val ktorClient: GestureClient by lazy {
+    private val gestureClient: GestureClient by lazy {
         GestureClient.getInstance(Gson(), KtorStateProvider)
     }
 
@@ -138,7 +140,7 @@ class GesturePlayingService : AccessibilityService() {
     override fun onCreate() {
         super.onCreate()
         debugLog("Служба доступности, onCreate()")
-//        prepareKtorClient()
+        prepareGestureClient()
 //        connectToServer()
     }
 
@@ -149,10 +151,18 @@ class GesturePlayingService : AccessibilityService() {
 //        hideNotification()
     }
 
-    private fun prepareKtorClient() {
+    private fun prepareGestureClient() {
         CoroutineScope(Dispatchers.Main).launch {
-            ktorClient.state.collect(::onClientStateChanged)
+            gestureClient.state.collect(::onClientStateChanged)
         }
+        CoroutineScope(Dispatchers.IO).launch {
+            gestureClient.userGestures.filterNotNull().collect(::onNewUserGesture)
+        }
+    }
+
+    private fun onNewUserGesture(userGesture: UserGesture) {
+        Log.d(TAG, userGesture.toString())
+        gesturePlayer.playGesture(userGesture)
     }
 
     private fun onClientStateChanged(clientState: ClientState) {
@@ -338,7 +348,7 @@ class GesturePlayingService : AccessibilityService() {
 
     private fun disconnectFromServer() {
         CoroutineScope(Dispatchers.IO).launch {
-            ktorClient.requestDisconnection()
+            gestureClient.requestDisconnection()
         }
     }
 
