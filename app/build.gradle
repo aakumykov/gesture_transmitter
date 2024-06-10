@@ -36,12 +36,12 @@ android {
     productFlavors {
         client {
             dimension "mode"
-            applicationId 'aakumykov.gesture_transmitter'
+            applicationId 'gesture_transmitter'
             applicationIdSuffix ".client"
         }
         server {
             dimension "mode"
-            applicationId 'aakumykov.gesture_transmitter'
+            applicationId 'gesture_transmitter'
             applicationIdSuffix ".server"
         }
     }
