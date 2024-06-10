@@ -13,11 +13,11 @@ import com.github.aakumykov.client.ktor_client.KtorClient
 import com.github.aakumykov.client.ktor_client.KtorClientState
 import com.github.aakumykov.client.ktor_client.KtorStateProvider
 import com.github.aakumykov.client.settings_provider.SettingsProvider
-import com.github.aakumykov.common.showToast
 import com.gitlab.aakumykov.exception_utils_module.ExceptionUtils
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 
 class ClientFragment : Fragment(R.layout.fragment_client) {
@@ -90,8 +90,10 @@ class ClientFragment : Fragment(R.layout.fragment_client) {
 
     // TODO: наблюдать за ходом отключения
     private fun disconnectFromServer() {
-        lifecycleScope.launch(Dispatchers.IO) {
-            ktorClient.disconnect()
+        lifecycleScope.launch {
+            withContext(Dispatchers.IO) {
+                ktorClient.requestDisconnect()
+            }
         }
     }
 

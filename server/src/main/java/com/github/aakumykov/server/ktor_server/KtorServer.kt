@@ -1,6 +1,7 @@
 package com.github.aakumykov.server.ktor_server
 
 import android.util.Log
+import com.github.aakumykov.common.CLIENT_WANTS_TO_DISCONNECT
 import com.github.aakumykov.kotlin_playground.UserGesture
 import com.gitlab.aakumykov.exception_utils_module.ExceptionUtils
 import com.google.gson.Gson
@@ -20,6 +21,7 @@ import io.ktor.websocket.CloseReason
 import io.ktor.websocket.Frame
 import io.ktor.websocket.FrameType
 import io.ktor.websocket.close
+import io.ktor.websocket.readText
 import kotlinx.coroutines.channels.ClosedReceiveChannelException
 import kotlinx.coroutines.delay
 import java.time.Duration
@@ -70,11 +72,11 @@ class KtorServer(private val gson: Gson) {
                     try {
                         for (frame in incoming) {
 
-                            if (stopRequested) {
+                            /*if (stopRequested) {
                                 Log.e(TAG, "Запрошен останов сервера...")
                                 closeSession("Останов, запрошенный пользователем")
                                 return@webSocket
-                            }
+                            }*/
 
                             when (frame.frameType) {
                                 FrameType.PING -> debugPing()
@@ -110,6 +112,13 @@ class KtorServer(private val gson: Gson) {
     }
 
     private suspend fun processTextFrame(textFrame: Frame.Text?) {
+
+        textFrame?.readText()?.equals(CLIENT_WANTS_TO_DISCONNECT)?.equals(true)?.also {
+            "Клиент запрашивает отключение".also { reasonMessage ->
+                Log.d(TAG, reasonMessage)
+                closeSession(reasonMessage)
+            }
+        }
 
         /*if (null == textFrame) {
             Log.e(TAG, "textFrame равна  null")

@@ -2,6 +2,7 @@ package com.github.aakumykov.client.ktor_client
 
 import android.net.Uri
 import android.util.Log
+import com.github.aakumykov.common.CLIENT_WANTS_TO_DISCONNECT
 import com.github.aakumykov.kotlin_playground.UserGesture
 import com.gitlab.aakumykov.exception_utils_module.ExceptionUtils
 import com.google.gson.Gson
@@ -15,6 +16,7 @@ import io.ktor.http.HttpMethod
 import io.ktor.websocket.Frame
 import io.ktor.websocket.close
 import io.ktor.websocket.readText
+import io.ktor.websocket.send
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
@@ -36,7 +38,7 @@ class KtorClient private constructor(
         KtorStateProvider.setError(e)
     }
 
-    private var clientWebSocketSession: ClientWebSocketSession? = null
+    private var webSocketSession: ClientWebSocketSession? = null
     private var currentServerUri: Uri? = null
 
     private val client by lazy {
@@ -68,7 +70,7 @@ class KtorClient private constructor(
 
             publishState(KtorClientState.CONNECTING)
 
-            clientWebSocketSession = client.webSocketSession(
+            webSocketSession = client.webSocketSession(
                 method = HttpMethod.Get,
                 host = serverAddress,
                 port = serverPort,
@@ -94,8 +96,8 @@ class KtorClient private constructor(
         try {
             publishState(KtorClientState.DISCONNECTING)
 
-            clientWebSocketSession?.close()
-            clientWebSocketSession = null
+            webSocketSession?.close()
+            webSocketSession = null
             client.close()
 
             publishState(KtorClientState.STOPPED)
@@ -106,8 +108,34 @@ class KtorClient private constructor(
     }
 
 
+    suspend fun requestDisconnect() {
+//        try {
+//            publishState(KtorClientState.DISCONNECTING)
+
+        if (isConnected()) {
+            if (isNotDisconnectingNow() || isNotConnectingNow()) {
+                webSocketSession?.send(CLIENT_WANTS_TO_DISCONNECT)
+            } else {
+                publishError(IllegalStateException("Клиент подключается или отключается прямо сейчас"))
+            }
+        } else {
+            publishError(IllegalStateException("Клиент не подключен к серверу"))
+        }
+
+            /*clientWebSocketSession?.close()
+            clientWebSocketSession = null
+            client.close()*/
+
+//            publishState(KtorClientState.STOPPED)
+
+//        } catch (e: Exception) {
+//            publishError(e)
+//        }
+    }
+
+
     fun gesturesFlow(): Flow<UserGesture?>? {
-        return clientWebSocketSession?.incoming?.receiveAsFlow()
+        return webSocketSession?.incoming?.receiveAsFlow()
             ?.filter { it is Frame.Text }
             ?.map { it as Frame.Text }
             ?.map { textFrame ->
@@ -123,17 +151,21 @@ class KtorClient private constructor(
             }
     }
 
-    fun isConnected(): Boolean = null != clientWebSocketSession
+    private fun isConnected(): Boolean = null != webSocketSession
 
     fun isNotConnected(): Boolean = !isConnected()
 
-    fun isNotConnectingNow(): Boolean  = currentStateIs(KtorClientState.CONNECTING)
+    fun isNotConnectingNow(): Boolean  = !currentStateIs(KtorClientState.CONNECTING)
 
-    fun isNotDisconnectingNow(): Boolean = currentStateIs(KtorClientState.DISCONNECTING)
+    fun isNotDisconnectingNow(): Boolean = !currentStateIs(KtorClientState.DISCONNECTING)
 
     private fun currentStateIs(state: KtorClientState): Boolean {
-        return KtorStateProvider.getState() != state
+        return currentClientState == state
     }
+
+    private val currentClientState: KtorClientState get() = KtorStateProvider.getState()
+
+
 
     companion object {
         val TAG: String = KtorClient::class.java.simpleName
