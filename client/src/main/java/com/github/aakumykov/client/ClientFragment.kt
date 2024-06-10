@@ -13,6 +13,7 @@ import com.github.aakumykov.client.ktor_client.GestureClient
 import com.github.aakumykov.client.ktor_client.ClientState
 import com.github.aakumykov.client.ktor_client.KtorStateProvider
 import com.github.aakumykov.client.settings_provider.SettingsProvider
+import com.github.aakumykov.common.GOOGLE_CHROME_PACKAGE_NAME
 import com.github.aakumykov.common.showToast
 import com.gitlab.aakumykov.exception_utils_module.ExceptionUtils
 import com.google.gson.Gson
@@ -141,7 +142,7 @@ class ClientFragment : Fragment(R.layout.fragment_client) {
 
     private fun launchGoogleChrome() {
         requireContext().packageManager
-            .getLaunchIntentForPackage(GesturePlayingService.GOOGLE_CHROME_PACKAGE_NAME)
+            .getLaunchIntentForPackage(GOOGLE_CHROME_PACKAGE_NAME)
             ?.also { startActivity(it) }
             ?: showToast(R.string.google_chrome_not_found)
     }

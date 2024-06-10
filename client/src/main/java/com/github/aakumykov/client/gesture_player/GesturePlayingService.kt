@@ -15,6 +15,7 @@ import com.github.aakumykov.client.ktor_client.ClientState
 import com.github.aakumykov.client.ktor_client.KtorStateProvider
 import com.github.aakumykov.client.settings_provider.SettingsProvider
 import com.github.aakumykov.client.utils.NotificationChannelHelper
+import com.github.aakumykov.common.GOOGLE_CHROME_PACKAGE_NAME
 import com.github.aakumykov.kotlin_playground.UserGesture
 import com.gitlab.aakumykov.exception_utils_module.ExceptionUtils
 import com.google.gson.Gson
@@ -24,7 +25,10 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 import java.util.concurrent.atomic.AtomicBoolean
 
+
 class GesturePlayingService : AccessibilityService() {
+
+    // TODO: добавить ChromeDetector
 
     private val trackedWindowHasAppeared: AtomicBoolean = AtomicBoolean(false)
     private val trackedWindowNotVisible: Boolean get() = !trackedWindowHasAppeared.get()
@@ -33,141 +37,50 @@ class GesturePlayingService : AccessibilityService() {
     private var chromeHasContent: Boolean = false
 
 
-    private val settingsProvider: SettingsProvider by lazy {
-        SettingsProvider.getInstance(applicationContext)
-    }
-
     private val gesturePlayer: GesturePlayer by lazy {
         GesturePlayer(this)
     }
-
-    private val serverAddress: String? get() = settingsProvider.getIpAddress()
-    private val serverPort: Int get() = settingsProvider.getPort()
-    private val serverPath: String? get() = settingsProvider.getPath()
-
 
     private val gestureClient: GestureClient by lazy {
         GestureClient.getInstance(Gson(), KtorStateProvider)
     }
 
 
-    private var isPaused: Boolean = false
-
-
-    private val thisServiceIntent
-        get() = Intent(applicationContext, GesturePlayingService::class.java)
-
-
-    private val pauseServiceIntent: Intent by lazy {
-        thisServiceIntent.apply { action = ACTION_PAUSE }
-    }
-
-
-    private val resumeServiceIntent: Intent by lazy {
-        thisServiceIntent.apply { action = ACTION_RESUME }
-    }
-
-
-    // FIXME: прямо или косвенно останавливать службу?
-    private val stopServiceIntent: Intent by lazy {
-        Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
-    }
-
-
-    // TODO: FLAG_CANCEL_CURRENT
-    private val pauseServicePendingIntent: PendingIntent by lazy {
-        PendingIntent.getService(
-            applicationContext,
-            CODE_ACTION_PAUSE,
-            pauseServiceIntent,
-            PendingIntent.FLAG_IMMUTABLE
-        )
-    }
-
-    private val resumeServicePendingIntent: PendingIntent by lazy {
-        PendingIntent.getService(
-            applicationContext,
-            CODE_ACTION_RESUME,
-            resumeServiceIntent,
-            PendingIntent.FLAG_IMMUTABLE
-        )
-    }
-
-
-    // TODO: FLAG_CANCEL_CURRENT
-    private val stopServicePendingIntent: PendingIntent by lazy {
-        PendingIntent.getActivity(
-            applicationContext,
-            CODE_ACTION_STOP,
-            stopServiceIntent,
-            PendingIntent.FLAG_IMMUTABLE
-        )
-    }
-
-    private val pauseServiceAction: NotificationCompat.Action by lazy {
-        NotificationCompat.Action(
-            R.drawable.ic_gesture_playing_service_pause,
-            getString(R.string.gesture_playing_service_action_pause),
-            pauseServicePendingIntent
-        )
-    }
-
-    private val resumeServiceAction: NotificationCompat.Action by lazy {
-        NotificationCompat.Action(
-            R.drawable.ic_gesture_playing_service_resume,
-            getString(R.string.gesture_playing_service_action_resume),
-            resumeServicePendingIntent
-        )
-    }
-
-    private val stopServiceAction: NotificationCompat.Action by lazy {
-        NotificationCompat.Action(
-            R.drawable.ic_gesture_playing_service_stop,
-            getString(R.string.gesture_playing_service_action_stop),
-            stopServicePendingIntent
-        )
-    }
-
-    private fun notificationBuilder(): NotificationCompat.Builder {
-        return NotificationCompat.Builder(this, notificationChannelId)
-            .setSmallIcon(R.drawable.ic_gesture_playing_service)
-            .setPriority(NOTIFICATION_PRIORITY)
-            .setStyle(androidx.media.app.NotificationCompat.MediaStyle()
-                .setShowActionsInCompactView(0,1))
-            .addAction(stopServiceAction)
-    }
-
     override fun onCreate() {
         super.onCreate()
         debugLog("Служба доступности, onCreate()")
         prepareGestureClient()
-//        connectToServer()
     }
 
     override fun onDestroy() {
         super.onDestroy()
         debugLog("Служба доступности, onDestroy()")
-//        disconnectFromServer()
-//        hideNotification()
     }
+
+
+    override fun onInterrupt() {}
+
 
     private fun prepareGestureClient() {
         CoroutineScope(Dispatchers.Main).launch {
             gestureClient.state.collect(::onClientStateChanged)
         }
+
         CoroutineScope(Dispatchers.IO).launch {
             gestureClient.userGestures.filterNotNull().collect(::onNewUserGesture)
         }
     }
+
 
     private fun onNewUserGesture(userGesture: UserGesture) {
         Log.d(TAG, userGesture.toString())
         gesturePlayer.playGesture(userGesture)
     }
 
+
     private fun onClientStateChanged(clientState: ClientState) {
 
-        debugLog("Состояние Ktor-клиента: $clientState")
+        debugLog("Состояние GestureClient-а: $clientState")
 
         when(clientState) {
             ClientState.INACTIVE -> {}
@@ -192,6 +105,7 @@ class GesturePlayingService : AccessibilityService() {
         }*/
     }
 
+
     override fun onServiceConnected() {
         super.onServiceConnected()
         /*getServiceInfo().apply {
@@ -202,77 +116,6 @@ class GesturePlayingService : AccessibilityService() {
         }.also {
             setServiceInfo(it)
         }*/
-    }
-
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-
-        when(intent?.action) {
-            ACTION_STOP -> { onStopWorkRequested() }
-            ACTION_RESUME -> { onResumeWorkRequested() }
-            ACTION_PAUSE -> { onPauseWorkRequested() }
-            null -> { debugLog("Нет действия в Intent") }
-            else -> { errorLog("Неизвестное действие в Intent: '${intent.action}'") }
-        }
-
-        return super.onStartCommand(intent, flags, startId)
-    }
-
-    private fun onPauseWorkRequested() {
-        isPaused = true
-        showPausedNotification()
-    }
-
-    private fun onResumeWorkRequested() {
-        isPaused = false
-        showWorkingNotification()
-    }
-
-    // TODO: реализовать останов и высвобождение клиента
-    private fun onStopWorkRequested() {
-        isPaused = false
-    }
-
-    private fun showWorkingNotification() {
-        startForeground(notificationId, workingNotification)
-    }
-
-    private fun showPausedNotification() {
-        startForeground(notificationId, pausedNotification)
-    }
-
-    private fun hideNotification() {
-        stopForeground(STOP_FOREGROUND_REMOVE)
-    }
-
-
-    private val workingNotification: Notification by lazy {
-        notificationBuilder()
-            .setContentTitle(getString(R.string.gesture_playing_service_duty_notification_title))
-            .setContentText(getString(R.string.gesture_playing_service_notification_text_working))
-            .addAction(pauseServiceAction)
-            .build()
-    }
-
-    private val pausedNotification: Notification by lazy {
-        notificationBuilder()
-            .setContentTitle(getString(R.string.gesture_playing_service_duty_notification_title))
-            .setContentText(getString(R.string.gesture_playing_service_notification_text_paused))
-            .addAction(resumeServiceAction)
-            .build()
-    }
-
-    private fun prepareNotificationChannel() {
-        NotificationChannelHelper(NotificationManagerCompat.from(this))
-            .createNotificationChannel(
-                id = notificationChannelId,
-                importance = NOTIFICATION_CHANNEL_IMPORTANCE,
-                getString(R.string.gesture_playing_service_notification_channel_name),
-                getString(R.string.gesture_playing_service_notification_channel_description),
-            )
-    }
-
-    private fun currentWindowIsChromeWindow(): Boolean {
-        return isAppWindow(GOOGLE_CHROME_PACKAGE_NAME)
     }
 
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
@@ -327,30 +170,11 @@ class GesturePlayingService : AccessibilityService() {
         }*/
     }
 
-    /*private fun connectToServer() {
-
-        debugLog("connectToServer()")
-
-        if (null == serverAddress || null == serverPath || serverPort <= 0) {
-            errorLog("Неполные настройки сервера: $serverAddress:$serverPort/$serverPath")
-            showToast(R.string.gesture_playing_service_error_incomplete_server_config)
-            return
-        }
-
-        CoroutineScope(Dispatchers.IO).launch {
-            ktorClient.connect(
-                serverAddress!!,
-                serverPort,
-                serverPath!!
-            )
-        }
-    }*/
-
-    private fun disconnectFromServer() {
-        CoroutineScope(Dispatchers.IO).launch {
-            gestureClient.requestDisconnection()
-        }
+    private fun currentWindowIsChromeWindow(): Boolean {
+        return isAppWindow(GOOGLE_CHROME_PACKAGE_NAME)
     }
+
+
 
     private fun debugLog(text: String) { Log.d(TAG, text) }
     private fun debugLog(tag: String, text: String) { Log.d(tag, text) }
@@ -358,32 +182,9 @@ class GesturePlayingService : AccessibilityService() {
     private fun errorLog(throwable: Throwable) { Log.e(TAG, ExceptionUtils.getErrorMessage(throwable), throwable) }
     private fun errorLog(text: String, throwable: Throwable) { Log.e(TAG, text, throwable) }
 
-    override fun onInterrupt() {
-
-    }
-
-    private val notificationId: Int = R.id.gesture_playing_service_nitification_id
-    private val notificationChannelId: String get() = "${packageName}_notifications"
 
     companion object {
-
         val TAG: String = GesturePlayingService::class.java.simpleName
-        const val TAG_START_STOP: String = "START_STOP"
-
-        // TODO: вынести в отдельный файл
-        const val GOOGLE_CHROME_PACKAGE_NAME = "com.android.chrome"
-
-        // TODO: вынести это в файл настроек?
-        const val NOTIFICATION_PRIORITY = NotificationCompat.PRIORITY_LOW
-        const val NOTIFICATION_CHANNEL_IMPORTANCE = NotificationManagerCompat.IMPORTANCE_LOW
-
-        const val CODE_ACTION_STOP: Int = 10
-        const val CODE_ACTION_PAUSE: Int = 20
-        const val CODE_ACTION_RESUME: Int = 30
-
-        const val ACTION_PAUSE = "ACTION_PAUSE"
-        const val ACTION_RESUME = "ACTION_RESUME"
-        const val ACTION_STOP = "ACTION_STOP"
     }
 }
 
