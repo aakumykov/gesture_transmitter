@@ -90,11 +90,15 @@ class ClientFragment : Fragment(R.layout.fragment_client) {
 
     private fun connectToServerReal() {
         lifecycleScope.launch(Dispatchers.IO) {
-            ktorClient.connect(
-                settingsProvider.getIpAddress(),
-                settingsProvider.getPort(),
-                settingsProvider.getPath()
-            )
+            try {
+                ktorClient.connect(
+                    settingsProvider.getIpAddress(),
+                    settingsProvider.getPort(),
+                    settingsProvider.getPath()
+                )
+            } catch (e: Exception) {
+                showError(e)
+            }
         }
     }
 
@@ -158,6 +162,13 @@ class ClientFragment : Fragment(R.layout.fragment_client) {
                 showError(errorMsg)
                 Log.e(TAG, ExceptionUtils.getErrorMessage(e), e);
             }
+        }
+    }
+
+    private fun showError(e: Exception) {
+        ExceptionUtils.getErrorMessage(e).also {
+            showToast(it)
+            Log.e(TAG, it, e)
         }
     }
 

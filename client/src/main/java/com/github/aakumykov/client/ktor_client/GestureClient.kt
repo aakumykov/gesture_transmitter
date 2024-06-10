@@ -1,6 +1,5 @@
 package com.github.aakumykov.client.ktor_client
 
-import android.net.Uri
 import android.util.Log
 import com.github.aakumykov.common.CLIENT_WANTS_TO_DISCONNECT
 import com.google.gson.Gson
@@ -9,11 +8,13 @@ import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.plugins.websocket.ClientWebSocketSession
 import io.ktor.client.plugins.websocket.WebSockets
 import io.ktor.client.plugins.websocket.webSocket
-import io.ktor.client.plugins.websocket.webSocketSession
-import io.ktor.client.plugins.websocket.wss
 import io.ktor.http.HttpMethod
+import io.ktor.websocket.FrameType
 import io.ktor.websocket.close
 import io.ktor.websocket.send
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import okhttp3.OkHttpClient
 import java.util.concurrent.TimeUnit
 
@@ -35,7 +36,7 @@ class GestureClient private constructor(
         KtorStateProvider.setError(e)
     }
 
-    private var webSocketSession: ClientWebSocketSession? = null
+    private var currentSession: ClientWebSocketSession? = null
 
 
     private val client by lazy {
@@ -65,7 +66,9 @@ class GestureClient private constructor(
                 port = serverPort,
                 path = serverPath
             ) {
-                webSocketSession = this
+                currentSession = this
+
+                startListeningForServer()
             }
 
             publishState(KtorClientState.CONNECTED)
@@ -76,12 +79,34 @@ class GestureClient private constructor(
     }
 
 
+    private fun startListeningForServer() {
+        CoroutineScope(Dispatchers.IO).launch {
+
+            currentSession?.also { session ->
+
+                for (frame in session.incoming) {
+
+                    Log.d("FRAME_TYPE", frame.frameType.name)
+
+                    when (frame.frameType) {
+                        FrameType.PING -> {  }
+                        FrameType.PONG -> {  }
+                        FrameType.TEXT -> {  }
+                        FrameType.BINARY -> {  }
+                        FrameType.CLOSE -> {  }
+                    }
+                }
+            }
+        }
+    }
+
+
     suspend fun disconnect() {
         try {
             publishState(KtorClientState.DISCONNECTING)
 
-            webSocketSession?.close()
-            webSocketSession = null
+            currentSession?.close()
+            currentSession = null
             client.close()
 
             publishState(KtorClientState.DISCONNECTED)
@@ -96,7 +121,7 @@ class GestureClient private constructor(
 
         if (isConnected()) {
             if (isNotDisconnectingNow() || isNotConnectingNow()) {
-                webSocketSession?.send(CLIENT_WANTS_TO_DISCONNECT)
+                currentSession?.send(CLIENT_WANTS_TO_DISCONNECT)
             } else {
                 publishError(IllegalStateException("Клиент подключается или отключается прямо сейчас"))
             }
@@ -133,7 +158,7 @@ class GestureClient private constructor(
             }
     }*/
 
-    fun isConnected(): Boolean = (null != webSocketSession && currentStateIs(KtorClientState.CONNECTED))
+    fun isConnected(): Boolean = (null != currentSession && currentStateIs(KtorClientState.CONNECTED))
 
     fun isConnectingNow(): Boolean = currentStateIs(KtorClientState.CONNECTING)
 

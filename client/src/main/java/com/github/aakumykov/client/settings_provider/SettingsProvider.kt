@@ -3,14 +3,13 @@ package com.github.aakumykov.client.settings_provider
 import android.content.Context
 import android.content.SharedPreferences
 import android.preference.PreferenceManager
+import com.github.aakumykov.common.DEFAULT_SERVER_ADDRESS
+import com.github.aakumykov.common.DEFAULT_SERVER_PATH
+import com.github.aakumykov.common.DEFAULT_SERVER_PORT
 
 const val KEY_SERVER_ADDRESS = "SERVER_ADDRESS"
 const val KEY_SERVER_PORT = "SERVER_PORT"
 const val KEY_SERVER_PATH = "SERVER_PATH"
-
-const val DEFAULT_SERVER_ADDRESS = "192.168.0.119"
-const val DEFAULT_SERVER_PORT = 8081
-const val DEFAULT_SERVER_PATH = "gestures"
 
 
 class SettingsProvider private constructor(private val applicationContext: Context) {

@@ -12,14 +12,13 @@ import com.github.aakumykov.common.inMainThread
 import com.github.aakumykov.common.showToast
 import com.github.aakumykov.kotlin_playground.UserGesture
 import com.github.aakumykov.server.databinding.FragmentServerBinding
-import com.github.aakumykov.server.ktor_server.DEFAULT_SERVER_ADDRESS
-import com.github.aakumykov.server.ktor_server.DEFAULT_SERVER_PATH
-import com.github.aakumykov.server.ktor_server.DEFAULT_SERVER_PORT
+import com.github.aakumykov.common.DEFAULT_SERVER_ADDRESS
+import com.github.aakumykov.common.DEFAULT_SERVER_PATH
+import com.github.aakumykov.common.DEFAULT_SERVER_PORT
 import com.github.aakumykov.server.ktor_server.KtorServer
 import com.gitlab.aakumykov.exception_utils_module.ExceptionUtils
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 class ServerFragment : Fragment(R.layout.fragment_server), View.OnTouchListener {
