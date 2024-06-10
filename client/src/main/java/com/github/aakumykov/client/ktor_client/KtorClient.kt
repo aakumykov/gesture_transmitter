@@ -22,8 +22,9 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import okhttp3.OkHttpClient
 import java.util.concurrent.TimeUnit
 
-class KtorClient(private val gson: Gson,
-                 private val ktorStateProvider: KtorStateProvider
+class KtorClient private constructor(
+    private val gson: Gson,
+    private val ktorStateProvider: KtorStateProvider
 ): ClientStateProvider by ktorStateProvider {
 
     private suspend fun publishState(ktorClientState: KtorClientState) {
@@ -129,5 +130,14 @@ class KtorClient(private val gson: Gson,
 
     companion object {
         val TAG: String = KtorClient::class.java.simpleName
+
+        private var _ourInstance: KtorClient? = null
+
+        // TODO: заменить на встроенную реализацию Singleton или сделать её через Dagger.
+        fun getInstance(gson: Gson, ktorStateProvider: KtorStateProvider): KtorClient {
+            if (null == _ourInstance)
+                _ourInstance = KtorClient(gson, ktorStateProvider)
+            return _ourInstance!!
+        }
     }
 }

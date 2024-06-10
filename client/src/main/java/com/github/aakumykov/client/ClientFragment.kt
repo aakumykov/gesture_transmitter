@@ -9,10 +9,12 @@ import com.github.aakumykov.client.databinding.FragmentClientBinding
 import com.github.aakumykov.client.extensions.isAccessibilityServiceEnabled
 import com.github.aakumykov.client.extensions.openAccessibilitySettings
 import com.github.aakumykov.client.gesture_player.GesturePlayingService
+import com.github.aakumykov.client.ktor_client.KtorClient
 import com.github.aakumykov.client.ktor_client.KtorClientState
 import com.github.aakumykov.client.ktor_client.KtorStateProvider
 import com.github.aakumykov.common.showToast
 import com.gitlab.aakumykov.exception_utils_module.ExceptionUtils
+import com.google.gson.Gson
 import kotlinx.coroutines.launch
 
 
@@ -21,6 +23,9 @@ class ClientFragment : Fragment(R.layout.fragment_client) {
     private var _binding: FragmentClientBinding? = null
     private val binding get() = _binding!!
 
+    private val ktorClient: KtorClient by lazy {
+        KtorClient.getInstance(Gson(), KtorStateProvider)
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

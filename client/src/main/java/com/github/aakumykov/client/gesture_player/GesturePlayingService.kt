@@ -56,7 +56,7 @@ class GesturePlayingService : AccessibilityService() {
 
 
     private val ktorClient: KtorClient by lazy {
-        KtorClient(Gson(), KtorStateProvider)
+        KtorClient.getInstance(Gson(), KtorStateProvider)
     }
 
 
