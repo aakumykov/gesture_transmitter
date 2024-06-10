@@ -74,9 +74,16 @@ class KtorServer(private val gson: Gson) {
 
                     try {
                         for (frame in incoming) {
-                            Log.d(TAG, "FRAME_TYPE: " + frame.frameType.name)
+
+                            Log.d(TAG, "FRAME_TYPE (сервер): " + frame.frameType.name)
+
+                            (frame as? Frame.Close)?.also {
+                                closeSession("Пришёл Close-пакет")
+                            }
+
                             (frame as? Frame.Text)?.also {
                                 Log.d(TAG, it.readText())
+                                processTextFrame(it)
                             }
                         }
                     }
@@ -117,6 +124,7 @@ class KtorServer(private val gson: Gson) {
     }
 
     private suspend fun closeSession(reasonMessage: String) {
+        Log.d(TAG, "closeSession('$reasonMessage')")
         serverSession?.close(CloseReason(CloseReason.Codes.NORMAL, reasonMessage))
         serverSession = null
     }

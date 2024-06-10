@@ -20,8 +20,7 @@
 
     <Button
         android:id="@+id/configButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        style="@style/client_button"
         android:layout_marginBottom="12dp"
         android:text="@string/config_button"
         android:visibility="gone" />
@@ -29,38 +28,37 @@
 
     <Button
         android:id="@+id/startButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        style="@style/client_button"
         android:backgroundTint="#81C784"
         android:text="@string/start_button" />
 
     <Button
         android:id="@+id/pauseButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        style="@style/client_button"
         android:backgroundTint="#FFD54F"
         android:text="@string/pause_button"
         android:visibility="gone" />
 
     <Button
         android:id="@+id/finishButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        style="@style/client_button"
         android:backgroundTint="#E57373"
-        android:text="@string/stop_button"
-        android:visibility="gone" />
+        android:text="@string/stop_button" />
 
+    <Button
+        android:id="@+id/requestFinishButton"
+        style="@style/client_button"
+        android:backgroundTint="#FF8A65"
+        android:text="Запросить финиш" />
 
     <Button
         android:id="@+id/testMessageButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        style="@style/client_button"
         android:text="Пробное сообщение" />
 
     <Button
         android:id="@+id/closeMessageButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        style="@style/client_button"
         android:text="Close-сообщение" />
 
 

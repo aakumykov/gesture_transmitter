@@ -8,6 +8,7 @@ import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.websocket.ClientWebSocketSession
 import io.ktor.client.plugins.websocket.WebSockets
+import io.ktor.client.plugins.websocket.cio.webSocketRaw
 import io.ktor.client.plugins.websocket.webSocket
 import io.ktor.http.HttpMethod
 import io.ktor.websocket.Frame
@@ -18,6 +19,7 @@ import io.ktor.websocket.send
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.ClosedReceiveChannelException
+import kotlinx.coroutines.channels.ClosedSendChannelException
 import kotlinx.coroutines.launch
 
 /**
@@ -62,38 +64,28 @@ class GestureClient private constructor(
 
             publishState(KtorClientState.CONNECTING)
 
-            client.webSocket(
+            client.webSocketRaw(
                 method = HttpMethod.Get,
                 host = serverAddress,
                 port = serverPort,
                 path = serverPath
             ) {
+
                 currentSession = this
 
                 publishState(KtorClientState.CONNECTED)
 
                 try {
                     for (frame in incoming) {
-                        Log.d(TAG, "FRAME_TYPE: " + frame.frameType.name)
+                        Log.d(TAG, "FRAME_TYPE (клиент): " + frame.frameType.name)
                         (frame as? Frame.Text)?.also {
                             Log.d(TAG, it.readText())
                         }
                     }
                 }
                 catch (e: ClosedReceiveChannelException) {
-                    Log.d(TAG, "Закрытие соединения")
-                }
-                catch (e: kotlin.coroutines.cancellation.CancellationException) {
-                    Log.e(TAG, "ОШИБКА: "+ ExceptionUtils.getErrorMessage(e), e);
-                }
-                catch (e: java.util.concurrent.CancellationException) {
-                    Log.e(TAG, "ОШИБКА: "+ ExceptionUtils.getErrorMessage(e), e);
-                }
-                catch (e: kotlinx.coroutines.CancellationException) {
-                    Log.e(TAG, "ОШИБКА: "+ ExceptionUtils.getErrorMessage(e), e);
-                }
-                catch (e: io.ktor.utils.io.CancellationException) {
-                    Log.e(TAG, "ОШИБКА: "+ ExceptionUtils.getErrorMessage(e), e);
+                    Log.d(TAG, "Попытка чтения из закрытого соединения.")
+                    Log.e(TAG, ExceptionUtils.getErrorMessage(e), e)
                 }
                 catch (t: Throwable) {
                     Log.e(TAG, "ОШИБКА: "+ ExceptionUtils.getErrorMessage(t), t)
@@ -129,6 +121,7 @@ class GestureClient private constructor(
 
 
     suspend fun disconnect() {
+        Log.d(TAG, "disconnect()")
         try {
             publishState(KtorClientState.DISCONNECTING)
 
@@ -148,7 +141,7 @@ class GestureClient private constructor(
 
         if (isConnected()) {
             if (isNotDisconnectingNow() || isNotConnectingNow()) {
-                currentSession?.send(CLIENT_WANTS_TO_DISCONNECT)
+                sendTextMessage(CLIENT_WANTS_TO_DISCONNECT)
             } else {
                 publishError(IllegalStateException("Клиент подключается или отключается прямо сейчас"))
             }
@@ -201,12 +194,24 @@ class GestureClient private constructor(
 
     suspend fun sendTextMessage(text: String) {
         Log.d(TAG, "sendTextMessage($text)")
-        currentSession?.send(Frame.Text(text)) ?: Log.e(TAG, "sendTextMessage(): currentSession is NULL")
+        try {
+            currentSession?.send(Frame.Text(text))
+                ?: throw IllegalStateException("sendTextMessage(): currentSession is NULL")
+        }
+        catch (e: Exception) {
+            publishError(e)
+        }
     }
 
     suspend fun sendCloseMessage() {
         Log.d(TAG, "sendCloseMessage()")
-        currentSession?.send(Frame.Close()) ?: Log.e(TAG, "sendCloseMessage(): currentSession is NULL")
+        try {
+            currentSession?.send(Frame.Close())
+                ?: throw IllegalStateException("sendCloseMessage(): currentSession is NULL")
+        }
+        catch (e: Exception) {
+            publishError(e)
+        }
     }
 
     val currentState: KtorClientState get() = KtorStateProvider.getState()

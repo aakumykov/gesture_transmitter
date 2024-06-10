@@ -53,17 +53,15 @@ class ClientFragment : Fragment(R.layout.fragment_client) {
 
     private fun prepareButtons() {
 
-        binding.accessibilityServiceButton.setOnClickListener {
-            requireContext().openAccessibilitySettings()
-        }
+        binding.accessibilityServiceButton.setOnClickListener { requireContext().openAccessibilitySettings() }
 
         binding.startButton.setOnClickListener { onStartButtonClicked() }
 
-        binding.pauseButton.setOnClickListener {
+        binding.pauseButton.setOnClickListener {}
 
-        }
+        binding.finishButton.setOnClickListener { disconnectFromServer() }
 
-        binding.finishButton.setOnClickListener { onFinishButtonClicked() }
+        binding.requestFinishButton.setOnClickListener { requestDisconnectFromServer() }
 
 
         binding.testMessageButton.setOnClickListener {
@@ -79,9 +77,8 @@ class ClientFragment : Fragment(R.layout.fragment_client) {
         }
     }
 
-
     private fun onFinishButtonClicked() {
-        disconnectFromServer()
+        requestDisconnectFromServer()
     }
 
     private fun onStartButtonClicked() {
@@ -116,8 +113,20 @@ class ClientFragment : Fragment(R.layout.fragment_client) {
         }
     }
 
-    // TODO: наблюдать за ходом отключения
+
     private fun disconnectFromServer() {
+        Log.d(TAG, "${TAG}: disconnectFromServer()")
+        lifecycleScope.launch {
+            withContext(Dispatchers.IO) {
+                ktorClient.disconnect()
+            }
+        }
+    }
+
+
+    // TODO: наблюдать за ходом отключения
+    private fun requestDisconnectFromServer() {
+        Log.d(TAG, "${TAG}: requestDisconnectFromServer()")
         lifecycleScope.launch {
             withContext(Dispatchers.IO) {
                 ktorClient.requestDisconnect()
