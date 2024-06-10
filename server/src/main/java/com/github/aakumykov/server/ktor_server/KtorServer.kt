@@ -93,7 +93,7 @@ class KtorServer(private val gson: Gson) {
                     }
                 }
             }
-        }.start(wait = false)
+        }.start(wait = true)
     }
 
     private suspend fun closeSession(reasonMessage: String) {

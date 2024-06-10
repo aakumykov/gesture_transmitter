@@ -39,18 +39,26 @@ class ClientFragment : Fragment(R.layout.fragment_client) {
             requireContext().openAccessibilitySettings()
         }
 
-        binding.startGoogleChromeButton.setOnClickListener {
+        binding.startButton.setOnClickListener {
+            // TODO: соединяться с сервером
             requireContext().packageManager
                 .getLaunchIntentForPackage(GesturePlayingService.GOOGLE_CHROME_PACKAGE_NAME)
                 ?.also { startActivity(it) }
                 ?: showToast(R.string.google_chrome_not_found)
+        }
+
+        binding.pauseButton.setOnClickListener {
+            // TODO: пауза
+        }
+
+        binding.finishButton.setOnClickListener {
+            // TODO: отсоединяться от сервера
         }
     }
 
     override fun onResume() {
         super.onResume()
         displayAccessibilityServiceState()
-        binding.startGoogleChromeButton.isEnabled = isAccessibilityServiceEnabled()
     }
 
     override fun onDestroyView() {
@@ -88,12 +96,12 @@ class ClientFragment : Fragment(R.layout.fragment_client) {
 
 
     private fun displayAccessibilityServiceState() {
-        binding.accessibilityServiceButton.setText(getString(
-            if (isAccessibilityServiceEnabled())
-                R.string.button_acc_service_enabled
-            else
-                R.string.button_acc_service_disabled
-        ))
+        binding.accessibilityServiceButton.apply {
+            setText(getString(
+                if (isAccessibilityServiceEnabled()) R.string.button_acc_service_enabled
+                else R.string.button_acc_service_disabled
+            ))
+        }
     }
 
     private fun isAccessibilityServiceEnabled(): Boolean {

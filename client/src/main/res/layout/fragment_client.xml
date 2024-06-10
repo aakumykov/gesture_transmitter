@@ -5,24 +5,46 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
-    tools:context=".ClientFragment">
+    tools:context=".ClientFragment"
+    android:paddingHorizontal="8dp">
 
     <Button
         android:id="@+id/accessibilityServiceButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="8dp"
+        android:layout_marginVertical="12dp"
+        android:backgroundTint="#64B5F6"
         android:text="@string/button_acc_service_disabled" />
 
+
     <Button
-        android:id="@+id/startGoogleChromeButton"
+        android:id="@+id/configButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="8dp"
-        android:backgroundTint="#F16E64"
-        android:text="@string/start_google_chrome_button"
-        app:icon="@drawable/ic_google_chrome"
-        app:iconGravity="textEnd" />
+        android:layout_marginBottom="12dp"
+        android:text="@string/config_button" />
+
+
+    <Button
+        android:id="@+id/startButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:backgroundTint="#81C784"
+        android:text="@string/start_button" />
+
+    <Button
+        android:id="@+id/pauseButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:backgroundTint="#FFD54F"
+        android:text="@string/pause_button" />
+
+    <Button
+        android:id="@+id/finishButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:backgroundTint="#E57373"
+        android:text="@string/stop_button" />
 
 
     <TextView

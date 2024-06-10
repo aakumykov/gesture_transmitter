@@ -154,10 +154,16 @@ class GesturePlayingService : AccessibilityService() {
 
     override fun onCreate() {
         super.onCreate()
-        debugStartStop("onCreate()")
-        prepareNotificationChannel()
-        showWorkingNotification()
-        prepareKtorClient()
+        debugLog("Служба доступности, onCreate()")
+//        prepareKtorClient()
+//        connectToServer()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        debugLog("Служба доступности, onDestroy()")
+//        disconnectFromServer()
+//        hideNotification()
     }
 
     private fun prepareKtorClient() {
@@ -233,24 +239,6 @@ class GesturePlayingService : AccessibilityService() {
         isPaused = false
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        debugStartStop("onDestroy()")
-
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                ktorClient.disconnect()
-            } catch (e: Exception) {
-                ExceptionUtils.getErrorMessage(e).also { errorMsg ->
-                    showToast(getString(R.string.gesture_playing_service_error, errorMsg))
-                    errorLog(errorMsg, e)
-                }
-            }
-        }
-
-        hideNotification()
-    }
-
     private fun showWorkingNotification() {
         startForeground(notificationId, workingNotification)
     }
@@ -302,7 +290,7 @@ class GesturePlayingService : AccessibilityService() {
 
 //            debugLog("windows_check","хром запущен: $chromeIsLaunched, содержимое: $chromeHasContent")
 
-            CoroutineScope(Dispatchers.IO).launch {
+            /*CoroutineScope(Dispatchers.IO).launch {
                 if (chromeIsLaunched && chromeHasContent) {
                     if (ktorClient.isNotConnected() && ktorClient.isNotConnectingNow())
                         connectToServer()
@@ -310,7 +298,7 @@ class GesturePlayingService : AccessibilityService() {
                     if (ktorClient.isConnected() && ktorClient.isNotDisconnectingNow())
                         disconnectFromServer()
                 }
-            }
+            }*/
         }
 
         /*if (null != event && event.isWindowStateChanged()) {
@@ -366,9 +354,7 @@ class GesturePlayingService : AccessibilityService() {
     }
 
     private fun disconnectFromServer() {
-
         debugLog("disconnectFromServer()")
-
         CoroutineScope(Dispatchers.IO).launch {
             ktorClient.disconnect()
         }
@@ -376,7 +362,6 @@ class GesturePlayingService : AccessibilityService() {
 
     private fun debugLog(text: String) { Log.d(TAG, text) }
     private fun debugLog(tag: String, text: String) { Log.d(tag, text) }
-    private fun debugStartStop(text: String) { Log.d(TAG_START_STOP, text) }
     private fun errorLog(text: String) { Log.e(TAG, text) }
     private fun errorLog(throwable: Throwable) { Log.e(TAG, ExceptionUtils.getErrorMessage(throwable), throwable) }
     private fun errorLog(text: String, throwable: Throwable) { Log.e(TAG, text, throwable) }
