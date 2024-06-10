@@ -82,7 +82,6 @@ class KtorServer(private val gson: Gson) {
                             }
 
                             (frame as? Frame.Text)?.also {
-                                Log.d(TAG, it.readText())
                                 processTextFrame(it)
                             }
                         }
@@ -138,12 +137,11 @@ class KtorServer(private val gson: Gson) {
     }
 
     private suspend fun processTextFrame(textFrame: Frame.Text?) {
-
-        textFrame?.readText()?.equals(CLIENT_WANTS_TO_DISCONNECT)?.equals(true)?.also {
-            "Клиент запрашивает отключение".also { reasonMessage ->
-                Log.d(TAG, reasonMessage)
-                closeSession(reasonMessage)
-            }
+        textFrame?.readText()?.also { text ->
+            if (CLIENT_WANTS_TO_DISCONNECT == text)
+                closeSession(CLIENT_WANTS_TO_DISCONNECT)
+            else
+                Log.d(TAG, "Входящий текст: '$text'")
         }
 
         /*if (null == textFrame) {

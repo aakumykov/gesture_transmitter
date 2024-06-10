@@ -57,11 +57,9 @@ class ClientFragment : Fragment(R.layout.fragment_client) {
 
         binding.startButton.setOnClickListener { onStartButtonClicked() }
 
-        binding.pauseButton.setOnClickListener {}
+        binding.pauseButton.setOnClickListener {  }
 
-        binding.finishButton.setOnClickListener { disconnectFromServer() }
-
-        binding.requestFinishButton.setOnClickListener { requestDisconnectFromServer() }
+        binding.finishButton.setOnClickListener { onFinishButtonClicked() }
 
 
         binding.testMessageButton.setOnClickListener {
@@ -114,19 +112,7 @@ class ClientFragment : Fragment(R.layout.fragment_client) {
     }
 
 
-    private fun disconnectFromServer() {
-        Log.d(TAG, "${TAG}: disconnectFromServer()")
-        lifecycleScope.launch {
-            withContext(Dispatchers.IO) {
-                ktorClient.disconnect()
-            }
-        }
-    }
-
-
-    // TODO: наблюдать за ходом отключения
     private fun requestDisconnectFromServer() {
-        Log.d(TAG, "${TAG}: requestDisconnectFromServer()")
         lifecycleScope.launch {
             withContext(Dispatchers.IO) {
                 ktorClient.requestDisconnect()
@@ -174,7 +160,7 @@ class ClientFragment : Fragment(R.layout.fragment_client) {
             KtorClientState.DISCONNECTING -> R.string.ktor_client_state_disconnecting
             KtorClientState.CONNECTED -> R.string.ktor_client_state_running
             KtorClientState.PAUSED -> R.string.ktor_client_state_paused
-            KtorClientState.DISCONNECTED -> R.string.ktor_client_state_stopped
+            KtorClientState.DISCONNECTED -> R.string.ktor_client_state_disconnected
             KtorClientState.ERROR -> R.string.ktor_client_state_error
         })
     }

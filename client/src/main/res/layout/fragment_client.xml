@@ -25,7 +25,6 @@
         android:text="@string/config_button"
         android:visibility="gone" />
 
-
     <Button
         android:id="@+id/startButton"
         style="@style/client_button"
@@ -44,12 +43,6 @@
         style="@style/client_button"
         android:backgroundTint="#E57373"
         android:text="@string/stop_button" />
-
-    <Button
-        android:id="@+id/requestFinishButton"
-        style="@style/client_button"
-        android:backgroundTint="#FF8A65"
-        android:text="Запросить финиш" />
 
     <Button
         android:id="@+id/testMessageButton"

@@ -6,10 +6,11 @@ enum class KtorClientState {
     CONNECTING,
     CONNECTED,
 
+    PAUSED,
+
+    @Deprecated("Не используется")
     DISCONNECTING,
     DISCONNECTED,
-
-    PAUSED,
 
     ERROR
 }

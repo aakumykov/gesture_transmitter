@@ -77,9 +77,15 @@ class GestureClient private constructor(
 
                 try {
                     for (frame in incoming) {
+
                         Log.d(TAG, "FRAME_TYPE (клиент): " + frame.frameType.name)
+
                         (frame as? Frame.Text)?.also {
                             Log.d(TAG, it.readText())
+                        }
+
+                        (frame as? Frame.Close)?.also {
+                            publishState(KtorClientState.DISCONNECTED)
                         }
                     }
                 }
@@ -105,7 +111,7 @@ class GestureClient private constructor(
 
                 for (frame in session.incoming) {
 
-                    Log.d(TAG, "FRAME_TYPE: "+frame.frameType.name)
+                    Log.d(TAG, "FRAME_TYPE (клиент): "+frame.frameType.name)
 
                     when (frame.frameType) {
                         FrameType.PING -> {  }
@@ -119,22 +125,6 @@ class GestureClient private constructor(
         }
     }
 
-
-    suspend fun disconnect() {
-        Log.d(TAG, "disconnect()")
-        try {
-            publishState(KtorClientState.DISCONNECTING)
-
-            currentSession?.close()
-            currentSession = null
-            client.close()
-
-            publishState(KtorClientState.DISCONNECTED)
-
-        } catch (e: Exception) {
-            publishError(e)
-        }
-    }
 
 
     suspend fun requestDisconnect() {
