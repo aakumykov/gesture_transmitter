@@ -18,6 +18,8 @@
     <string name="gesture_playing_service_action_resume">Возобновить</string>
     <string name="gesture_playing_service_error">Ошибка: %1$s</string>
     <string name="ktor_client_state_inactive">Ktor-клиент неактивен</string>
+    <string name="ktor_client_state_connecting">Ktor-клиент соединяется с сервером</string>
+    <string name="ktor_client_state_disconnecting">Ktor-клиент отключается от сервера</string>
     <string name="ktor_client_state_running">Ktor-клиент активен</string>
     <string name="ktor_client_state_paused">Ktor-клиент на паузе</string>
     <string name="ktor_client_state_stopped">Ktor-клиент остановлен</string>

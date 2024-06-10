@@ -63,6 +63,8 @@ class ClientFragment : Fragment(R.layout.fragment_client) {
 
         binding.clientStateView.setText(when(state) {
             KtorClientState.INACTIVE -> R.string.ktor_client_state_inactive
+            KtorClientState.CONNECTING -> R.string.ktor_client_state_connecting
+            KtorClientState.DISCONNECTING -> R.string.ktor_client_state_disconnecting
             KtorClientState.RUNNING -> R.string.ktor_client_state_running
             KtorClientState.PAUSED -> R.string.ktor_client_state_paused
             KtorClientState.STOPPED -> R.string.ktor_client_state_stopped

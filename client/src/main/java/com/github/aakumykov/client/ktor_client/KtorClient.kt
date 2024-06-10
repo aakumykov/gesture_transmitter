@@ -59,6 +59,9 @@ class KtorClient(private val gson: Gson,
             disconnect()
 
         return try {
+
+            publishState(KtorClientState.CONNECTING)
+
             clientWebSocketSession = client.webSocketSession(
                 method = HttpMethod.Get,
                 host = serverAddress,
@@ -112,7 +115,17 @@ class KtorClient(private val gson: Gson,
             }
     }
 
-    private fun isConnected(): Boolean = null != clientWebSocketSession
+    fun isConnected(): Boolean = null != clientWebSocketSession
+
+    fun isNotConnected(): Boolean = !isConnected()
+
+    fun isNotConnectingNow(): Boolean  = currentStateIs(KtorClientState.CONNECTING)
+
+    fun isNotDisconnectingNow(): Boolean = currentStateIs(KtorClientState.DISCONNECTING)
+
+    private fun currentStateIs(state: KtorClientState): Boolean {
+        return KtorStateProvider.getState() != state
+    }
 
     companion object {
         val TAG: String = KtorClient::class.java.simpleName

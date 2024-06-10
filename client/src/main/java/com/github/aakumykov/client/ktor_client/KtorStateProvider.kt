@@ -1,8 +1,11 @@
 package com.github.aakumykov.client.ktor_client
 
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
 
 interface ClientStateProvider {
     suspend fun setError(e: Exception)
@@ -25,5 +28,11 @@ object KtorStateProvider : ClientStateProvider {
 
     override suspend fun setError(e: Exception) {
         _errorFlow.emit(e)
+    }
+
+    fun getState(): KtorClientState {
+        return runBlocking(Dispatchers.IO) {
+            state.first()
+        }
     }
 }
