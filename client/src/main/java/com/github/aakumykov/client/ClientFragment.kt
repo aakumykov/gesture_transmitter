@@ -26,7 +26,7 @@ class ClientFragment : Fragment(R.layout.fragment_client) {
     private var _binding: FragmentClientBinding? = null
     private val binding get() = _binding!!
 
-    private val ktorClient: GestureClient by lazy {
+    private val gestureClient: GestureClient by lazy {
         GestureClient.getInstance(Gson(), KtorStateProvider)
     }
 
@@ -63,10 +63,10 @@ class ClientFragment : Fragment(R.layout.fragment_client) {
 
     private fun onPauseButtonClicked() {
         lifecycleScope.launch(Dispatchers.IO) {
-            ktorClient.currentState.also { state ->
+            gestureClient.currentState.also { state ->
                 when(state) {
-                    ClientState.PAUSED -> ktorClient.resumeInteraction()
-                    ClientState.CONNECTED -> ktorClient.pauseInteraction()
+                    ClientState.PAUSED -> gestureClient.resumeInteraction()
+                    ClientState.CONNECTED -> gestureClient.pauseInteraction()
                     else -> Log.w(TAG, "Пауза/возобновление недоступны в статусе '$state'")
                 }
             }
@@ -87,7 +87,7 @@ class ClientFragment : Fragment(R.layout.fragment_client) {
 
 
     private fun connectToServer() {
-        when(ktorClient.currentState) {
+        when(gestureClient.currentState) {
             ClientState.CONNECTED -> { showToast(R.string.toast_already_connected) }
             ClientState.CONNECTING -> { showToast(R.string.toast_connecting_now) }
             ClientState.DISCONNECTING -> { showToast(R.string.toast_disconnecting_now) }
@@ -98,7 +98,7 @@ class ClientFragment : Fragment(R.layout.fragment_client) {
     private fun connectToServerReal() {
         lifecycleScope.launch(Dispatchers.IO) {
             try {
-                ktorClient.connect(
+                gestureClient.connect(
                     settingsProvider.getIpAddress(),
                     settingsProvider.getPort(),
                     settingsProvider.getPath()
@@ -113,7 +113,7 @@ class ClientFragment : Fragment(R.layout.fragment_client) {
     private fun requestDisconnectFromServer() {
         lifecycleScope.launch {
             withContext(Dispatchers.IO) {
-                ktorClient.requestDisconnect()
+                gestureClient.requestDisconnection()
             }
         }
     }

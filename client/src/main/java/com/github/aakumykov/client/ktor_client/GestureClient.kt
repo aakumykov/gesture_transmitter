@@ -23,8 +23,8 @@ import kotlinx.coroutines.channels.ClosedReceiveChannelException
 import kotlinx.coroutines.launch
 
 /**
- * Подключается, отключается, слушает GestureServer.
- * Публикует полученные "жесты" в виде потока.
+ * Получает [UserGesture] от GestureServer-а,
+ * публикует их для своих пользователей.
  */
 class GestureClient private constructor(
     private val gson: Gson,
@@ -103,19 +103,39 @@ class GestureClient private constructor(
         }
     }
 
+
+    suspend fun requestDisconnection() {
+
+        if (isConnected()) {
+            if (isNotDisconnectingNow() || isNotConnectingNow()) {
+                sendTextMessage(CLIENT_WANTS_TO_DISCONNECT)
+            } else {
+                publishError(IllegalStateException("Клиент подключается или отключается прямо сейчас"))
+            }
+        } else {
+            publishError(IllegalStateException("Клиент не подключен к серверу"))
+        }
+    }
+
+
+    suspend fun pauseInteraction() {
+        sendTextMessage(CLIENT_WANTS_TO_PAUSE)
+    }
+
+
+    suspend fun resumeInteraction() {
+        sendTextMessage(CLIENT_WANTS_TO_RESUME)
+    }
+
+
     private suspend fun processTextFrame(textFrame: Frame.Text) {
         textFrame.readText().also { text ->
             when(text) {
-                SERVER_PAUSED -> processServerPausedState()
+                SERVER_PAUSED -> publishState(ClientState.PAUSED)
                 SERVER_RESUMED -> publishState(ClientState.CONNECTED)
                 else -> Log.d(TAG, "Клиент получил текстовое сообщение: '$text'")
             }
         }
-    }
-
-    private suspend fun processServerPausedState() {
-        Log.d(TAG, "Сервер встал на пузу")
-        publishState(ClientState.PAUSED)
     }
 
 
@@ -137,21 +157,6 @@ class GestureClient private constructor(
                     }
                 }
             }
-        }
-    }
-
-
-
-    suspend fun requestDisconnect() {
-
-        if (isConnected()) {
-            if (isNotDisconnectingNow() || isNotConnectingNow()) {
-                sendTextMessage(CLIENT_WANTS_TO_DISCONNECT)
-            } else {
-                publishError(IllegalStateException("Клиент подключается или отключается прямо сейчас"))
-            }
-        } else {
-            publishError(IllegalStateException("Клиент не подключен к серверу"))
         }
     }
 
@@ -187,7 +192,7 @@ class GestureClient private constructor(
         return currentState == state
     }
 
-    suspend fun sendTextMessage(text: String) {
+    private suspend fun sendTextMessage(text: String) {
         Log.d(TAG, "sendTextMessage($text)")
         try {
             currentSession?.send(Frame.Text(text))
@@ -198,24 +203,6 @@ class GestureClient private constructor(
         }
     }
 
-    suspend fun sendCloseMessage() {
-        Log.d(TAG, "sendCloseMessage()")
-        try {
-            currentSession?.send(Frame.Close())
-                ?: throw IllegalStateException("sendCloseMessage(): currentSession is NULL")
-        }
-        catch (e: Exception) {
-            publishError(e)
-        }
-    }
-
-    suspend fun pauseInteraction() {
-        sendTextMessage(CLIENT_WANTS_TO_PAUSE)
-    }
-
-    suspend fun resumeInteraction() {
-        sendTextMessage(CLIENT_WANTS_TO_RESUME)
-    }
 
 
     val currentState: ClientState get() = KtorStateProvider.getState()

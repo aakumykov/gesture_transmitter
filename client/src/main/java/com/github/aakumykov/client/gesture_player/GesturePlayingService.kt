@@ -338,7 +338,7 @@ class GesturePlayingService : AccessibilityService() {
 
     private fun disconnectFromServer() {
         CoroutineScope(Dispatchers.IO).launch {
-            ktorClient.requestDisconnect()
+            ktorClient.requestDisconnection()
         }
     }
 
