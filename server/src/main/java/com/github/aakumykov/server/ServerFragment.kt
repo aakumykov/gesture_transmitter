@@ -50,6 +50,8 @@ class ServerFragment : Fragment(R.layout.fragment_server), View.OnTouchListener 
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentServerBinding.bind(view)
 
+
+
         lifecycleScope.launch {
             GestureRecorder.recordedGestureFlow
                 .filterNotNull()
