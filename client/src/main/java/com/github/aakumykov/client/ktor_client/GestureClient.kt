@@ -2,10 +2,10 @@ package com.github.aakumykov.client.ktor_client
 
 import android.util.Log
 import com.github.aakumykov.common.CLIENT_WANTS_TO_DISCONNECT
+import com.gitlab.aakumykov.exception_utils_module.ExceptionUtils
 import com.google.gson.Gson
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
-import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.plugins.websocket.ClientWebSocketSession
 import io.ktor.client.plugins.websocket.WebSockets
 import io.ktor.client.plugins.websocket.webSocket
@@ -13,12 +13,12 @@ import io.ktor.http.HttpMethod
 import io.ktor.websocket.Frame
 import io.ktor.websocket.FrameType
 import io.ktor.websocket.close
+import io.ktor.websocket.readText
 import io.ktor.websocket.send
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.ClosedReceiveChannelException
 import kotlinx.coroutines.launch
-import okhttp3.OkHttpClient
-import java.util.concurrent.TimeUnit
 
 /**
  * Подключается, отключается, слушает GestureServer.
@@ -72,8 +72,31 @@ class GestureClient private constructor(
 
                 publishState(KtorClientState.CONNECTED)
 
-                for (frame in incoming) {
-                    Log.d(TAG, "FRAME_TYPE: "+frame.frameType.name)
+                try {
+                    for (frame in incoming) {
+                        Log.d(TAG, "FRAME_TYPE: " + frame.frameType.name)
+                        (frame as? Frame.Text)?.also {
+                            Log.d(TAG, it.readText())
+                        }
+                    }
+                }
+                catch (e: ClosedReceiveChannelException) {
+                    Log.d(TAG, "Закрытие соединения")
+                }
+                catch (e: kotlin.coroutines.cancellation.CancellationException) {
+                    Log.e(TAG, "ОШИБКА: "+ ExceptionUtils.getErrorMessage(e), e);
+                }
+                catch (e: java.util.concurrent.CancellationException) {
+                    Log.e(TAG, "ОШИБКА: "+ ExceptionUtils.getErrorMessage(e), e);
+                }
+                catch (e: kotlinx.coroutines.CancellationException) {
+                    Log.e(TAG, "ОШИБКА: "+ ExceptionUtils.getErrorMessage(e), e);
+                }
+                catch (e: io.ktor.utils.io.CancellationException) {
+                    Log.e(TAG, "ОШИБКА: "+ ExceptionUtils.getErrorMessage(e), e);
+                }
+                catch (t: Throwable) {
+                    Log.e(TAG, "ОШИБКА: "+ ExceptionUtils.getErrorMessage(t), t)
                 }
             }
 

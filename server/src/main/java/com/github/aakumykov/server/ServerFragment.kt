@@ -69,7 +69,7 @@ class ServerFragment : Fragment(R.layout.fragment_server), View.OnTouchListener 
 
     private fun sendTetsMessage() {
         lifecycleScope.launch(Dispatchers.IO) {
-            ktorServer.sendTestMessage("Привет-${Random.nextInt(100)}")
+            ktorServer.sendTestMessage("Привет от сервера-${Random.nextInt(100)}")
         }
     }
 

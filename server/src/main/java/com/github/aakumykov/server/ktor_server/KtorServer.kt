@@ -70,15 +70,19 @@ class KtorServer(private val gson: Gson) {
                     serverSession = this
                     Log.d(TAG, "Новое подключение, ${serverSession.hashCode()}")
 
-                    /*incoming.receiveAsFlow().onEach { frame ->
-                        Log.d(TAG, "FRAME_TYPE: "+frame.frameType.name)
-                        *//*(frame as? Frame.Text)?.let { text ->
-                            Log.d("INCOMING_FRAME", "text: text")
-                        }*//*
-                    }.launchIn(this)*/
-
-                    for (frame in incoming) {
-                        Log.d(TAG, "FRAME_TYPE: "+frame.frameType.name)
+                    try {
+                        for (frame in incoming) {
+                            Log.d(TAG, "FRAME_TYPE: " + frame.frameType.name)
+                            (frame as? Frame.Text)?.also {
+                                Log.d(TAG, it.readText())
+                            }
+                        }
+                    }
+                    catch (e: ClosedReceiveChannelException) {
+                        Log.d(TAG, "Закрытие соединения")
+                    }
+                    catch (t: Throwable) {
+                        Log.e(TAG, "ОШИБКА: "+ExceptionUtils.getErrorMessage(t), t);
                     }
 
                     /*try {
