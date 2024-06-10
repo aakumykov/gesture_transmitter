@@ -39,6 +39,9 @@ class GesturePlayingService : AccessibilityService() {
     private val trackedWindowHasAppeared: AtomicBoolean = AtomicBoolean(false)
     private val trackedWindowNotVisible: Boolean get() = !trackedWindowHasAppeared.get()
 
+    private var chromeIsLaunched: Boolean = false
+    private var chromeHasContent: Boolean = false
+
     private val gesturePlayer: GesturePlayer by lazy {
         GesturePlayer(this)
     }
@@ -285,9 +288,28 @@ class GesturePlayingService : AccessibilityService() {
             )
     }
 
+    private fun currentWindowIsChromeWindow(): Boolean {
+        return isAppWindow(GOOGLE_CHROME_PACKAGE_NAME)
+    }
+
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
-        if (null != event && event.isWindowStateChanged()) {
-            if (isAppWindow(GOOGLE_CHROME_PACKAGE_NAME, true)/* && trackedWindowNotVisible*/) {
+
+        event?.also { ev ->
+            chromeIsLaunched = currentWindowIsChromeWindow()
+            chromeHasContent = currentWindowHasChild()
+
+/*                debugLog("windows_check", "Окно Хрома активно")
+            }
+            else {
+                chromeIsLaunched = false
+                debugLog("windows_check", "Окно Хрома неактивно")
+            }*/
+
+            debugLog("windows_check","хром запущен: $chromeIsLaunched, содержимое: $chromeHasContent")
+        }
+
+        /*if (null != event && event.isWindowStateChanged()) {
+            if (isAppWindow(GOOGLE_CHROME_PACKAGE_NAME, true)*//* && trackedWindowNotVisible*//*) {
                 debugLog("Гоголь Хром детектед, $dateTimeString")
                 trackedWindowHasAppeared.set(true)
                 connectToServer()
@@ -296,7 +318,7 @@ class GesturePlayingService : AccessibilityService() {
                 trackedWindowHasAppeared.set(false)
                 disconnectFromServer()
             }
-        }
+        }*/
 
         /*rootInActiveWindow?.also { rootView ->
 
@@ -313,8 +335,8 @@ class GesturePlayingService : AccessibilityService() {
                 else -> "Другое событие"
             }
 
-            debugLog("--------------")
-            debugLog("$evTypeString: package: $pn, child: $chCnt")
+            debugLog("window_state","--------------")
+            debugLog("window_state","$evTypeString: package: $pn, child: $chCnt")
 //            showChildrenRecursively(0, rootView.getChildren())
         }*/
     }
@@ -327,6 +349,8 @@ class GesturePlayingService : AccessibilityService() {
             return
         }
 
+        debugLog("connectToServer()")
+
         CoroutineScope(Dispatchers.IO).launch {
             ktorClient.connect(
                 serverAddress!!,
@@ -337,12 +361,15 @@ class GesturePlayingService : AccessibilityService() {
     }
 
     private fun disconnectFromServer() {
+        debugLog("disconnectFromServer()")
+
         CoroutineScope(Dispatchers.IO).launch {
             ktorClient.disconnect()
         }
     }
 
     private fun debugLog(text: String) { Log.d(TAG, text) }
+    private fun debugLog(tag: String, text: String) { Log.d(tag, text) }
     private fun debugStartStop(text: String) { Log.d(TAG_START_STOP, text) }
     private fun errorLog(text: String) { Log.e(TAG, text) }
     private fun errorLog(throwable: Throwable) { Log.e(TAG, ExceptionUtils.getErrorMessage(throwable), throwable) }
@@ -381,25 +408,17 @@ fun AccessibilityEvent.isWindowStateChanged(): Boolean {
     return AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED == eventType
 }
 
-/**
- * Проверяет, соответствует ли свойство rootInActiveWindow.packageName
- * аргументу [checkedPackageName], т.о. выясняя, принадлежит ли окно, вызвавшее
- * событие [AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED] интересующему приложению.
- *
- * @param checkedPackageName Имя пакета приложение, на принадлежность которому проверяется окно,
- * вызвавшее событие [AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED].
- *
- * @param windowMustBeWithContent Дополнительное условие, согласно которому, окно должно быть с содержимым,
- * т.е. иметь дочерние View.
- */
-fun AccessibilityService.isAppWindow(checkedPackageName: String, windowMustBeWithContent: Boolean): Boolean {
+
+fun AccessibilityService.isAppWindow(checkedPackageName: String): Boolean {
     return when(rootInActiveWindow) {
         null -> false
-        else -> {
-            val isPackageNameMatches = (rootInActiveWindow.packageName == checkedPackageName)
-            val hasChild = (rootInActiveWindow.childCount > 0)
-            if (windowMustBeWithContent) isPackageNameMatches && hasChild
-            else isPackageNameMatches
-        }
+        else -> rootInActiveWindow.packageName == checkedPackageName
+    }
+}
+
+fun AccessibilityService.currentWindowHasChild(): Boolean {
+    return when(rootInActiveWindow) {
+        null -> false
+        else -> rootInActiveWindow.childCount > 0
     }
 }
