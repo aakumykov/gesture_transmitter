@@ -9,10 +9,11 @@ import com.github.aakumykov.client.databinding.FragmentClientBinding
 import com.github.aakumykov.client.extensions.isAccessibilityServiceEnabled
 import com.github.aakumykov.client.extensions.openAccessibilitySettings
 import com.github.aakumykov.client.gesture_player.GesturePlayingService
-import com.github.aakumykov.client.ktor_client.KtorClient
+import com.github.aakumykov.client.ktor_client.GestureClient
 import com.github.aakumykov.client.ktor_client.KtorClientState
 import com.github.aakumykov.client.ktor_client.KtorStateProvider
 import com.github.aakumykov.client.settings_provider.SettingsProvider
+import com.github.aakumykov.common.showToast
 import com.gitlab.aakumykov.exception_utils_module.ExceptionUtils
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
@@ -25,8 +26,8 @@ class ClientFragment : Fragment(R.layout.fragment_client) {
     private var _binding: FragmentClientBinding? = null
     private val binding get() = _binding!!
 
-    private val ktorClient: KtorClient by lazy {
-        KtorClient.getInstance(Gson(), KtorStateProvider)
+    private val ktorClient: GestureClient by lazy {
+        GestureClient.getInstance(Gson(), KtorStateProvider)
     }
 
     private val settingsProvider: SettingsProvider by lazy {
@@ -77,8 +78,17 @@ class ClientFragment : Fragment(R.layout.fragment_client) {
             ?: showToast(R.string.google_chrome_not_found)*/
     }
 
-    // TODO: наблюдать за ходом подключения
+
     private fun connectToServer() {
+        when(ktorClient.currentState) {
+            KtorClientState.CONNECTED -> { showToast(R.string.toast_already_connected) }
+            KtorClientState.CONNECTING -> { showToast(R.string.toast_connecting_now) }
+            KtorClientState.DISCONNECTING -> { showToast(R.string.toast_disconnecting_now) }
+            else -> connectToServerReal()
+        }
+    }
+
+    private fun connectToServerReal() {
         lifecycleScope.launch(Dispatchers.IO) {
             ktorClient.connect(
                 settingsProvider.getIpAddress(),
@@ -110,27 +120,36 @@ class ClientFragment : Fragment(R.layout.fragment_client) {
 
 
     private fun onKtorClientStateChanged(state: KtorClientState) {
+        displayClientState(state)
+        showHideProgressBar(state)
+        hideErrorIfNotError(state)
+    }
 
-        binding.clientStateView.setText(when(state) {
-            KtorClientState.INACTIVE -> R.string.ktor_client_state_inactive
-            KtorClientState.CONNECTING -> R.string.ktor_client_state_connecting
-            KtorClientState.DISCONNECTING -> R.string.ktor_client_state_disconnecting
-            KtorClientState.RUNNING -> R.string.ktor_client_state_running
-            KtorClientState.PAUSED -> R.string.ktor_client_state_paused
-            KtorClientState.STOPPED -> R.string.ktor_client_state_stopped
-            KtorClientState.ERROR -> R.string.ktor_client_state_error
-        })
+    private fun hideErrorIfNotError(state: KtorClientState) {
+        when(state) {
+            KtorClientState.ERROR -> {}
+            else -> hideError()
+        }
+    }
 
+    private fun showHideProgressBar(state: KtorClientState) {
         when(state) {
             KtorClientState.CONNECTING -> showProgressBar()
             KtorClientState.DISCONNECTING -> showProgressBar()
             else -> hideProgressBar()
         }
+    }
 
-        when(state) {
-            KtorClientState.ERROR -> {}
-            else -> hideError()
-        }
+    private fun displayClientState(state: KtorClientState) {
+        binding.clientStateView.setText(when(state) {
+            KtorClientState.INACTIVE -> R.string.ktor_client_state_inactive
+            KtorClientState.CONNECTING -> R.string.ktor_client_state_connecting
+            KtorClientState.DISCONNECTING -> R.string.ktor_client_state_disconnecting
+            KtorClientState.CONNECTED -> R.string.ktor_client_state_running
+            KtorClientState.PAUSED -> R.string.ktor_client_state_paused
+            KtorClientState.DISCONNECTED -> R.string.ktor_client_state_stopped
+            KtorClientState.ERROR -> R.string.ktor_client_state_error
+        })
     }
 
     private fun onKtorClientError(e: Exception?) {

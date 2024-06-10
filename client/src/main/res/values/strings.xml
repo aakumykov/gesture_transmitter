@@ -30,5 +30,8 @@
     <string name="stop_button">Фнинш</string>
     <string name="google_chrome_not_found">Google Chrome не найден</string>
     <string name="config_button">Настройки</string>
+    <string name="toast_already_connected">Клиент уже подключен</string>
+    <string name="toast_connecting_now">Клиент в процессе подключения</string>
+    <string name="toast_disconnecting_now">Клиент в процессе отключения</string>
 
 </resources>

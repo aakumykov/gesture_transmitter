@@ -4,28 +4,17 @@ import android.accessibilityservice.AccessibilityService
 import android.app.Notification
 import android.app.PendingIntent
 import android.content.Intent
-import android.content.SharedPreferences
-import android.preference.PreferenceManager
 import android.provider.Settings
 import android.util.Log
 import android.view.accessibility.AccessibilityEvent
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.github.aakumykov.client.R
-import com.github.aakumykov.client.extensions.showToast
-import com.github.aakumykov.client.ktor_client.KtorClient
+import com.github.aakumykov.client.ktor_client.GestureClient
 import com.github.aakumykov.client.ktor_client.KtorClientState
 import com.github.aakumykov.client.ktor_client.KtorStateProvider
-import com.github.aakumykov.client.settings_provider.DEFAULT_SERVER_ADDRESS
-import com.github.aakumykov.client.settings_provider.DEFAULT_SERVER_PATH
-import com.github.aakumykov.client.settings_provider.DEFAULT_SERVER_PORT
-import com.github.aakumykov.client.settings_provider.KEY_SERVER_ADDRESS
-import com.github.aakumykov.client.settings_provider.KEY_SERVER_PATH
-import com.github.aakumykov.client.settings_provider.KEY_SERVER_PORT
 import com.github.aakumykov.client.settings_provider.SettingsProvider
 import com.github.aakumykov.client.utils.NotificationChannelHelper
-import com.github.aakumykov.common.dateTimeString
-import com.github.aakumykov.kotlin_playground.UserGesture
 import com.gitlab.aakumykov.exception_utils_module.ExceptionUtils
 import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineScope
@@ -55,8 +44,8 @@ class GesturePlayingService : AccessibilityService() {
     private val serverPath: String? get() = settingsProvider.getPath()
 
 
-    private val ktorClient: KtorClient by lazy {
-        KtorClient.getInstance(Gson(), KtorStateProvider)
+    private val ktorClient: GestureClient by lazy {
+        GestureClient.getInstance(Gson(), KtorStateProvider)
     }
 
 
@@ -174,15 +163,15 @@ class GesturePlayingService : AccessibilityService() {
             KtorClientState.INACTIVE -> {}
             KtorClientState.CONNECTING -> {}
             KtorClientState.DISCONNECTING -> {}
-            KtorClientState.RUNNING -> startListeningForGestures()
+            KtorClientState.CONNECTED -> startListeningForGestures()
             KtorClientState.PAUSED -> {}
-            KtorClientState.STOPPED -> {}
+            KtorClientState.DISCONNECTED -> {}
             KtorClientState.ERROR -> {}
         }
     }
 
     private fun startListeningForGestures() {
-        CoroutineScope(Dispatchers.IO).launch {
+        /*CoroutineScope(Dispatchers.IO).launch {
             try {
                 ktorClient.gesturesFlow()?.collect { userGesture: UserGesture? ->
                     gesturePlayer.playGesture(userGesture)
@@ -190,7 +179,7 @@ class GesturePlayingService : AccessibilityService() {
             } catch (e: Exception) {
                 errorLog(e)
             }
-        }
+        }*/
     }
 
     override fun onServiceConnected() {
@@ -328,7 +317,7 @@ class GesturePlayingService : AccessibilityService() {
         }*/
     }
 
-    private fun connectToServer() {
+    /*private fun connectToServer() {
 
         debugLog("connectToServer()")
 
@@ -345,7 +334,7 @@ class GesturePlayingService : AccessibilityService() {
                 serverPath!!
             )
         }
-    }
+    }*/
 
     private fun disconnectFromServer() {
         debugLog("disconnectFromServer()")

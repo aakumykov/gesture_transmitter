@@ -2,10 +2,14 @@ package com.github.aakumykov.client.ktor_client
 
 enum class KtorClientState {
     INACTIVE,
+
     CONNECTING,
+    CONNECTED,
+
     DISCONNECTING,
-    RUNNING,
+    DISCONNECTED,
+
     PAUSED,
-    STOPPED,
+
     ERROR
 }
