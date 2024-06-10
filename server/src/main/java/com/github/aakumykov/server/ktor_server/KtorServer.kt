@@ -24,6 +24,9 @@ import io.ktor.websocket.close
 import io.ktor.websocket.readText
 import kotlinx.coroutines.channels.ClosedReceiveChannelException
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.receiveAsFlow
 import java.time.Duration
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -64,19 +67,24 @@ class KtorServer(private val gson: Gson) {
             routing {
                 webSocket(path = path) {
 
-                    closeSession("Новое подключение закрывает старое")
-
                     serverSession = this
                     Log.d(TAG, "Новое подключение, ${serverSession.hashCode()}")
 
-                    try {
+                    incoming.receiveAsFlow().onEach { frame ->
+                        Log.d("FRAME_TYPE", frame.frameType.name)
+                        /*(frame as? Frame.Text)?.let { text ->
+                            Log.d("INCOMING_FRAME", "text: text")
+                        }*/
+                    }.launchIn(this)
+
+                    /*try {
                         for (frame in incoming) {
 
-                            /*if (stopRequested) {
+                            *//*if (stopRequested) {
                                 Log.e(TAG, "Запрошен останов сервера...")
                                 closeSession("Останов, запрошенный пользователем")
                                 return@webSocket
-                            }*/
+                            }*//*
 
                             when (frame.frameType) {
                                 FrameType.PING -> debugPing()
@@ -92,7 +100,7 @@ class KtorServer(private val gson: Gson) {
                     }
                     catch (t: Throwable) {
                         Log.e(TAG, ExceptionUtils.getErrorMessage(t), t)
-                    }
+                    }*/
                 }
             }
         }.start(wait = true)
