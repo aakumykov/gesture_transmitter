@@ -2,6 +2,6 @@ package com.github.aakumykov.qwerty
 
 import dagger.Component
 
-@Component(modules = [])
+@Component()
 interface QwertyComponent {
 }
