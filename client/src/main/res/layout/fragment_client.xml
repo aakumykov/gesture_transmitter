@@ -14,7 +14,8 @@
         android:layout_height="wrap_content"
         android:layout_marginVertical="12dp"
         android:backgroundTint="#64B5F6"
-        android:text="@string/button_acc_service_disabled" />
+        android:text="@string/button_acc_service_disabled"
+        android:visibility="gone" />
 
 
     <Button
@@ -22,7 +23,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="12dp"
-        android:text="@string/config_button" />
+        android:text="@string/config_button"
+        android:visibility="gone" />
 
 
     <Button
@@ -37,14 +39,29 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:backgroundTint="#FFD54F"
-        android:text="@string/pause_button" />
+        android:text="@string/pause_button"
+        android:visibility="gone" />
 
     <Button
         android:id="@+id/finishButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:backgroundTint="#E57373"
-        android:text="@string/stop_button" />
+        android:text="@string/stop_button"
+        android:visibility="gone" />
+
+
+    <Button
+        android:id="@+id/testMessageButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Пробное сообщение" />
+
+    <Button
+        android:id="@+id/closeMessageButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Close-сообщение" />
 
 
     <TextView

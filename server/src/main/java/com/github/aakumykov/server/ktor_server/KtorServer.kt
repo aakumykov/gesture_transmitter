@@ -52,7 +52,7 @@ class KtorServer(private val gson: Gson) {
         _stopRequested.set(false)
 
         runningServer = embeddedServer(
-            Jetty,
+            CIO,
             host = address,
             port = port
         ) {

@@ -4,11 +4,13 @@ import android.util.Log
 import com.github.aakumykov.common.CLIENT_WANTS_TO_DISCONNECT
 import com.google.gson.Gson
 import io.ktor.client.HttpClient
+import io.ktor.client.engine.cio.CIO
 import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.plugins.websocket.ClientWebSocketSession
 import io.ktor.client.plugins.websocket.WebSockets
 import io.ktor.client.plugins.websocket.webSocket
 import io.ktor.http.HttpMethod
+import io.ktor.websocket.Frame
 import io.ktor.websocket.FrameType
 import io.ktor.websocket.close
 import io.ktor.websocket.send
@@ -40,12 +42,12 @@ class GestureClient private constructor(
 
 
     private val client by lazy {
-        HttpClient(OkHttp) {
-            engine {
+        HttpClient(CIO) {
+            /*engine {
                 preconfigured = OkHttpClient.Builder()
                     .pingInterval(20, TimeUnit.SECONDS)
                     .build()
-            }
+            }*/
             install(WebSockets)
         }
     }
@@ -170,6 +172,16 @@ class GestureClient private constructor(
 
     private fun currentStateIs(state: KtorClientState): Boolean {
         return currentState == state
+    }
+
+    suspend fun sendTextMessage(text: String) {
+        Log.d(TAG, "sendTextMessage($text)")
+        currentSession?.send(Frame.Text(text)) ?: Log.e(TAG, "sendTextMessage(): currentSession is NULL")
+    }
+
+    suspend fun sendCloseMessage() {
+        Log.d(TAG, "sendCloseMessage()")
+        currentSession?.send(Frame.Close()) ?: Log.e(TAG, "sendCloseMessage(): currentSession is NULL")
     }
 
     val currentState: KtorClientState get() = KtorStateProvider.getState()

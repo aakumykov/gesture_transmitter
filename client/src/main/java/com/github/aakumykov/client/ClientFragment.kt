@@ -19,6 +19,7 @@ import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlin.random.Random
 
 
 class ClientFragment : Fragment(R.layout.fragment_client) {
@@ -63,6 +64,19 @@ class ClientFragment : Fragment(R.layout.fragment_client) {
         }
 
         binding.finishButton.setOnClickListener { onFinishButtonClicked() }
+
+
+        binding.testMessageButton.setOnClickListener {
+            lifecycleScope.launch(Dispatchers.IO) {
+                ktorClient.sendTextMessage("Привет от Клиента-${Random.nextInt(100)}")
+            }
+        }
+
+        binding.closeMessageButton.setOnClickListener {
+            lifecycleScope.launch(Dispatchers.IO) {
+                ktorClient.sendCloseMessage()
+            }
+        }
     }
 
 
