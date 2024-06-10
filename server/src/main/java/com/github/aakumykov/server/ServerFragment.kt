@@ -20,6 +20,7 @@ import com.gitlab.aakumykov.exception_utils_module.ExceptionUtils
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlin.random.Random
 
 class ServerFragment : Fragment(R.layout.fragment_server), View.OnTouchListener {
 
@@ -56,6 +57,13 @@ class ServerFragment : Fragment(R.layout.fragment_server), View.OnTouchListener 
         binding.touchRecordingArea.setOnTouchListener(this)
         binding.startServerButton.setOnClickListener { startServer() }
         binding.stopServerButton.setOnClickListener { stopServer() }
+        binding.sendTestMessageButton.setOnClickListener { sendTetsMessage() }
+    }
+
+    private fun sendTetsMessage() {
+        lifecycleScope.launch(Dispatchers.IO) {
+            ktorServer.sendTestMessage("Привет-${Random.nextInt(100)}")
+        }
     }
 
     private fun onNewGesture(gesture: UserGesture?) {

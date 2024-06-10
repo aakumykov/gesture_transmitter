@@ -70,12 +70,16 @@ class KtorServer(private val gson: Gson) {
                     serverSession = this
                     Log.d(TAG, "Новое подключение, ${serverSession.hashCode()}")
 
-                    incoming.receiveAsFlow().onEach { frame ->
+                    /*incoming.receiveAsFlow().onEach { frame ->
                         Log.d("FRAME_TYPE", frame.frameType.name)
-                        /*(frame as? Frame.Text)?.let { text ->
+                        *//*(frame as? Frame.Text)?.let { text ->
                             Log.d("INCOMING_FRAME", "text: text")
-                        }*/
-                    }.launchIn(this)
+                        }*//*
+                    }.launchIn(this)*/
+
+                    for (frame in incoming) {
+                        Log.d("FRAME_TYPE", "FRAME_TYPE: "+frame.frameType.name)
+                    }
 
                     /*try {
                         for (frame in incoming) {
@@ -174,6 +178,10 @@ class KtorServer(private val gson: Gson) {
         delay(gracePeriodMillis + timeoutMillis)
         runningServer = null
         Log.d(TAG, "...сервер, вероятно, остановлен.")
+    }
+
+    suspend fun sendTestMessage(text: String) {
+        serverSession?.outgoing?.send(Frame.Text(text))
     }
 
 
