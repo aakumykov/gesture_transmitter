@@ -1,4 +1,4 @@
-package com.github.aakumykov.server.ktor_server
+package com.github.aakumykov.server.gesture_server
 
 import android.util.Log
 import com.github.aakumykov.common.CLIENT_WANTS_TO_DISCONNECT
@@ -28,7 +28,7 @@ import kotlinx.coroutines.delay
 import java.time.Duration
 import java.util.concurrent.atomic.AtomicBoolean
 
-class KtorServer(private val gson: Gson) {
+class GestureServer(private val gson: Gson) {
 
     private var onPause: Boolean = false
     private var runningServer: ApplicationEngine? = null
@@ -181,6 +181,6 @@ class KtorServer(private val gson: Gson) {
 
 
     companion object {
-        val TAG: String = KtorServer::class.java.simpleName
+        val TAG: String = GestureServer::class.java.simpleName
     }
 }

@@ -15,12 +15,11 @@ import com.github.aakumykov.server.databinding.FragmentServerBinding
 import com.github.aakumykov.common.DEFAULT_SERVER_ADDRESS
 import com.github.aakumykov.common.DEFAULT_SERVER_PATH
 import com.github.aakumykov.common.DEFAULT_SERVER_PORT
-import com.github.aakumykov.server.ktor_server.KtorServer
+import com.github.aakumykov.server.gesture_server.GestureServer
 import com.gitlab.aakumykov.exception_utils_module.ExceptionUtils
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlin.random.Random
 
 class ServerFragment : Fragment(R.layout.fragment_server), View.OnTouchListener {
 
@@ -29,7 +28,7 @@ class ServerFragment : Fragment(R.layout.fragment_server), View.OnTouchListener 
 
     private val gestureRecorder by lazy { GestureRecorder }
 
-    private val ktorServer: KtorServer by lazy { KtorServer(Gson()) }
+    private val mGestureServer: GestureServer by lazy { GestureServer(Gson()) }
 
     private fun showError(throwable: Throwable) {
         binding.serverErrorView.apply {
@@ -64,7 +63,7 @@ class ServerFragment : Fragment(R.layout.fragment_server), View.OnTouchListener 
         gesture?.also {
             Log.d(TAG, "Новый записанный жест: $gesture")
             lifecycleScope.launch(Dispatchers.IO) {
-                ktorServer.sendUserGesture(gesture)
+                mGestureServer.sendUserGesture(gesture)
             }
         }
     }
@@ -73,7 +72,7 @@ class ServerFragment : Fragment(R.layout.fragment_server), View.OnTouchListener 
         hideError()
         lifecycleScope.launch(Dispatchers.IO) {
             try {
-                ktorServer.start(DEFAULT_SERVER_ADDRESS, DEFAULT_SERVER_PORT, DEFAULT_SERVER_PATH)
+                mGestureServer.start(DEFAULT_SERVER_ADDRESS, DEFAULT_SERVER_PORT, DEFAULT_SERVER_PATH)
             } catch (e: Exception) {
                 inMainThread { showError(e) }
                 Log.e(TAG, ExceptionUtils.getErrorMessage(e), e)
@@ -84,7 +83,7 @@ class ServerFragment : Fragment(R.layout.fragment_server), View.OnTouchListener 
     private fun stopServer() {
         lifecycleScope.launch(Dispatchers.IO) {
             try {
-                ktorServer.stop()
+                mGestureServer.stop()
                 // TODO: сообщать об останове, основываясь на статусе, полученном от сервера
                 inMainThread { showToast(R.string.server_was_stopped) }
             } catch (e: Exception) {
