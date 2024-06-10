@@ -43,7 +43,7 @@ class ClientFragment : Fragment(R.layout.fragment_client) {
 
     private fun subscribeToKtorClientState() {
         lifecycleScope.launch {
-            KtorStateProvider.state.collect(::onClientStateChanged)
+            KtorStateProvider.state.collect(::onNewClientState)
         }
         lifecycleScope.launch {
             KtorStateProvider.error.collect(::onKtorClientError)
@@ -51,13 +51,10 @@ class ClientFragment : Fragment(R.layout.fragment_client) {
     }
 
     private fun prepareButtons() {
-
-        binding.accessibilityServiceButton.setOnClickListener { requireContext().openAccessibilitySettings() }
-
+        binding.accessibilityServiceButton.setOnClickListener {
+            requireContext().openAccessibilitySettings() }
         binding.startButton.setOnClickListener { onStartButtonClicked() }
-
         binding.pauseButton.setOnClickListener { onPauseButtonClicked() }
-
         binding.finishButton.setOnClickListener { onFinishButtonClicked() }
     }
 
@@ -78,11 +75,10 @@ class ClientFragment : Fragment(R.layout.fragment_client) {
     }
 
     private fun onStartButtonClicked() {
-        connectToServer()
-        /*requireContext().packageManager
-            .getLaunchIntentForPackage(GesturePlayingService.GOOGLE_CHROME_PACKAGE_NAME)
-            ?.also { startActivity(it) }
-            ?: showToast(R.string.google_chrome_not_found)*/
+        if (gestureClient.isConnected())
+            launchGoogleChrome()
+        else
+            connectToServer()
     }
 
 
@@ -130,11 +126,24 @@ class ClientFragment : Fragment(R.layout.fragment_client) {
     }
 
 
-    private fun onClientStateChanged(state: ClientState) {
+    private fun onNewClientState(state: ClientState) {
         displayClientState(state)
         updatePauseButton(state)
         showHideProgressBar(state)
         hideErrorIfNotError(state)
+        launchGoogleChromeOnConnected(state)
+    }
+
+    private fun launchGoogleChromeOnConnected(state: ClientState) {
+        if (ClientState.CONNECTED == state)
+            launchGoogleChrome()
+    }
+
+    private fun launchGoogleChrome() {
+        requireContext().packageManager
+            .getLaunchIntentForPackage(GesturePlayingService.GOOGLE_CHROME_PACKAGE_NAME)
+            ?.also { startActivity(it) }
+            ?: showToast(R.string.google_chrome_not_found)
     }
 
     private fun updatePauseButton(state: ClientState) {
