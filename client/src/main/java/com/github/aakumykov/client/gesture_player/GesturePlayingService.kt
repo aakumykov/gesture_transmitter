@@ -172,6 +172,8 @@ class GesturePlayingService : AccessibilityService() {
 
         when(ktorClientState) {
             KtorClientState.INACTIVE -> {}
+            KtorClientState.CONNECTING -> {}
+            KtorClientState.DISCONNECTING -> {}
             KtorClientState.RUNNING -> startListeningForGestures()
             KtorClientState.PAUSED -> {}
             KtorClientState.STOPPED -> {}
@@ -298,14 +300,17 @@ class GesturePlayingService : AccessibilityService() {
             chromeIsLaunched = currentWindowIsChromeWindow()
             chromeHasContent = currentWindowHasChild()
 
-/*                debugLog("windows_check", "Окно Хрома активно")
-            }
-            else {
-                chromeIsLaunched = false
-                debugLog("windows_check", "Окно Хрома неактивно")
-            }*/
+//            debugLog("windows_check","хром запущен: $chromeIsLaunched, содержимое: $chromeHasContent")
 
-            debugLog("windows_check","хром запущен: $chromeIsLaunched, содержимое: $chromeHasContent")
+            CoroutineScope(Dispatchers.IO).launch {
+                if (chromeIsLaunched && chromeHasContent) {
+                    if (ktorClient.isNotConnected() && ktorClient.isNotConnectingNow())
+                        connectToServer()
+                } else {
+                    if (ktorClient.isConnected() && ktorClient.isNotDisconnectingNow())
+                        disconnectFromServer()
+                }
+            }
         }
 
         /*if (null != event && event.isWindowStateChanged()) {
@@ -343,13 +348,13 @@ class GesturePlayingService : AccessibilityService() {
 
     private fun connectToServer() {
 
+        debugLog("connectToServer()")
+
         if (null == serverAddress || null == serverPath || serverPort <= 0) {
             errorLog("Неполные настройки сервера: $serverAddress:$serverPort/$serverPath")
             showToast(R.string.gesture_playing_service_error_incomplete_server_config)
             return
         }
-
-        debugLog("connectToServer()")
 
         CoroutineScope(Dispatchers.IO).launch {
             ktorClient.connect(
@@ -361,6 +366,7 @@ class GesturePlayingService : AccessibilityService() {
     }
 
     private fun disconnectFromServer() {
+
         debugLog("disconnectFromServer()")
 
         CoroutineScope(Dispatchers.IO).launch {
