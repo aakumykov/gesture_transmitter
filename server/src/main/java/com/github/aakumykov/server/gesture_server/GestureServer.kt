@@ -77,8 +77,6 @@ class GestureServer(private val gson: Gson) {
                     try {
                         for (frame in incoming) {
 
-                            Log.d(TAG, "FRAME_TYPE (сервер): " + frame.frameType.name)
-
                             (frame as? Frame.Close)?.also {
                                 closeSession("Пришёл Close-пакет")
                             }

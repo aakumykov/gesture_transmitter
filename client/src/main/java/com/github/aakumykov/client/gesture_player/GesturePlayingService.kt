@@ -125,7 +125,7 @@ class GesturePlayingService : AccessibilityService() {
     }
 
     private fun reportServerChromeIsActive(isActive: Boolean) {
-        Log.d(TAG, "reportServerChromeLaunched()")
+        Log.d(TAG, "reportServerChromeLaunched($isActive)")
         CoroutineScope(Dispatchers.IO).launch {
             gestureClient.reportServerTargetAppIsActive(isActive)
         }
