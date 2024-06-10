@@ -9,4 +9,5 @@
     <string name="stop_recording_button">Остановить запись</string>
     <string name="server_was_stopped">Сервер остановлен</string>
     <string name="send_test_message_button">Отправить пробное сообщение</string>
+    <string name="send_close_message_button">Отправить Close-сообщение</string>
 </resources>

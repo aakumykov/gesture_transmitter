@@ -58,6 +58,13 @@ class ServerFragment : Fragment(R.layout.fragment_server), View.OnTouchListener 
         binding.startServerButton.setOnClickListener { startServer() }
         binding.stopServerButton.setOnClickListener { stopServer() }
         binding.sendTestMessageButton.setOnClickListener { sendTetsMessage() }
+        binding.sendCloseMessageButton.setOnClickListener { sendCloseMessage() }
+    }
+
+    private fun sendCloseMessage() {
+        lifecycleScope.launch(Dispatchers.IO) {
+            ktorServer.sendCloseMessage()
+        }
     }
 
     private fun sendTetsMessage() {

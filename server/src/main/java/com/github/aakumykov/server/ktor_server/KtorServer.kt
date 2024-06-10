@@ -184,6 +184,12 @@ class KtorServer(private val gson: Gson) {
         serverSession?.outgoing?.send(Frame.Text(text))
     }
 
+    suspend fun sendCloseMessage() {
+        serverSession?.outgoing?.send(Frame.Close(
+            CloseReason(CloseReason.Codes.NORMAL, "Тестовое Close-сообщение")
+        ))
+    }
+
 
     companion object {
         val TAG: String = KtorServer::class.java.simpleName
