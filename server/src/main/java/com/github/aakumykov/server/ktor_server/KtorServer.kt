@@ -13,10 +13,12 @@ import io.ktor.server.jetty.Jetty
 import io.ktor.server.jetty.JettyApplicationEngine
 import io.ktor.server.routing.routing
 import io.ktor.server.websocket.DefaultWebSocketServerSession
+import io.ktor.server.websocket.WebSocketServerSession
 import io.ktor.server.websocket.WebSockets
 import io.ktor.server.websocket.pingPeriod
 import io.ktor.server.websocket.timeout
 import io.ktor.server.websocket.webSocket
+import io.ktor.server.websocket.webSocketRaw
 import io.ktor.websocket.CloseReason
 import io.ktor.websocket.Frame
 import io.ktor.websocket.FrameType
@@ -33,7 +35,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 class KtorServer(private val gson: Gson) {
 
     private var runningServer: ApplicationEngine? = null
-    private var serverSession: DefaultWebSocketServerSession? = null
+    private var serverSession: WebSocketServerSession? = null
     private val sessionHashCode: String
         get() = "session.hashCode: ${(serverSession?.hashCode() ?: "[нет сессии]")}"
     private val _stopRequested: AtomicBoolean = AtomicBoolean(false)
@@ -65,7 +67,7 @@ class KtorServer(private val gson: Gson) {
             }
 
             routing {
-                webSocket(path = path) {
+                webSocketRaw(path = path) {
 
                     serverSession = this
                     Log.d(TAG, "Новое подключение, ${serverSession.hashCode()}")
