@@ -12,9 +12,9 @@ import com.github.aakumykov.client.gesture_player.GesturePlayingService
 import com.github.aakumykov.client.gesture_client.GestureClient
 import com.github.aakumykov.client.client_state_provider.ClientState
 import com.github.aakumykov.client.client_state_provider.KtorStateProvider
-import com.github.aakumykov.preferences.settings_provider.SettingsProvider
 import com.github.aakumykov.common.config.GOOGLE_CHROME_PACKAGE_NAME
 import com.github.aakumykov.common.extentions.showToast
+import com.github.aakumykov.common.settings_provider.SettingsProvider
 import com.gitlab.aakumykov.exception_utils_module.ExceptionUtils
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
@@ -31,8 +31,8 @@ class ClientFragment : Fragment(R.layout.fragment_client) {
         GestureClient.getInstance(Gson(), KtorStateProvider)
     }
 
-    private val settingsProvider: com.github.aakumykov.preferences.settings_provider.SettingsProvider by lazy {
-        com.github.aakumykov.preferences.settings_provider.SettingsProvider.getInstance(requireActivity().applicationContext)
+    private val settingsProvider: SettingsProvider by lazy {
+        SettingsProvider.getInstance(requireActivity().applicationContext)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
