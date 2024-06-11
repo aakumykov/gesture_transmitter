@@ -75,7 +75,6 @@ fun PreferencesScreen(settingsProvider: SettingsProvider, modifier: Modifier = M
             placeholderRes = R.string.server_address_placeholder,
             keyboardOptions = decimalKeyboardOptions()
         ) {
-//            settingsProvider.storeIpAddress(ipAddress.value)
             ipAddress.value = it
         }
 
@@ -87,7 +86,6 @@ fun PreferencesScreen(settingsProvider: SettingsProvider, modifier: Modifier = M
             placeholderRes = R.string.server_port_placeholder,
             keyboardOptions = decimalKeyboardOptions()
         ) {
-//            settingsProvider.storePort(port.intValue)
             port.intValue = it.toInt()
         }
 
@@ -98,20 +96,27 @@ fun PreferencesScreen(settingsProvider: SettingsProvider, modifier: Modifier = M
             text = path.value,
             placeholderRes = R.string.server_path_placeholder
         ) {
-//            settingsProvider.storeIpAddress(path.value)
             path.value = it
         }
 
-
+        //
+        // Сохранить
+        //
         Button(
             modifier = Modifier.fillMaxWidth().padding(top = 12.dp),
             onClick = {
-
+                settingsProvider.storeIpAddress(ipAddress.value)
+                settingsProvider.storePort(port.intValue)
+                settingsProvider.storePath(path.value)
+                activity?.finish()
             }
         ) {
-            Text(text = "Сохранить")
+            Text("Сохранить")
         }
 
+        //
+        // Отменить
+        //
         Button(
             modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
             colors = ButtonDefaults.buttonColors(
@@ -119,7 +124,7 @@ fun PreferencesScreen(settingsProvider: SettingsProvider, modifier: Modifier = M
             ),
             onClick = { activity?.finish() }
         ) {
-            Text(text = "Отмена")
+            Text("Отмена")
         }
     }
 }
@@ -128,8 +133,10 @@ fun PreferencesScreen(settingsProvider: SettingsProvider, modifier: Modifier = M
 fun InputField(text: String,
                placeholderRes: Int,
                keyboardOptions: KeyboardOptions = textKeyboardOptions(),
+               enabled: Boolean = true,
                onValueChange: (String) -> Unit) {
     OutlinedTextField(
+        enabled = enabled,
         value = text,
         placeholder = { TextPlaceholder(stringRes = placeholderRes) },
         onValueChange = onValueChange,
