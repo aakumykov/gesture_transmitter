@@ -44,19 +44,6 @@ android {
             excludes += '/META-INF/{AL2.0,LGPL2.1}'
         }
     }
-    flavorDimensions 'mode'
-    productFlavors {
-        client {
-            dimension 'mode'
-            applicationId 'gesture_transmitter'
-            applicationIdSuffix '.client'
-        }
-        server {
-            dimension 'mode'
-            applicationId 'gesture_transmitter'
-            applicationIdSuffix '.server'
-        }
-    }
 }
 
 dependencies {
