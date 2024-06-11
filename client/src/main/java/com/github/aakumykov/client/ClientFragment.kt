@@ -9,9 +9,9 @@ import com.github.aakumykov.client.databinding.FragmentClientBinding
 import com.github.aakumykov.client.extensions.isAccessibilityServiceEnabled
 import com.github.aakumykov.client.extensions.openAccessibilitySettings
 import com.github.aakumykov.client.gesture_player.GesturePlayingService
-import com.github.aakumykov.client.ktor_client.GestureClient
-import com.github.aakumykov.client.ktor_client.ClientState
-import com.github.aakumykov.client.ktor_client.KtorStateProvider
+import com.github.aakumykov.client.gesture_client.GestureClient
+import com.github.aakumykov.client.gesture_client.ClientState
+import com.github.aakumykov.client.gesture_client.KtorStateProvider
 import com.github.aakumykov.client.settings_provider.SettingsProvider
 import com.github.aakumykov.common.GOOGLE_CHROME_PACKAGE_NAME
 import com.github.aakumykov.common.showToast

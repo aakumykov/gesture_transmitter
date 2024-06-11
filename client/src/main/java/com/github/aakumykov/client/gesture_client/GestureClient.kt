@@ -1,4 +1,4 @@
-package com.github.aakumykov.client.ktor_client
+package com.github.aakumykov.client.gesture_client
 
 import android.util.Log
 import com.github.aakumykov.common.CLIENT_WANTS_TO_DISCONNECT
