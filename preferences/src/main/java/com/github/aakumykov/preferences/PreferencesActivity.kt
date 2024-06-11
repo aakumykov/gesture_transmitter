@@ -1,5 +1,6 @@
 package com.github.aakumykov.preferences
 
+import android.app.Activity
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -24,12 +25,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.github.aakumykov.common.settings_provider.SettingsProvider
 import com.github.aakumykov.preferences.ui.theme.Gesture_transmitterTheme
-import kotlin.math.sin
 
 class PreferencesActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -62,6 +61,8 @@ fun PreferencesScreen(settingsProvider: SettingsProvider, modifier: Modifier = M
     val path = rememberSaveable {
         mutableStateOf(settingsProvider.getPath())
     }
+
+    val activity = (LocalContext.current as? Activity)
 
 
     Column(modifier = modifier.fillMaxSize()) {
@@ -104,7 +105,9 @@ fun PreferencesScreen(settingsProvider: SettingsProvider, modifier: Modifier = M
 
         Button(
             modifier = Modifier.fillMaxWidth().padding(top = 12.dp),
-            onClick = { /*TODO*/ }
+            onClick = {
+
+            }
         ) {
             Text(text = "Сохранить")
         }
@@ -114,7 +117,7 @@ fun PreferencesScreen(settingsProvider: SettingsProvider, modifier: Modifier = M
             colors = ButtonDefaults.buttonColors(
                 containerColor = colorResource(id = R.color.button_cancel)
             ),
-            onClick = { /*TODO*/ }
+            onClick = { activity?.finish() }
         ) {
             Text(text = "Отмена")
         }
