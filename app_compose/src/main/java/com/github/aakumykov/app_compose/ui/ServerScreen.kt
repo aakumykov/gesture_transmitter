@@ -14,10 +14,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.max
 import androidx.compose.ui.viewinterop.AndroidView
+import com.github.aakumykov.app_compose.R
 import com.github.aakumykov.app_compose.ui.components.SimpleButton
 
 @Composable
@@ -56,9 +58,7 @@ fun ServerScreen(
             factory = { context ->
                 TextView(context).apply {
                     gravity = Gravity.CENTER
-                    text = "Запустите сервер.\n" +
-                            "Подключите клиента." +
-                            "Водите пальцем вверх-вниз"
+                    text = context.getString(R.string.gesture_reading_view_hint)
                 }
             },
             update = {
