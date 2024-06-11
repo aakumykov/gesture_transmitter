@@ -4,7 +4,7 @@ import android.app.Application
 import android.content.Context
 import com.github.aakumykov.server.ServerApp
 
-class AppCompose : Application() {
+class App : Application() {
 
     override fun onCreate() {
         super.onCreate()
