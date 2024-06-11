@@ -45,7 +45,7 @@ dependencies {
     implementation libs.androidx.core.ktx
     implementation libs.androidx.appcompat
     implementation libs.material
-    implementation project(':data_model')
+    api project(':data_model')
     implementation project(':common')
     testImplementation libs.junit
     androidTestImplementation libs.androidx.junit
@@ -59,7 +59,7 @@ dependencies {
     implementation "io.ktor:ktor-server-jetty-jvm:$ktor_version"
     implementation "io.ktor:ktor-server-cio-jvm:$ktor_version"
 
-    implementation 'com.github.aakumykov:exception_utils:0.4'
+    api 'com.github.aakumykov:exception_utils:0.4'
 
     annotationProcessor "androidx.room:room-compiler:2.6.1"
     kapt "androidx.room:room-compiler:2.6.1"

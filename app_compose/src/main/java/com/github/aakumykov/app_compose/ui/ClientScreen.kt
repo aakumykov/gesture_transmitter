@@ -57,3 +57,7 @@ private fun launchGoogleChrome(context: Context) {
 fun showToast(context: Context, stringRes: Int) {
     context.showToast(stringRes)
 }
+
+fun showToast(context: Context, text: String) {
+    context.showToast(text)
+}
