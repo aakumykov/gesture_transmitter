@@ -1,4 +1,4 @@
-package com.github.aakumykov.app_compose.funstions
+package com.github.aakumykov.app_compose.funstions.ui
 
 import androidx.compose.runtime.MutableState
 import com.github.aakumykov.client.client_state_provider.ClientState

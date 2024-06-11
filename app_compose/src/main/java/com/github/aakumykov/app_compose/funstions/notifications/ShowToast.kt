@@ -1,4 +1,4 @@
-package com.github.aakumykov.app_compose.funstions
+package com.github.aakumykov.app_compose.funstions.notifications
 
 import android.content.Context
 import com.github.aakumykov.client.extensions.showToast

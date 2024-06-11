@@ -1,5 +1,6 @@
-package com.github.aakumykov.app_compose.funstions
+package com.github.aakumykov.app_compose.funstions.gesture_client
 
+import com.github.aakumykov.app_compose.funstions.notifications.showError
 import com.github.aakumykov.client.gesture_client.GestureClient
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope

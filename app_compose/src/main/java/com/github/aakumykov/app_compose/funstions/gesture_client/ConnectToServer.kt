@@ -1,6 +1,7 @@
-package com.github.aakumykov.app_compose.funstions
+package com.github.aakumykov.app_compose.funstions.gesture_client
 
 import com.github.aakumykov.app_compose.App
+import com.github.aakumykov.app_compose.funstions.notifications.showToast
 import com.github.aakumykov.client.R
 import com.github.aakumykov.client.client_state_provider.ClientState
 import com.github.aakumykov.client.gesture_client.GestureClient

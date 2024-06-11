@@ -14,11 +14,11 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.Lifecycle
-import com.github.aakumykov.app_compose.funstions.connectToServer
-import com.github.aakumykov.app_compose.funstions.disconnectFromServer
-import com.github.aakumykov.app_compose.funstions.launchGoogleChrome
-import com.github.aakumykov.app_compose.funstions.pauseButtonText
-import com.github.aakumykov.app_compose.funstions.pauseResumeServerInteraction
+import com.github.aakumykov.app_compose.funstions.gesture_client.connectToServer
+import com.github.aakumykov.app_compose.funstions.gesture_client.disconnectFromServer
+import com.github.aakumykov.app_compose.funstions.app_launching.launchGoogleChrome
+import com.github.aakumykov.app_compose.funstions.ui.pauseButtonText
+import com.github.aakumykov.app_compose.funstions.gesture_client.pauseResumeServerInteraction
 import com.github.aakumykov.app_compose.ui.gui_elements.client.ClientState
 import com.github.aakumykov.app_compose.ui.gui_elements.client.accessibilityButtonText
 import com.github.aakumykov.app_compose.ui.gui_elements.shared.SimpleButton

@@ -1,7 +1,8 @@
-package com.github.aakumykov.app_compose.funstions
+package com.github.aakumykov.app_compose.funstions.app_launching
 
 import android.content.Context
 import androidx.core.content.ContextCompat
+import com.github.aakumykov.app_compose.funstions.notifications.showToast
 import com.github.aakumykov.client.R
 import com.github.aakumykov.common.config.GOOGLE_CHROME_PACKAGE_NAME
 

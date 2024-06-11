@@ -8,7 +8,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.github.aakumykov.app_compose.funstions.clientStateToStringRes
+import com.github.aakumykov.app_compose.funstions.ui.clientStateToStringRes
 import com.github.aakumykov.client.client_state_provider.ClientState
 
 @Composable
