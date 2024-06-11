@@ -27,14 +27,14 @@ class SettingsProvider private constructor(private val applicationContext: Conte
     }
 
 
-    fun getIpAddress(): String?
-        = sharedPreferences.getString(KEY_SERVER_ADDRESS, DEFAULT_SERVER_ADDRESS)
+    fun getIpAddress(): String
+        = sharedPreferences.getString(KEY_SERVER_ADDRESS, null) ?: DEFAULT_SERVER_ADDRESS
 
     fun getPort(): Int
         = sharedPreferences.getInt(KEY_SERVER_PORT, DEFAULT_SERVER_PORT)
 
-    fun getPath(): String?
-        = sharedPreferences.getString(KEY_SERVER_PATH, DEFAULT_SERVER_PATH)
+    fun getPath(): String
+        = sharedPreferences.getString(KEY_SERVER_PATH, null) ?: DEFAULT_SERVER_PATH
 
 
     private fun editor(): SharedPreferences.Editor = sharedPreferences.edit()
