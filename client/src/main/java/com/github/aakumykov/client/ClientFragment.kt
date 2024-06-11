@@ -1,5 +1,6 @@
 package com.github.aakumykov.client
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -53,7 +54,9 @@ class ClientFragment : Fragment(R.layout.fragment_client) {
 
     private fun prepareButtons() {
         binding.accessibilityServiceButton.setOnClickListener {
-            requireContext().openAccessibilitySettings() }
+            requireContext().openAccessibilitySettings()
+        }
+        binding.configButton.setOnClickListener {  }
         binding.startButton.setOnClickListener { onStartButtonClicked() }
         binding.pauseButton.setOnClickListener { onPauseButtonClicked() }
         binding.finishButton.setOnClickListener { onFinishButtonClicked() }
