@@ -1,6 +1,5 @@
-package com.github.aakumykov.preferences.ui.theme
+package com.github.aakumykov.prefs_module.theme
 
-import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme

@@ -1,4 +1,4 @@
-package com.github.aakumykov.preferences.ui.theme
+package com.github.aakumykov.prefs_module.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle

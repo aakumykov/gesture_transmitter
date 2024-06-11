@@ -1,4 +1,4 @@
-package com.github.aakumykov.preferences
+package com.github.aakumykov.prefs_module
 
 import android.app.Activity
 import android.os.Bundle
@@ -28,7 +28,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.github.aakumykov.common.settings_provider.SettingsProvider
-import com.github.aakumykov.preferences.ui.theme.Gesture_transmitterTheme
+import com.github.aakumykov.prefs_module.theme.Gesture_transmitterTheme
 
 class PreferencesActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

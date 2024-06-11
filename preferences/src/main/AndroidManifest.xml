@@ -9,7 +9,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Gesture_transmitter">
         <activity
-            android:name=".PreferencesActivity"
+            android:name="com.github.aakumykov.prefs_module.PreferencesActivity"
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.Gesture_transmitter">
