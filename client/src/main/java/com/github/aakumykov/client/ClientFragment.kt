@@ -56,10 +56,17 @@ class ClientFragment : Fragment(R.layout.fragment_client) {
         binding.accessibilityServiceButton.setOnClickListener {
             requireContext().openAccessibilitySettings()
         }
-        binding.configButton.setOnClickListener {  }
+        binding.configButton.setOnClickListener { onConfigButtonClicked() }
         binding.startButton.setOnClickListener { onStartButtonClicked() }
         binding.pauseButton.setOnClickListener { onPauseButtonClicked() }
         binding.finishButton.setOnClickListener { onFinishButtonClicked() }
+    }
+
+    private fun onConfigButtonClicked() {
+        childFragmentManager.beginTransaction()
+            .addToBackStack(null)
+            .add(SettingsFragment.newInstance(), SettingsFragment.TAG)
+            .commit()
     }
 
     private fun onPauseButtonClicked() {

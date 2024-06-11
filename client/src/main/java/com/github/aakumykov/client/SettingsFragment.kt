@@ -18,12 +18,9 @@ class SettingsFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         return ComposeView(requireContext()).apply {
-            // Dispose of the Composition when the view's LifecycleOwner
-            // is destroyed
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
                 MaterialTheme {
-                    // In Compose world
                     Text("Hello Compose!")
                 }
             }
@@ -31,6 +28,8 @@ class SettingsFragment : Fragment() {
     }
 
     companion object {
+        val TAG: String = SettingsFragment::class.java.simpleName
+
         fun newInstance(): SettingsFragment {
             return SettingsFragment()
         }
