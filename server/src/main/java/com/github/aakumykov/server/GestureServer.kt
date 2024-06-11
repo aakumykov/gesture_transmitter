@@ -1,4 +1,4 @@
-package com.github.aakumykov.server.gesture_server
+package com.github.aakumykov.server
 
 import android.util.Log
 import androidx.core.util.Supplier
@@ -11,7 +11,7 @@ import com.github.aakumykov.common.constants.TARGET_APP_IS_ACTIVE
 import com.github.aakumykov.common.constants.TARGET_APP_IS_INACTIVE
 import com.github.aakumykov.data_model.LogMessage
 import com.github.aakumykov.kotlin_playground.UserGesture
-import com.github.aakumykov.server.GestureLogger
+import com.github.aakumykov.server.gesture_logger.GestureLogger
 import com.gitlab.aakumykov.exception_utils_module.ExceptionUtils
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException

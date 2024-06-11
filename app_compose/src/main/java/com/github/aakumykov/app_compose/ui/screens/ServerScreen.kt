@@ -15,7 +15,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
@@ -26,7 +25,7 @@ import com.github.aakumykov.app_compose.ui.gui_elements.shared.SimpleButton
 import com.github.aakumykov.common.settings_provider.SettingsProvider
 import com.github.aakumykov.common.utils.inMainThread
 import com.github.aakumykov.server.GestureRecorder
-import com.github.aakumykov.server.gesture_server.GestureServer
+import com.github.aakumykov.server.GestureServer
 import com.gitlab.aakumykov.exception_utils_module.ExceptionUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.filterNotNull

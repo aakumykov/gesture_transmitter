@@ -24,7 +24,7 @@ import com.github.aakumykov.data_model.utils.TimestampSupplier
 import com.github.aakumykov.app_compose.ui.screens.SettingsScreen
 import com.github.aakumykov.server.GestureRecorder
 import com.github.aakumykov.server.gesture_logger.RoomGestureLogger
-import com.github.aakumykov.server.gesture_server.GestureServer
+import com.github.aakumykov.server.GestureServer
 import com.github.aakumykov.server.logDatabase
 import com.github.aakumykov.server.log_database.LoggingRepository
 import com.google.gson.Gson
