@@ -102,7 +102,7 @@ fun ClientScreen(
         )
 
         SimpleButton(
-            text = "Пауза",
+            text = stringResource(pauseButtonText(clientState)),
             bgColor = colorResource(com.github.aakumykov.client.R.color.button_pause),
             onClick = {
                 pauseResumeServerInteraction(gestureClient, coroutineScope, coroutineDispatcher)
@@ -118,6 +118,13 @@ fun ClientScreen(
         )
 
         ClientState(clientState.value)
+    }
+}
+
+fun pauseButtonText(clientState: MutableState<ClientState>): Int {
+    return when(clientState.value) {
+        ClientState.PAUSED -> com.github.aakumykov.client.R.string.pause_button_resume
+        else -> com.github.aakumykov.client.R.string.pause_button_pause
     }
 }
 
