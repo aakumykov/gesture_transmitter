@@ -21,7 +21,6 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "gesture_transmitter"
-include ':app'
 include ':data_model'
 include ':client'
 include ':server'
