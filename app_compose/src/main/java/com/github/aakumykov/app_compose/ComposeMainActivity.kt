@@ -53,9 +53,9 @@ class ComposeMainActivity : ComponentActivity() {
                         )
                     }
                     composable(DESTINATION_CLIENT) {
-                        ClientScreen {
-                            navController.popBackStack()
-                        }
+                        ClientScreen(
+                            onSettingsButtonClicked = { navController.navigate(DESTINATION_SETTINGS) }
+                        )
                     }
                     composable(DESTINATION_SERVER) {
                         ServerScreen {
@@ -65,7 +65,7 @@ class ComposeMainActivity : ComponentActivity() {
                     composable(DESTINATION_SETTINGS) {
                         PreferencesScreen(
                             settingsProvider = SettingsProvider.getInstance(App.appContext),
-                            onSaveButtonClicked = {},
+                            onSaveButtonClicked = { navController.popBackStack()     },
                             onCancelButtonClicked = { navController.popBackStack() }
                         )
                     }

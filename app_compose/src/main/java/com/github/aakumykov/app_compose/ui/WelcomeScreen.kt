@@ -23,11 +23,6 @@ fun WelcomeScreen(
             textRes = R.string.button_server,
             onClick = onServerButtonClicked
         )
-
-        WelcomeScreenButton(
-            textRes = R.string.button_settings,
-            onClick = onSettingsButtonClicked
-        )
     }
 }
 
