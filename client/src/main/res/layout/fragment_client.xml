@@ -14,7 +14,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="24dp"
-        android:backgroundTint="#64B5F6"
+        android:backgroundTint="@color/button_acc_service"
         android:text="@string/button_acc_service_disabled" />
 
 
@@ -27,19 +27,19 @@
     <Button
         android:id="@+id/startButton"
         style="@style/client_button"
-        android:backgroundTint="#81C784"
+        android:backgroundTint="@color/button_start"
         android:text="@string/start_button" />
 
     <Button
         android:id="@+id/pauseButton"
         style="@style/client_button"
-        android:backgroundTint="#FFD54F"
+        android:backgroundTint="@color/button_pause"
         android:text="@string/pause_button_pause" />
 
     <Button
         android:id="@+id/finishButton"
         style="@style/client_button"
-        android:backgroundTint="#E57373"
+        android:backgroundTint="@color/button_stop"
         android:text="@string/stop_button" />
 
 

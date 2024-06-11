@@ -8,15 +8,22 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun SimpleButton(text: String, bgColor: Color, modifier: Modifier = Modifier, onClick: () -> Unit) {
+fun SimpleButton(
+    text: String,
+    bgColor: Color,
+    textAlign: TextAlign = TextAlign.Center,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
+) {
     Button(
         onClick = onClick,
         modifier = modifier.fillMaxWidth().padding(vertical = 8.dp),
         colors = ButtonDefaults.buttonColors(containerColor = bgColor)
     ) {
-        Text(text = text)
+        Text(text = text, textAlign = textAlign)
     }
 }

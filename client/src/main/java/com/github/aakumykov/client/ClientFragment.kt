@@ -1,6 +1,5 @@
 package com.github.aakumykov.client
 
-import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -9,7 +8,6 @@ import androidx.lifecycle.lifecycleScope
 import com.github.aakumykov.client.databinding.FragmentClientBinding
 import com.github.aakumykov.client.extensions.isAccessibilityServiceEnabled
 import com.github.aakumykov.client.extensions.openAccessibilitySettings
-import com.github.aakumykov.client.gesture_player.GesturePlayingService
 import com.github.aakumykov.client.gesture_client.GestureClient
 import com.github.aakumykov.client.client_state_provider.ClientState
 import com.github.aakumykov.client.client_state_provider.KtorStateProvider
@@ -235,15 +233,13 @@ class ClientFragment : Fragment(R.layout.fragment_client) {
     private fun displayAccessibilityServiceState() {
         binding.accessibilityServiceButton.apply {
             setText(getString(
-                if (isAccessibilityServiceEnabled()) R.string.button_acc_service_enabled
+                if (requireContext().isAccessibilityServiceEnabled()) R.string.button_acc_service_enabled
                 else R.string.button_acc_service_disabled
             ))
         }
     }
 
-    private fun isAccessibilityServiceEnabled(): Boolean {
-        return requireContext().isAccessibilityServiceEnabled(GesturePlayingService::class.java)
-    }
+
 
 
     companion object {

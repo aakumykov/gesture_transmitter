@@ -9,9 +9,9 @@ import android.provider.Settings
 import android.view.accessibility.AccessibilityManager
 import android.widget.Toast
 import androidx.annotation.StringRes
-import androidx.core.content.ContextCompat.startActivity
+import com.github.aakumykov.client.gesture_player.GesturePlayingService
 
-fun Context.isAccessibilityServiceEnabled(serviceClass: Class<out AccessibilityService>): Boolean
+fun Context.isAccessibilityServiceOfClassEnabled(serviceClass: Class<out AccessibilityService>): Boolean
 {
     val am = getSystemService(Context.ACCESSIBILITY_SERVICE) as AccessibilityManager
 
@@ -29,6 +29,10 @@ fun Context.isAccessibilityServiceEnabled(serviceClass: Class<out AccessibilityS
 
 fun Context.openAccessibilitySettings() {
     startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
+}
+
+fun Context.isAccessibilityServiceEnabled(): Boolean {
+    return isAccessibilityServiceOfClassEnabled(GesturePlayingService::class.java)
 }
 
 
