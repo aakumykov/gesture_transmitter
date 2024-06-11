@@ -50,6 +50,7 @@ android {
 
 dependencies {
 
+    api project(':prefs_module')
     implementation libs.androidx.core.ktx
     implementation libs.androidx.appcompat
     implementation libs.material
