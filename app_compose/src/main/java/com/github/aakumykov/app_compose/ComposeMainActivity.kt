@@ -15,6 +15,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.github.aakumykov.app_compose.ui.screens.ClientScreen
+import com.github.aakumykov.app_compose.ui.screens.JournalScreen
 import com.github.aakumykov.app_compose.ui.screens.ServerScreen
 import com.github.aakumykov.app_compose.ui.screens.WelcomeScreen
 import com.github.aakumykov.client.client_state_provider.KtorStateProvider
@@ -25,6 +26,8 @@ import com.github.aakumykov.app_compose.ui.screens.SettingsScreen
 import com.github.aakumykov.server.GestureRecorder
 import com.github.aakumykov.server.gesture_logger.RoomGestureLogger
 import com.github.aakumykov.server.GestureServer
+import com.github.aakumykov.server.gesture_logger.GestureLogReader
+import com.github.aakumykov.server.gesture_logger.GestureLogger
 import com.github.aakumykov.server.logDatabase
 import com.github.aakumykov.server.log_database.LoggingRepository
 import com.google.gson.Gson
@@ -34,6 +37,7 @@ const val DESTINATION_WELCOME = "DESTINATION_WELCOME"
 const val DESTINATION_CLIENT = "DESTINATION_CLIENT"
 const val DESTINATION_SERVER = "DESTINATION_SERVER"
 const val DESTINATION_SETTINGS = "DESTINATION_SETTINGS"
+const val DESTINATION_JOURNAL = "DESTINATION_JOURNAL"
 
 
 class ComposeMainActivity : ComponentActivity() {
@@ -60,6 +64,10 @@ class ComposeMainActivity : ComponentActivity() {
 
     private val roomGestureLogger by lazy {
         RoomGestureLogger(loggingRepository)
+    }
+
+    private val gestureLogReader: GestureLogReader by lazy {
+        roomGestureLogger
     }
 
     private val settingsProvider: SettingsProvider by lazy {
@@ -126,6 +134,7 @@ class ComposeMainActivity : ComponentActivity() {
                     composable(DESTINATION_SERVER) {
                         ServerScreen(
                             onSettingsButtonClicked = { navigateToSettings(navController) },
+                            onJournalButtonClicked = { navController.navigate(DESTINATION_JOURNAL) },
                             settingsProvider = settingsProvider,
                             gestureServer = gestureServer,
                             gestureRecorder = gestureRecorder
@@ -140,6 +149,17 @@ class ComposeMainActivity : ComponentActivity() {
                             settingsProvider = SettingsProvider.getInstance(App.appContext),
                             onSaveButtonClicked = { navController.popBackStack() },
                             onCancelButtonClicked = { navController.popBackStack() }
+                        )
+                    }
+
+                    //
+                    // Журнал
+                    //
+                    composable(DESTINATION_JOURNAL) {
+                        JournalScreen(
+                            gestureLogReader = gestureLogReader,
+                            onBackButtonClicked = { navController.popBackStack() },
+                            modifier = Modifier.fillMaxSize()
                         )
                     }
                 }

@@ -35,6 +35,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun ServerScreen(
     onSettingsButtonClicked: () -> Unit,
+    onJournalButtonClicked: () -> Unit,
     settingsProvider: SettingsProvider,
     gestureServer: GestureServer,
     gestureRecorder: GestureRecorder
@@ -65,7 +66,13 @@ fun ServerScreen(
 
         SimpleButton(
             text = "Настройки",
+            bgColor = colorResource(R.color.button_see_journal),
             onClick = onSettingsButtonClicked
+        )
+
+        SimpleButton(
+            text = "Журнал",
+            onClick = onJournalButtonClicked
         )
 
         SimpleButton(
