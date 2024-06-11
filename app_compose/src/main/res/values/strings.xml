@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">app_compose</string>
+    <string name="app_name">gesture_transmitter</string>
     <string name="button_client">Клиент</string>
     <string name="button_server">Сервер</string>
     <string name="button_settings">Настройки</string>
