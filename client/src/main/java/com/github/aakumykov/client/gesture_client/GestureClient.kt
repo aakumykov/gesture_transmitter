@@ -84,7 +84,7 @@ class GestureClient private constructor(
                         }
 
                         (frame as? Frame.Close)?.also {
-                            processCloseFrame(it)
+                            processCloseFrame()
                         }
                     }
                 }
@@ -136,7 +136,7 @@ class GestureClient private constructor(
 
 
 
-    private suspend fun processCloseFrame(closeFrame: Frame.Close) {
+    private suspend fun processCloseFrame() {
         publishState(ClientState.DISCONNECTED)
         currentSession = null
     }
@@ -161,7 +161,7 @@ class GestureClient private constructor(
             }
         } catch (e: JsonSyntaxException) {
             // TODO: отчитаться серверу
-            Log.e(TAG, ExceptionUtils.getErrorMessage(e), e);
+            Log.e(TAG, ExceptionUtils.getErrorMessage(e), e)
         }
     }
 
@@ -184,13 +184,9 @@ class GestureClient private constructor(
 
     fun isConnected(): Boolean = (null != currentSession && currentStateIs(ClientState.CONNECTED))
 
-    fun isConnectingNow(): Boolean = currentStateIs(ClientState.CONNECTING)
+    private fun isNotConnectingNow(): Boolean  = !currentStateIs(ClientState.CONNECTING)
 
-    fun isNotConnected(): Boolean = !isConnected()
-
-    fun isNotConnectingNow(): Boolean  = !currentStateIs(ClientState.CONNECTING)
-
-    fun isNotDisconnectingNow(): Boolean = !currentStateIs(ClientState.DISCONNECTING)
+    private fun isNotDisconnectingNow(): Boolean = !currentStateIs(ClientState.DISCONNECTING)
 
     private fun currentStateIs(state: ClientState): Boolean {
         return currentState == state
