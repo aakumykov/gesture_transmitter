@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">app_compose</string>
+    <string name="button_client">Клиент</string>
+    <string name="button_server">Сервер</string>
+</resources>
