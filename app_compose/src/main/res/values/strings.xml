@@ -3,5 +3,5 @@
     <string name="button_client">Клиент</string>
     <string name="button_server">Сервер</string>
     <string name="button_settings">Настройки</string>
-    <string name="gesture_reading_view_hint">Запустите сервер.\nПодключите клиента.\nВодите пальцем вверх-вниз</string>
+    <string name="gesture_reading_view_hint">Запустите сервер.\nПодключите клиента.\nВодите здесь пальцем вверх-вниз</string>
 </resources>
