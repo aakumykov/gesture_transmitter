@@ -11,6 +11,8 @@ import com.github.aakumykov.common.SERVER_PAUSED
 import com.github.aakumykov.common.SERVER_RESUMED
 import com.github.aakumykov.common.TARGET_APP_IS_ACTIVE
 import com.github.aakumykov.common.TARGET_APP_IS_INACTIVE
+import com.github.aakumykov.data_model.LogMessage
+import com.github.aakumykov.data_model.utils.TimestampSupplier
 import com.github.aakumykov.kotlin_playground.UserGesture
 import com.gitlab.aakumykov.exception_utils_module.ExceptionUtils
 import com.google.gson.Gson
@@ -27,6 +29,7 @@ import kotlinx.coroutines.channels.ClosedReceiveChannelException
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlin.math.log
 
 /**
  * Получает [UserGesture] от GestureServer-а,
@@ -155,14 +158,33 @@ class GestureClient private constructor(
 
     private suspend fun processSerializedUserGesture(text: String) {
         try {
-            gson.fromJson(text, UserGesture::class.java)?.also {userGesture ->
+            gson.fromJson(text, UserGesture::class.java)?.also { userGesture ->
                 Log.d(TAG, userGesture.toString())
                 publishUserGesture(userGesture)
+                logUserGestureToServer(userGesture)
             }
         } catch (e: JsonSyntaxException) {
-            // TODO: отчитаться серверу
             Log.e(TAG, ExceptionUtils.getErrorMessage(e), e)
+            logErrorToServer(e)
         }
+    }
+
+
+    private suspend fun logErrorToServer(e: Exception) {
+        sendLogMessage(
+            LogMessage.create("ОШИБКА РАЗБОРА ЖЕСТА: "+ExceptionUtils.getErrorMessage(e), TimestampSupplier.get())
+        )
+    }
+
+
+    private suspend fun logUserGestureToServer(userGesture: UserGesture) {
+        sendLogMessage(
+            LogMessage.create("Клиент получил жест: $userGesture", TimestampSupplier.get())
+        )
+    }
+
+    private suspend fun sendLogMessage(logMessage: LogMessage) {
+        sendTextMessage(gson.toJson(logMessage))
     }
 
 
@@ -195,7 +217,7 @@ class GestureClient private constructor(
     private suspend fun sendTextMessage(text: String) {
         Log.d(TAG, "sendTextMessage($text)")
         try {
-            currentSession?.send(Frame.Text(text))
+            currentSession?.outgoing?.send(Frame.Text(text))
                 ?: throw IllegalStateException("sendTextMessage(): currentSession is NULL")
         }
         catch (e: Exception) {
