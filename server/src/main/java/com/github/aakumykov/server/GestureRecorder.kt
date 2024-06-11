@@ -19,7 +19,7 @@ object GestureRecorder {
     private var laseRecordedGesture: UserGesture? = null
 
     private val _recorderGestureFlow: MutableSharedFlow<UserGesture?> = MutableSharedFlow(0,0)
-    val recordedGestureFlow: SharedFlow<UserGesture?> = _recorderGestureFlow
+    val gesturesFlow: SharedFlow<UserGesture?> = _recorderGestureFlow
 
     fun startRecording(initialMotionEvent: MotionEvent) {
         Log.d(TAG, "startRecording(), $initialMotionEvent")

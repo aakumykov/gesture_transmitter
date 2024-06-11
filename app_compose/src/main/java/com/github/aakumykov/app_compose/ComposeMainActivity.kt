@@ -108,9 +108,9 @@ class ComposeMainActivity : ComponentActivity(), View.OnTouchListener {
                     composable(DESTINATION_SERVER) {
                         ServerScreen(
                             onSettingsButtonClicked = { navigateToSettings(navController) },
-                            onTouchListener = this@ComposeMainActivity,
                             settingsProvider = SettingsProvider.getInstance(App.appContext),
                             gestureServer = gestureServer,
+                            gestureRecorder = gestureRecorder
                         )
                     }
                     composable(DESTINATION_SETTINGS) {
