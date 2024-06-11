@@ -149,8 +149,6 @@ class ComposeMainActivity : ComponentActivity() {
 
     private fun navigateToSettings(navController: NavController) {
         navController.navigate(DESTINATION_SETTINGS)
-        navController.navigate(DESTINATION_SETTINGS)
-        navController.navigate(DESTINATION_SETTINGS)
     }
 }
 
