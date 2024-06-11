@@ -9,6 +9,7 @@ import com.github.aakumykov.common.SERVER_RESUMED
 import com.github.aakumykov.common.TARGET_APP_IS_ACTIVE
 import com.github.aakumykov.common.TARGET_APP_IS_INACTIVE
 import com.github.aakumykov.kotlin_playground.UserGesture
+import com.github.aakumykov.server.GestureLogger
 import com.gitlab.aakumykov.exception_utils_module.ExceptionUtils
 import com.google.gson.Gson
 import io.ktor.server.application.install
@@ -28,9 +29,11 @@ import io.ktor.websocket.readText
 import kotlinx.coroutines.channels.ClosedReceiveChannelException
 import kotlinx.coroutines.delay
 import java.time.Duration
-import java.util.concurrent.atomic.AtomicBoolean
 
-class GestureServer(private val gson: Gson) {
+class GestureServer(
+    private val gson: Gson,
+    private val gestureLogger: GestureLogger
+) {
 
     private var onPause: Boolean = false
 
