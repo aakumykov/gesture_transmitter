@@ -10,6 +10,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -49,29 +50,45 @@ class ComposeMainActivity : ComponentActivity() {
                         WelcomeScreen(
                             onClientButtonClicked = { navController.navigate(DESTINATION_CLIENT) },
                             onServerButtonClicked = { navController.navigate(DESTINATION_SERVER) },
-                            onSettingsButtonClicked = { navController.navigate(DESTINATION_SETTINGS) },
+                            onSettingsButtonClicked = { navigateToSettings(navController) },
                         )
                     }
                     composable(DESTINATION_CLIENT) {
                         ClientScreen(
-                            onSettingsButtonClicked = { navController.navigate(DESTINATION_SETTINGS) }
+                            onSettingsButtonClicked = { navigateToSettings(navController) }
                         )
                     }
                     composable(DESTINATION_SERVER) {
-                        ServerScreen {
-                            navController.popBackStack()
-                        }
+                        ServerScreen(
+                            onSettingsButtonClicked = { navigateToSettings(navController) },
+                            onStartServerButtonClicked = { startServer() },
+                            onStopServerButtonClicked = { stopServer() }
+                        )
                     }
                     composable(DESTINATION_SETTINGS) {
                         PreferencesScreen(
                             settingsProvider = SettingsProvider.getInstance(App.appContext),
-                            onSaveButtonClicked = { navController.popBackStack()     },
+                            onSaveButtonClicked = { navController.popBackStack() },
                             onCancelButtonClicked = { navController.popBackStack() }
                         )
                     }
                 }
-
             }
         }
     }
+
+
+    private fun startServer() {
+
+    }
+
+    private fun stopServer() {
+
+    }
+}
+
+fun navigateToSettings(navController: NavController) {
+    navController.navigate(DESTINATION_SETTINGS)
+    navController.navigate(DESTINATION_SETTINGS)
+    navController.navigate(DESTINATION_SETTINGS)
 }
