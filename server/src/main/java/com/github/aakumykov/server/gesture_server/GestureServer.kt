@@ -1,6 +1,7 @@
 package com.github.aakumykov.server.gesture_server
 
 import android.util.Log
+import androidx.core.util.Supplier
 import com.github.aakumykov.common.CLIENT_WANTS_TO_DISCONNECT
 import com.github.aakumykov.common.CLIENT_WANTS_TO_PAUSE
 import com.github.aakumykov.common.CLIENT_WANTS_TO_RESUME
@@ -8,10 +9,12 @@ import com.github.aakumykov.common.SERVER_PAUSED
 import com.github.aakumykov.common.SERVER_RESUMED
 import com.github.aakumykov.common.TARGET_APP_IS_ACTIVE
 import com.github.aakumykov.common.TARGET_APP_IS_INACTIVE
+import com.github.aakumykov.data_model.LogMessage
 import com.github.aakumykov.kotlin_playground.UserGesture
 import com.github.aakumykov.server.GestureLogger
 import com.gitlab.aakumykov.exception_utils_module.ExceptionUtils
 import com.google.gson.Gson
+import com.google.gson.JsonSyntaxException
 import io.ktor.server.application.install
 import io.ktor.server.cio.CIO
 import io.ktor.server.engine.ApplicationEngine
@@ -22,17 +25,24 @@ import io.ktor.server.websocket.WebSockets
 import io.ktor.server.websocket.pingPeriod
 import io.ktor.server.websocket.timeout
 import io.ktor.server.websocket.webSocketRaw
+import io.ktor.util.Digest
 import io.ktor.websocket.CloseReason
 import io.ktor.websocket.Frame
 import io.ktor.websocket.close
 import io.ktor.websocket.readText
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.ClosedReceiveChannelException
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.time.Duration
+import java.util.Date
+import java.util.UUID
 
 class GestureServer(
     private val gson: Gson,
-    private val gestureLogger: GestureLogger
+    private val gestureLogger: GestureLogger,
+    private val timestampSupplier: Supplier<Long>
 ) {
 
     private var onPause: Boolean = false
@@ -116,8 +126,27 @@ class GestureServer(
                 CLIENT_WANTS_TO_RESUME -> { processResumeRequest() }
                 TARGET_APP_IS_ACTIVE -> { onTargetAppActivated() }
                 TARGET_APP_IS_INACTIVE -> { onTargetAppDeactivated() }
-                else -> Log.d(TAG, "Сервер получил текстовое сообщение: '$text'")
+                else -> { processLogMessage(text) }
             }
+        }
+    }
+
+    private fun processLogMessage(text: String) {
+
+        val logMessage: LogMessage = try {
+            gson.fromJson(text, LogMessage::class.java)
+        }
+        catch (e: JsonSyntaxException) {
+            Log.e(TAG, ExceptionUtils.getErrorMessage(e), e)
+            LogMessage(
+                id = UUID.randomUUID().toString(),
+                message = text,
+                timestamp = timestampSupplier.get()
+            )
+        }
+
+        CoroutineScope(Dispatchers.IO).launch {
+            gestureLogger.log(logMessage)
         }
     }
 

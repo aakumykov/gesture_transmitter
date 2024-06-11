@@ -6,6 +6,7 @@ import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.widget.Toast
+import androidx.core.util.Supplier
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.github.aakumykov.common.DEFAULT_SERVER_ADDRESS
@@ -23,6 +24,7 @@ import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
+import java.util.Date
 
 class ServerFragment : Fragment(R.layout.fragment_server), View.OnTouchListener {
 
@@ -39,7 +41,8 @@ class ServerFragment : Fragment(R.layout.fragment_server), View.OnTouchListener 
                     logDatabase.getLogMessageDAO(),
                     Dispatchers.IO
                 )
-            )
+            ),
+            { Date().time }
         )
     }
 
