@@ -20,8 +20,8 @@ import androidx.compose.ui.unit.dp
 import com.github.aakumykov.app_compose.R
 import com.github.aakumykov.app_compose.funstions.keyboard.decimalKeyboardOptions
 import com.github.aakumykov.app_compose.ui.gui_elements.settings.InputField
+import com.github.aakumykov.app_compose.ui.theme.Gesture_transmitterTheme
 import com.github.aakumykov.common.settings_provider.SettingsProvider
-import com.github.aakumykov.prefs_module.theme.Gesture_transmitterTheme
 
 @Composable
 fun SettingsScreen(

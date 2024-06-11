@@ -61,10 +61,7 @@ class ClientFragment : Fragment(R.layout.fragment_client) {
     }
 
     private fun onConfigButtonClicked() {
-        childFragmentManager.beginTransaction()
-            .addToBackStack(null)
-            .add(SettingsFragment.newInstance(), SettingsFragment.TAG)
-            .commit()
+
     }
 
     private fun onPauseButtonClicked() {
