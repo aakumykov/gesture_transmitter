@@ -1,13 +1,18 @@
 package com.github.aakumykov.server.di
 
-import com.github.aakumykov.common.di.AppComponent
+import com.github.aakumykov.common.di.CommonComponent
+import com.github.aakumykov.server.GestureRecorder
+import com.github.aakumykov.server.GestureServer
 import com.github.aakumykov.server.ServerFragment
-import dagger.Subcomponent
+import dagger.Component
 
-@Subcomponent
+@Component(
+    modules = [ ServerModule::class ],
+    dependencies = [ CommonComponent::class ]
+)
 interface ServerComponent {
-
     fun injectServerFragment(serverFragment: ServerFragment)
 
-    fun getAppComponent(): AppComponent
+    fun getGestureServer(): GestureServer
+    fun getGestureRecorder(): GestureRecorder
 }

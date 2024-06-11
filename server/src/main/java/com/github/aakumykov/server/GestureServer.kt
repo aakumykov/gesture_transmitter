@@ -1,4 +1,4 @@
-package com.github.aakumykov.server.gesture_server
+package com.github.aakumykov.server
 
 import android.util.Log
 import com.github.aakumykov.common.CLIENT_WANTS_TO_DISCONNECT
@@ -28,9 +28,9 @@ import io.ktor.websocket.readText
 import kotlinx.coroutines.channels.ClosedReceiveChannelException
 import kotlinx.coroutines.delay
 import java.time.Duration
-import java.util.concurrent.atomic.AtomicBoolean
+import javax.inject.Inject
 
-class GestureServer(private val gson: Gson) {
+class GestureServer @Inject constructor(private val gson: Gson) {
 
     private var onPause: Boolean = false
 

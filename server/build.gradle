@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.jetbrains.kotlin.android)
+    id 'kotlin-kapt'
 }
 
 android {
@@ -59,4 +60,7 @@ dependencies {
     implementation "io.ktor:ktor-server-cio-jvm:$ktor_version"
 
     implementation 'com.github.aakumykov:exception_utils:0.4'
+
+    api 'com.google.dagger:dagger:2.48.1'
+    kapt 'com.google.dagger:dagger-compiler:2.48.1'
 }
