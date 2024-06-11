@@ -1,4 +1,4 @@
-package com.github.aakumykov.client.settings_provider
+package com.github.aakumykov.common.settings_provider
 
 import android.content.Context
 import android.content.SharedPreferences
