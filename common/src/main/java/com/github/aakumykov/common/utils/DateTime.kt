@@ -1,4 +1,4 @@
-package com.github.aakumykov.common
+package com.github.aakumykov.common.utils
 
 import java.text.SimpleDateFormat
 import java.util.Date

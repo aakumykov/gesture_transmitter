@@ -1,4 +1,4 @@
-package com.github.aakumykov.common
+package com.github.aakumykov.common.constants
 
 const val CLIENT_WANTS_TO_DISCONNECT = "CLIENT_WANTS_TO_DISCONNECT"
 

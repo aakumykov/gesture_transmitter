@@ -4,13 +4,13 @@ import android.util.Log
 import com.github.aakumykov.client.client_state_provider.ClientState
 import com.github.aakumykov.client.client_state_provider.ClientStateProvider
 import com.github.aakumykov.client.client_state_provider.KtorStateProvider
-import com.github.aakumykov.common.CLIENT_WANTS_TO_DISCONNECT
-import com.github.aakumykov.common.CLIENT_WANTS_TO_PAUSE
-import com.github.aakumykov.common.CLIENT_WANTS_TO_RESUME
-import com.github.aakumykov.common.SERVER_PAUSED
-import com.github.aakumykov.common.SERVER_RESUMED
-import com.github.aakumykov.common.TARGET_APP_IS_ACTIVE
-import com.github.aakumykov.common.TARGET_APP_IS_INACTIVE
+import com.github.aakumykov.common.constants.CLIENT_WANTS_TO_DISCONNECT
+import com.github.aakumykov.common.constants.CLIENT_WANTS_TO_PAUSE
+import com.github.aakumykov.common.constants.CLIENT_WANTS_TO_RESUME
+import com.github.aakumykov.common.constants.SERVER_PAUSED
+import com.github.aakumykov.common.constants.SERVER_RESUMED
+import com.github.aakumykov.common.constants.TARGET_APP_IS_ACTIVE
+import com.github.aakumykov.common.constants.TARGET_APP_IS_INACTIVE
 import com.github.aakumykov.data_model.LogMessage
 import com.github.aakumykov.data_model.utils.TimestampSupplier
 import com.github.aakumykov.kotlin_playground.UserGesture
@@ -29,7 +29,6 @@ import kotlinx.coroutines.channels.ClosedReceiveChannelException
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
-import kotlin.math.log
 
 /**
  * Получает [UserGesture] от GestureServer-а,

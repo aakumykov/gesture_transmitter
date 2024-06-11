@@ -3,9 +3,9 @@ package com.github.aakumykov.client.settings_provider
 import android.content.Context
 import android.content.SharedPreferences
 import android.preference.PreferenceManager
-import com.github.aakumykov.common.DEFAULT_SERVER_ADDRESS
-import com.github.aakumykov.common.DEFAULT_SERVER_PATH
-import com.github.aakumykov.common.DEFAULT_SERVER_PORT
+import com.github.aakumykov.common.config.DEFAULT_SERVER_ADDRESS
+import com.github.aakumykov.common.config.DEFAULT_SERVER_PATH
+import com.github.aakumykov.common.config.DEFAULT_SERVER_PORT
 
 const val KEY_SERVER_ADDRESS = "SERVER_ADDRESS"
 const val KEY_SERVER_PORT = "SERVER_PORT"

@@ -1,4 +1,4 @@
-package com.github.aakumykov.common
+package com.github.aakumykov.common.utils
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext

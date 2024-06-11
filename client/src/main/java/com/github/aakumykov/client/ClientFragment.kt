@@ -13,8 +13,8 @@ import com.github.aakumykov.client.gesture_client.GestureClient
 import com.github.aakumykov.client.client_state_provider.ClientState
 import com.github.aakumykov.client.client_state_provider.KtorStateProvider
 import com.github.aakumykov.client.settings_provider.SettingsProvider
-import com.github.aakumykov.common.GOOGLE_CHROME_PACKAGE_NAME
-import com.github.aakumykov.common.showToast
+import com.github.aakumykov.common.config.GOOGLE_CHROME_PACKAGE_NAME
+import com.github.aakumykov.common.extentions.showToast
 import com.gitlab.aakumykov.exception_utils_module.ExceptionUtils
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers

@@ -1,4 +1,4 @@
-package com.github.aakumykov.common
+package com.github.aakumykov.common.extentions
 
 import android.widget.Toast
 import androidx.annotation.StringRes
