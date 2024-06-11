@@ -1,37 +1,30 @@
-package com.github.aakumykov.prefs_module
+package com.github.aakumykov.app_compose.ui.screens
 
 import android.app.Activity
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.github.aakumykov.app_compose.R
+import com.github.aakumykov.app_compose.funstions.keyboard.decimalKeyboardOptions
+import com.github.aakumykov.app_compose.ui.gui_elements.settings.InputField
 import com.github.aakumykov.common.settings_provider.SettingsProvider
 import com.github.aakumykov.prefs_module.theme.Gesture_transmitterTheme
 
 @Composable
-fun PreferencesScreen(
+fun SettingsScreen(
     settingsProvider: SettingsProvider,
     modifier: Modifier = Modifier,
     onSaveButtonClicked: () -> Unit,
@@ -117,56 +110,12 @@ fun PreferencesScreen(
     }
 }
 
-@Composable
-fun InputField(text: String,
-               placeholderRes: Int,
-               keyboardOptions: KeyboardOptions = textKeyboardOptions(),
-               enabled: Boolean = true,
-               onValueChange: (String) -> Unit) {
-    OutlinedTextField(
-        enabled = enabled,
-        value = text,
-        placeholder = { TextPlaceholder(stringRes = placeholderRes) },
-        onValueChange = onValueChange,
-        singleLine = true,
-        keyboardOptions = keyboardOptions,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(all = 12.dp)
-    )
-}
-
-
-@Composable
-fun TextPlaceholder(stringRes: Int) {
-    Text(
-        text = stringResource(stringRes),
-        color = Color.Gray,
-        modifier = Modifier.fillMaxWidth()
-    )
-}
-
-
-fun textKeyboardOptions(): KeyboardOptions {
-    return KeyboardOptions(
-        keyboardType = KeyboardType.Text,
-        autoCorrect = false,
-    )
-}
-
-fun decimalKeyboardOptions(): KeyboardOptions {
-    return KeyboardOptions(
-        keyboardType = KeyboardType.Decimal,
-        autoCorrect = false,
-    )
-}
-
 
 @Preview(showBackground = true)
 @Composable
-fun GreetingPreview() {
+fun SettingsScreenPreview() {
     Gesture_transmitterTheme {
-        PreferencesScreen(
+        SettingsScreen(
             settingsProvider = SettingsProvider.getInstance(LocalContext.current),
             onSaveButtonClicked = {},
             onCancelButtonClicked = {}

@@ -11,4 +11,7 @@
     <string name="client_state_disconnected">Отключен от сервера</string>
     <string name="client_state_error">Ошибка клиента</string>
     <string name="client_state_disconnecting">Отсоединяется от сервера</string>
+    <string name="server_address_placeholder">IP-адрес сервера</string>
+    <string name="server_port_placeholder">Порт сервера</string>
+    <string name="server_path_placeholder">Путь на сервере</string>
 </resources>

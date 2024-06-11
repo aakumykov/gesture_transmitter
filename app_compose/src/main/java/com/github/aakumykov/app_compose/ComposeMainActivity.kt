@@ -21,7 +21,7 @@ import com.github.aakumykov.client.client_state_provider.KtorStateProvider
 import com.github.aakumykov.client.gesture_client.GestureClient
 import com.github.aakumykov.common.settings_provider.SettingsProvider
 import com.github.aakumykov.data_model.utils.TimestampSupplier
-import com.github.aakumykov.prefs_module.PreferencesScreen
+import com.github.aakumykov.app_compose.ui.screens.SettingsScreen
 import com.github.aakumykov.server.GestureRecorder
 import com.github.aakumykov.server.gesture_logger.RoomGestureLogger
 import com.github.aakumykov.server.gesture_server.GestureServer
@@ -136,7 +136,7 @@ class ComposeMainActivity : ComponentActivity() {
                     // Настройки
                     //
                     composable(DESTINATION_SETTINGS) {
-                        PreferencesScreen(
+                        SettingsScreen(
                             settingsProvider = SettingsProvider.getInstance(App.appContext),
                             onSaveButtonClicked = { navController.popBackStack() },
                             onCancelButtonClicked = { navController.popBackStack() }
