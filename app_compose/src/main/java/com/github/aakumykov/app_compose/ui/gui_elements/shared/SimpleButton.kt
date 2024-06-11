@@ -1,4 +1,4 @@
-package com.github.aakumykov.app_compose.ui.components
+package com.github.aakumykov.app_compose.ui.gui_elements.shared
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -15,8 +15,8 @@ import androidx.compose.ui.unit.dp
 fun SimpleButton(
     text: String,
     bgColor: Color,
-    textAlign: TextAlign = TextAlign.Center,
     modifier: Modifier = Modifier,
+    textAlign: TextAlign = TextAlign.Center,
     onClick: () -> Unit
 ) {
     Button(

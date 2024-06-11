@@ -1,4 +1,4 @@
-package com.github.aakumykov.app_compose.ui.components
+package com.github.aakumykov.app_compose.ui.gui_elements.shared
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding

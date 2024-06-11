@@ -1,11 +1,8 @@
-package com.github.aakumykov.app_compose.ui
+package com.github.aakumykov.app_compose.ui.screens
 
 import android.content.Context
 import android.util.Log
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
@@ -14,19 +11,18 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat.startActivity
 import androidx.lifecycle.Lifecycle
 import com.github.aakumykov.app_compose.App
 import com.github.aakumykov.app_compose.R
-import com.github.aakumykov.app_compose.ui.components.SimpleButton
+import com.github.aakumykov.app_compose.ui.gui_elements.client.ClientState
+import com.github.aakumykov.app_compose.ui.gui_elements.client.accessibilityButtonText
+import com.github.aakumykov.app_compose.ui.gui_elements.shared.SimpleButton
 import com.github.aakumykov.client.ClientFragment
 import com.github.aakumykov.client.client_state_provider.ClientState
 import com.github.aakumykov.client.extensions.isAccessibilityServiceEnabled
@@ -220,26 +216,6 @@ fun showError(e: Exception) {
         Log.e(TAG, it)
     }
 }
-
-
-@Composable
-fun ClientState(clientState: ClientState) {
-    Text(
-        text = stringResource(clientStateToStringRes(clientState)),
-        textAlign = TextAlign.Center,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 12.dp)
-    )
-}
-
-
-@Composable
-fun accessibilityButtonText(accButtonText: MutableState<Boolean>): String {
-    return if (accButtonText.value) stringResource(com.github.aakumykov.client.R.string.button_acc_service_enabled)
-    else stringResource(com.github.aakumykov.client.R.string.button_acc_service_disabled)
-}
-
 
 
 private fun launchGoogleChrome(context: Context) {

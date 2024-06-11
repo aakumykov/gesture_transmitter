@@ -1,9 +1,9 @@
-package com.github.aakumykov.app_compose.ui
+package com.github.aakumykov.app_compose.ui.screens
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
-import com.github.aakumykov.app_compose.ui.components.WelcomeScreenButton
+import com.github.aakumykov.app_compose.ui.gui_elements.shared.WelcomeScreenButton
 import com.github.aakumykov.app_compose.R
 import com.github.aakumykov.app_compose.ui.theme.Gesture_transmitterTheme
 

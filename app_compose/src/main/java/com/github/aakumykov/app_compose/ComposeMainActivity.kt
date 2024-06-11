@@ -14,9 +14,9 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.github.aakumykov.app_compose.ui.ClientScreen
-import com.github.aakumykov.app_compose.ui.ServerScreen
-import com.github.aakumykov.app_compose.ui.WelcomeScreen
+import com.github.aakumykov.app_compose.ui.screens.ClientScreen
+import com.github.aakumykov.app_compose.ui.screens.ServerScreen
+import com.github.aakumykov.app_compose.ui.screens.WelcomeScreen
 import com.github.aakumykov.client.client_state_provider.KtorStateProvider
 import com.github.aakumykov.client.gesture_client.GestureClient
 import com.github.aakumykov.common.settings_provider.SettingsProvider

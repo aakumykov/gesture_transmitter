@@ -1,4 +1,4 @@
-package com.github.aakumykov.app_compose.ui
+package com.github.aakumykov.app_compose.ui.screens
 
 import android.annotation.SuppressLint
 import android.util.Log
@@ -21,7 +21,7 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.github.aakumykov.app_compose.R
-import com.github.aakumykov.app_compose.ui.components.SimpleButton
+import com.github.aakumykov.app_compose.ui.gui_elements.shared.SimpleButton
 import com.github.aakumykov.common.settings_provider.SettingsProvider
 import com.github.aakumykov.common.utils.inMainThread
 import com.github.aakumykov.server.GestureRecorder
