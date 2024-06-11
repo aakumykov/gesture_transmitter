@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import com.github.aakumykov.app_compose.R
 import com.github.aakumykov.app_compose.funstions.keyboard.decimalKeyboardOptions
 import com.github.aakumykov.app_compose.ui.gui_elements.settings.InputField
+import com.github.aakumykov.app_compose.ui.gui_elements.shared.SimpleButton
 import com.github.aakumykov.app_compose.ui.theme.Gesture_transmitterTheme
 import com.github.aakumykov.common.settings_provider.SettingsProvider
 
@@ -83,7 +84,8 @@ fun SettingsScreen(
         //
         // Сохранить
         //
-        Button(
+        SimpleButton(
+            text = "Сохранить",
             modifier = Modifier.fillMaxWidth().padding(top = 12.dp),
             onClick = {
                 settingsProvider.storeIpAddress(ipAddress.value)
@@ -91,22 +93,17 @@ fun SettingsScreen(
                 settingsProvider.storePath(path.value)
                 onSaveButtonClicked.invoke()
             }
-        ) {
-            Text("Сохранить")
-        }
+        )
 
         //
         // Отменить
         //
-        Button(
+        SimpleButton(
+            text = "Отменить",
             modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = colorResource(id = R.color.button_cancel)
-            ),
+            bgColor = colorResource(id = R.color.button_cancel),
             onClick = onCancelButtonClicked
-        ) {
-            Text("Отмена")
-        }
+        )
     }
 }
 

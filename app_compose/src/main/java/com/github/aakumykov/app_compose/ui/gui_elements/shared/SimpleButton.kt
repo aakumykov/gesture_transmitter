@@ -22,7 +22,7 @@ fun SimpleButton(
 ) {
     Button(
         onClick = onClick,
-        modifier = modifier.fillMaxWidth().padding(vertical = 8.dp),
+        modifier = modifier.fillMaxWidth(),
         colors = ButtonDefaults.buttonColors(containerColor = bgColor)
     ) {
         Text(text = text, textAlign = textAlign)
