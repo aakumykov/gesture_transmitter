@@ -8,22 +8,28 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import com.github.aakumykov.common.R
+import androidx.compose.ui.unit.dp
 import com.github.aakumykov.common.settings_provider.SettingsProvider
 import com.github.aakumykov.preferences.ui.theme.Gesture_transmitterTheme
+import kotlin.math.sin
 
 class PreferencesActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -45,41 +51,66 @@ class PreferencesActivity : ComponentActivity() {
 @Composable
 fun PreferencesScreen(settingsProvider: SettingsProvider, modifier: Modifier = Modifier) {
 
-    val ipAddress = remember {
+    val ipAddress = rememberSaveable {
         mutableStateOf(settingsProvider.getIpAddress())
     }
 
+    val port = rememberSaveable {
+        mutableIntStateOf(settingsProvider.getPort())
+    }
+
+    val path = rememberSaveable {
+        mutableStateOf(settingsProvider.getPath())
+    }
+
+
     Column(modifier = modifier.fillMaxSize()) {
 
-        OutlinedTextField(
-            value = ipAddress.value.toString(),
-            onValueChange = {
-                settingsProvider.storeIpAddress(ipAddress.value.toString())
-            },
-            modifier = Modifier.fillMaxWidth()
-        )
+        //
+        // Адрес
+        //
+        InputField(
+            text = ipAddress.value,
+            placeholderRes = R.string.server_address_placeholder,
+            keyboardOptions = decimalKeyboardOptions()
+        ) {
+//            settingsProvider.storeIpAddress(ipAddress.value)
+            ipAddress.value = it
+        }
 
-        OutlinedTextField(
-            value = settingsProvider.getPort().toString(),
-            onValueChange = {},
-            modifier = Modifier.fillMaxWidth()
-        )
+        //
+        // Порт
+        //
+        InputField(
+            text = port.intValue.toString(),
+            placeholderRes = R.string.server_port_placeholder,
+            keyboardOptions = decimalKeyboardOptions()
+        ) {
+//            settingsProvider.storePort(port.intValue)
+            port.intValue = it.toInt()
+        }
 
-        OutlinedTextField(
-            value = settingsProvider.getPath().toString(),
-            onValueChange = {},
-            modifier = Modifier.fillMaxWidth()
-        )
+        //
+        // Путь
+        //
+        InputField(
+            text = path.value,
+            placeholderRes = R.string.server_path_placeholder
+        ) {
+//            settingsProvider.storeIpAddress(path.value)
+            path.value = it
+        }
+
 
         Button(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().padding(top = 12.dp),
             onClick = { /*TODO*/ }
         ) {
             Text(text = "Сохранить")
         }
 
         Button(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
             colors = ButtonDefaults.buttonColors(
                 containerColor = colorResource(id = R.color.button_cancel)
             ),
@@ -89,6 +120,49 @@ fun PreferencesScreen(settingsProvider: SettingsProvider, modifier: Modifier = M
         }
     }
 }
+
+@Composable
+fun InputField(text: String,
+               placeholderRes: Int,
+               keyboardOptions: KeyboardOptions = textKeyboardOptions(),
+               onValueChange: (String) -> Unit) {
+    OutlinedTextField(
+        value = text,
+        placeholder = { TextPlaceholder(stringRes = placeholderRes) },
+        onValueChange = onValueChange,
+        singleLine = true,
+        keyboardOptions = keyboardOptions,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(all = 12.dp)
+    )
+}
+
+
+@Composable
+fun TextPlaceholder(stringRes: Int) {
+    Text(
+        text = stringResource(stringRes),
+        color = Color.Gray,
+        modifier = Modifier.fillMaxWidth()
+    )
+}
+
+
+fun textKeyboardOptions(): KeyboardOptions {
+    return KeyboardOptions(
+        keyboardType = KeyboardType.Text,
+        autoCorrect = false,
+    )
+}
+
+fun decimalKeyboardOptions(): KeyboardOptions {
+    return KeyboardOptions(
+        keyboardType = KeyboardType.Decimal,
+        autoCorrect = false,
+    )
+}
+
 
 @Preview(showBackground = true)
 @Composable
