@@ -66,13 +66,12 @@ fun ServerScreen(
 
         SimpleButton(
             text = "Настройки",
-            bgColor = Color.Blue,
             onClick = onSettingsButtonClicked
         )
 
         SimpleButton(
             text = "Запустить сервер",
-            bgColor = Color.Cyan,
+            bgColor = colorResource(R.color.button_start_server),
             onClick = {
                 scope.launch(Dispatchers.IO) {
                     try {
@@ -93,7 +92,7 @@ fun ServerScreen(
 
         SimpleButton(
             text = "Остановить сервер",
-            bgColor = Color.DarkGray,
+            bgColor = colorResource(R.color.button_stop_server),
             onClick = {
                 scope.launch(Dispatchers.IO) {
                     try {
