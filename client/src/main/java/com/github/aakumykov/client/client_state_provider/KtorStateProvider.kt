@@ -1,4 +1,4 @@
-package com.github.aakumykov.client.gesture_client
+package com.github.aakumykov.client.client_state_provider
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow

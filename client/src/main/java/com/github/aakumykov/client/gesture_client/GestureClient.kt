@@ -1,6 +1,9 @@
 package com.github.aakumykov.client.gesture_client
 
 import android.util.Log
+import com.github.aakumykov.client.client_state_provider.ClientState
+import com.github.aakumykov.client.client_state_provider.ClientStateProvider
+import com.github.aakumykov.client.client_state_provider.KtorStateProvider
 import com.github.aakumykov.common.CLIENT_WANTS_TO_DISCONNECT
 import com.github.aakumykov.common.CLIENT_WANTS_TO_PAUSE
 import com.github.aakumykov.common.CLIENT_WANTS_TO_RESUME
@@ -32,7 +35,6 @@ import kotlinx.coroutines.flow.SharedFlow
 class GestureClient private constructor(
     private val gson: Gson,
     private val ktorStateProvider: KtorStateProvider,
-//    private val gestureLogger: GestureLogger
 ): ClientStateProvider by ktorStateProvider {
 
     private var currentSession: ClientWebSocketSession? = null
