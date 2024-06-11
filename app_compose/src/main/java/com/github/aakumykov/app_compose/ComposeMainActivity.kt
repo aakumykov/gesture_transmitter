@@ -114,6 +114,7 @@ class ComposeMainActivity : ComponentActivity() {
                     composable(DESTINATION_CLIENT) {
                         ClientScreen(
                             gestureClient = gestureClient,
+                            settingsProvider = settingsProvider,
                             coroutineDispatcher = ioDispatcher,
                             onSettingsButtonClicked = { navigateToSettings(navController) }
                         )

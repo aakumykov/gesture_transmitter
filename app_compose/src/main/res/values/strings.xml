@@ -4,4 +4,11 @@
     <string name="button_server">Сервер</string>
     <string name="button_settings">Настройки</string>
     <string name="gesture_reading_view_hint">Запустите сервер.\nПодключите клиента.\nВодите здесь пальцем вверх-вниз</string>
+    <string name="client_state_inactive">Клиент неактивен</string>
+    <string name="client_state_connecting">Клиент соединяется с сервером</string>
+    <string name="client_state_connected">Соединён с сервером</string>
+    <string name="client_state_paused">Клиент (и сервер) на паузе</string>
+    <string name="client_state_disconnected">Отключен от сервера</string>
+    <string name="client_state_error">Ошибка клиента</string>
+    <string name="client_state_disconnecting">Отсоединяется от сервера</string>
 </resources>
