@@ -30,25 +30,13 @@ import androidx.compose.ui.unit.dp
 import com.github.aakumykov.common.settings_provider.SettingsProvider
 import com.github.aakumykov.prefs_module.theme.Gesture_transmitterTheme
 
-class PreferencesActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        setContent {
-            Gesture_transmitterTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    PreferencesScreen(
-                        SettingsProvider.getInstance(this),
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
-            }
-        }
-    }
-}
-
 @Composable
-fun PreferencesScreen(settingsProvider: SettingsProvider, modifier: Modifier = Modifier) {
+fun PreferencesScreen(
+    settingsProvider: SettingsProvider,
+    modifier: Modifier = Modifier,
+    onSaveButtonClicked: () -> Unit,
+    onCancelButtonClicked: () -> Unit
+) {
 
     val ipAddress = rememberSaveable {
         mutableStateOf(settingsProvider.getIpAddress())
@@ -108,7 +96,7 @@ fun PreferencesScreen(settingsProvider: SettingsProvider, modifier: Modifier = M
                 settingsProvider.storeIpAddress(ipAddress.value)
                 settingsProvider.storePort(port.intValue)
                 settingsProvider.storePath(path.value)
-                activity?.finish()
+                onSaveButtonClicked.invoke()
             }
         ) {
             Text("Сохранить")
@@ -122,7 +110,7 @@ fun PreferencesScreen(settingsProvider: SettingsProvider, modifier: Modifier = M
             colors = ButtonDefaults.buttonColors(
                 containerColor = colorResource(id = R.color.button_cancel)
             ),
-            onClick = { activity?.finish() }
+            onClick = onCancelButtonClicked
         ) {
             Text("Отмена")
         }
@@ -178,6 +166,10 @@ fun decimalKeyboardOptions(): KeyboardOptions {
 @Composable
 fun GreetingPreview() {
     Gesture_transmitterTheme {
-        PreferencesScreen(SettingsProvider.getInstance(LocalContext.current))
+        PreferencesScreen(
+            settingsProvider = SettingsProvider.getInstance(LocalContext.current),
+            onSaveButtonClicked = {},
+            onCancelButtonClicked = {}
+        )
     }
 }
