@@ -37,6 +37,10 @@ import kotlinx.coroutines.launch
 import java.time.Duration
 import java.util.UUID
 
+//
+// В сервер нужно добавить подключаемые обработчикии 
+// входящих сообщений. Это сделает его гибким.
+//
 class GestureServer(
     private val gson: Gson,
     private val gestureLogger: GestureLogger,
