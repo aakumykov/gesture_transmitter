@@ -1,7 +1,9 @@
-package com.github.aakumykov.app_compose.di
+package com.github.aakumykov.app_compose.di.modules
 
 import android.app.Application
 import android.content.Context
+import com.github.aakumykov.app_compose.di.annotations.AppContext
+import com.github.aakumykov.app_compose.di.annotations.AppScope
 import dagger.Module
 import dagger.Provides
 
