@@ -31,6 +31,7 @@ import com.github.aakumykov.server.logDatabase
 import com.github.aakumykov.server.log_database.LoggingRepository
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
+import javax.inject.Inject
 
 const val DESTINATION_WELCOME = "DESTINATION_WELCOME"
 const val DESTINATION_CLIENT = "DESTINATION_CLIENT"
@@ -69,9 +70,8 @@ class ComposeMainActivity : ComponentActivity() {
         roomGestureLogger
     }
 
-    private val settingsProvider: SettingsProvider by lazy {
-        SettingsProvider.getInstance(App.appContext)
-    }
+    @Inject
+    protected lateinit var settingsProvider: SettingsProvider
 
     private val ktorStateProvider by lazy { KtorStateProvider }
 
@@ -88,6 +88,8 @@ class ComposeMainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+        App.appComponent.injectToComposeMainActivity(this)
 
         setContent {
 
@@ -145,7 +147,7 @@ class ComposeMainActivity : ComponentActivity() {
                     //
                     composable(DESTINATION_SETTINGS) {
                         SettingsScreen(
-                            settingsProvider = SettingsProvider.getInstance(App.appContext),
+                            settingsProvider = settingsProvider,
                             onSaveButtonClicked = { navController.popBackStack() },
                             onCancelButtonClicked = { navController.popBackStack() }
                         )

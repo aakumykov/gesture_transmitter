@@ -104,6 +104,7 @@ fun SettingsScreen(
     }
 }
 
+/*
 
 @Preview(showBackground = true)
 @Composable
@@ -115,4 +116,4 @@ fun SettingsScreenPreview() {
             onCancelButtonClicked = {}
         )
     }
-}
+}*/
