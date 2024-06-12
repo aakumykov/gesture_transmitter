@@ -23,12 +23,14 @@ import com.github.aakumykov.client.gesture_client.GestureClient
 import com.github.aakumykov.settings_provider.SettingsProvider
 import com.github.aakumykov.common.utils.TimestampSupplier
 import com.github.aakumykov.app_compose.ui.screens.SettingsScreen
+import com.github.aakumykov.common.di.annotations.IODispatcher
 import com.github.aakumykov.server.GestureRecorder
 import com.github.aakumykov.logger.gesture_logger.RoomGestureLogger
 import com.github.aakumykov.server.GestureServer
 import com.github.aakumykov.logger.gesture_logger.GestureLogReader
 import com.github.aakumykov.logger.loggingDatabase
 import com.google.gson.Gson
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import javax.inject.Inject
 
@@ -49,7 +51,9 @@ class ComposeMainActivity : ComponentActivity() {
     @Inject
     private lateinit var gestureRecorder: GestureRecorder
 
-    private val ioDispatcher by lazy { Dispatchers.IO }
+    @Inject
+    @IODispatcher
+    private lateinit var ioDispatcher: CoroutineDispatcher
 
     @Inject
     protected lateinit var roomGestureLogger: RoomGestureLogger

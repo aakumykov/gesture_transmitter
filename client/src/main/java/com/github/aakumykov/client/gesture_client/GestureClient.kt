@@ -41,8 +41,6 @@ class GestureClient @Inject constructor(
 )
     : ClientStateProvider by clientStateProvider
 {
-    // FIXME: убрать TimestampSupplier
-
     private var currentSession: ClientWebSocketSession? = null
 
 

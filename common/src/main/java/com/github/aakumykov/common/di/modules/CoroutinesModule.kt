@@ -1,6 +1,7 @@
 package com.github.aakumykov.common.di.modules
 
 import com.github.aakumykov.common.di.annotations.AppScope
+import com.github.aakumykov.common.di.annotations.IODispatcher
 import dagger.Module
 import dagger.Provides
 import kotlinx.coroutines.CoroutineDispatcher
@@ -11,5 +12,6 @@ class CoroutinesModule {
 
     @AppScope
     @Provides
+    @IODispatcher
     fun provideIOCoroutineDispatcher(): CoroutineDispatcher = Dispatchers.IO
 }
