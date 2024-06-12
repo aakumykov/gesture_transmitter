@@ -66,12 +66,12 @@ fun ServerScreen(
 
         SimpleButton(
             text = "Настройки",
-            bgColor = colorResource(R.color.button_see_journal),
             onClick = onSettingsButtonClicked
         )
 
         SimpleButton(
             text = "Журнал",
+            bgColor = colorResource(R.color.button_see_journal),
             onClick = onJournalButtonClicked
         )
 
