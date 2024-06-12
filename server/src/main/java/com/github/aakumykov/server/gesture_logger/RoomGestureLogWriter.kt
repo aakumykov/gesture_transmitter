@@ -15,8 +15,4 @@ class RoomGestureLogWriter(
     override suspend fun getLogMessages(): Flow<LogMessage> {
         return loggingRepository.getLogMessages()
     }
-
-    override suspend fun getLogMessagesAsList(): List<LogMessage> {
-        return loggingRepository.getLogMessagesAsList()
-    }
 }

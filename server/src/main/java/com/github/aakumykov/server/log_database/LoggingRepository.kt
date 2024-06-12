@@ -20,10 +20,4 @@ class LoggingRepository(
             logMessageDAO.getLogMessages()
         }
     }
-
-    suspend fun getLogMessagesAsList(): List<LogMessage> {
-        return withContext(executionDispatcher) {
-            logMessageDAO.getLogMessagesAsList()
-        }
-    }
 }
