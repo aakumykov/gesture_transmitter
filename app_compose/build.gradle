@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
+    id 'kotlin-kapt'
 }
 
 android {
@@ -69,4 +70,7 @@ dependencies {
     debugImplementation libs.androidx.ui.test.manifest
 
     implementation libs.androidx.lifecycle.runtime.compose
+
+    implementation 'com.google.dagger:dagger:2.48.1'
+    kapt 'com.google.dagger:dagger-compiler:2.48.1'
 }
