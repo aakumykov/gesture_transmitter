@@ -44,7 +44,7 @@ class App : Application() {
         val appComponent: AppComponent get() = _appComponent!!
 
         private var _loggingDatabase: LogDatabase? = null
-        val loggingDatabase: LogDatabase = _loggingDatabase!!
+        val loggingDatabase: LogDatabase get() = _loggingDatabase!!
     }
 }
 
