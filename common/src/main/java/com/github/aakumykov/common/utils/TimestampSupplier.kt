@@ -1,4 +1,4 @@
-package com.github.aakumykov.server.utils
+package com.github.aakumykov.common.utils
 
 import androidx.core.util.Supplier
 import java.util.Date

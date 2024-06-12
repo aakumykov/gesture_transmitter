@@ -4,8 +4,9 @@ import com.github.aakumykov.data_model.LogMessage
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
-class LoggingRepository(
+class LoggingRepository @Inject constructor(
     private val logMessageDAO: LogMessageDAO,
     private val executionDispatcher: CoroutineDispatcher
 ) {
