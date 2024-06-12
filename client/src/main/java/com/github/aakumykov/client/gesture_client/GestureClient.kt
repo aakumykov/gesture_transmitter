@@ -48,6 +48,8 @@ class GestureClient private constructor(
 
     val currentState: ClientState get() = KtorStateProvider.getState()
 
+    val currentError: Exception? get() = KtorStateProvider.getError()
+
 
     private val client by lazy {
         HttpClient(CIO) {
