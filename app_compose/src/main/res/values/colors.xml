@@ -11,4 +11,6 @@
     <color name="button_stop_server">#FF9800</color>
     <color name="button_cancel">#A7A7A7</color>
     <color name="button_see_journal">#03A9F4</color>
+    <color name="info_view_default">#464646</color>
+    <color name="error">#D32F2F</color>
 </resources>

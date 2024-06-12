@@ -21,7 +21,8 @@ import com.github.aakumykov.app_compose.funstions.gesture_client.connectToServer
 import com.github.aakumykov.app_compose.funstions.gesture_client.disconnectFromServer
 import com.github.aakumykov.app_compose.funstions.gesture_client.pauseResumeServerInteraction
 import com.github.aakumykov.app_compose.funstions.ui.pauseButtonText
-import com.github.aakumykov.app_compose.ui.gui_elements.client.ClientState
+import com.github.aakumykov.app_compose.ui.gui_elements.client.ClientErrorView
+import com.github.aakumykov.app_compose.ui.gui_elements.client.ClientStateView
 import com.github.aakumykov.app_compose.ui.gui_elements.client.accessibilityButtonText
 import com.github.aakumykov.app_compose.ui.gui_elements.shared.SimpleButton
 import com.github.aakumykov.client.client_state_provider.ClientState
@@ -48,7 +49,10 @@ fun ClientScreen(
     val lifecycleState by lifecycleOwner.lifecycle.currentStateFlow.collectAsState()
 
     val accessibilityButtonText = remember { mutableStateOf(context.isAccessibilityServiceEnabled()) }
+
     val clientCurrentState = remember { mutableStateOf(gestureClient.currentState) }
+
+    val clientCurrentError = remember { mutableStateOf(gestureClient.currentError) }
 
     var chromeWasLaunchedOnConnected by rememberSaveable { mutableStateOf(false) }
 
@@ -84,6 +88,18 @@ fun ClientScreen(
                     launchGoogleChrome(context)
                     chromeWasLaunchedOnConnected = true
                 }
+            }
+    }
+
+
+    //
+    // Наблюдаю за ошибкой резидента
+    //
+    LaunchedEffect(Unit) {
+        gestureClient.errorsFlow
+            .filterNotNull()
+            .collect { e ->
+                clientCurrentError.value = e
             }
     }
 
@@ -130,9 +146,16 @@ fun ClientScreen(
             }
         )
 
-        ClientState(clientCurrentState.value)
+        //
+        // Статус клиента
+        //
+        ClientStateView(clientCurrentState.value)
+
+        //
+        //
+        //
+        ClientErrorView(clientCurrentState.value, clientCurrentError.value)
     }
 }
-
 
 const val TAG: String = "ClientScreen"
