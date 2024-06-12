@@ -12,7 +12,7 @@ import com.github.aakumykov.common.constants.SERVER_RESUMED
 import com.github.aakumykov.common.constants.TARGET_APP_IS_ACTIVE
 import com.github.aakumykov.common.constants.TARGET_APP_IS_INACTIVE
 import com.github.aakumykov.data_model.LogMessage
-import com.github.aakumykov.data_model.utils.TimestampSupplier
+import com.github.aakumykov.server.utils.TimestampSupplier
 import com.github.aakumykov.kotlin_playground.UserGesture
 import com.gitlab.aakumykov.exception_utils_module.ExceptionUtils
 import com.google.gson.Gson
@@ -173,14 +173,14 @@ class GestureClient private constructor(
 
     private suspend fun logErrorToServer(e: Exception) {
         sendLogMessage(
-            LogMessage.create("ОШИБКА РАЗБОРА ЖЕСТА: "+ExceptionUtils.getErrorMessage(e), TimestampSupplier.get())
+            LogMessage.create("ОШИБКА РАЗБОРА ЖЕСТА: "+ExceptionUtils.getErrorMessage(e), com.github.aakumykov.server.utils.TimestampSupplier.get())
         )
     }
 
 
     private suspend fun logUserGestureToServer(userGesture: UserGesture) {
         sendLogMessage(
-            LogMessage.create("Клиент получил жест: $userGesture", TimestampSupplier.get())
+            LogMessage.create("Клиент получил жест: $userGesture", com.github.aakumykov.server.utils.TimestampSupplier.get())
         )
     }
 

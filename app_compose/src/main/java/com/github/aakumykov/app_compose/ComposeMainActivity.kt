@@ -21,7 +21,7 @@ import com.github.aakumykov.app_compose.ui.screens.WelcomeScreen
 import com.github.aakumykov.client.client_state_provider.KtorStateProvider
 import com.github.aakumykov.client.gesture_client.GestureClient
 import com.github.aakumykov.settings_provider.SettingsProvider
-import com.github.aakumykov.data_model.utils.TimestampSupplier
+import com.github.aakumykov.server.utils.TimestampSupplier
 import com.github.aakumykov.app_compose.ui.screens.SettingsScreen
 import com.github.aakumykov.server.GestureRecorder
 import com.github.aakumykov.logger.gesture_logger.RoomGestureLogger

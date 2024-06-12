@@ -2,7 +2,6 @@ package com.github.aakumykov.data_model
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.github.aakumykov.data_model.utils.TimestampSupplier
 import java.util.UUID
 
 @Entity(tableName = "log_messages")
