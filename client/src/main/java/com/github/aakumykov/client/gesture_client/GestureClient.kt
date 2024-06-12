@@ -39,6 +39,8 @@ class GestureClient private constructor(
     private val ktorStateProvider: KtorStateProvider,
 ): ClientStateProvider by ktorStateProvider {
 
+    // FIXME: убрать TimestampSupplier
+
     private var currentSession: ClientWebSocketSession? = null
 
 
