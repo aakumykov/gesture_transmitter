@@ -1,4 +1,4 @@
-package com.github.aakumykov.app_compose.di.annotations
+package com.github.aakumykov.common.di
 
 import javax.inject.Scope
 
