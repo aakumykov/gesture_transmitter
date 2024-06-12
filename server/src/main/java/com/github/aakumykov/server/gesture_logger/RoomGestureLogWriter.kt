@@ -4,11 +4,11 @@ import com.github.aakumykov.data_model.LogMessage
 import com.github.aakumykov.server.log_database.LoggingRepository
 import kotlinx.coroutines.flow.Flow
 
-class RoomGestureLogger(
+class RoomGestureLogWriter(
     private val loggingRepository: LoggingRepository,
-) : GestureLogger, GestureLogReader {
+) : GestureLogWriter, GestureLogReader {
 
-    override suspend fun log(logMessage: LogMessage) {
+    override suspend fun writeToLoca(logMessage: LogMessage) {
         loggingRepository.addLogMessage(logMessage)
     }
 
