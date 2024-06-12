@@ -47,6 +47,7 @@ dependencies {
     implementation libs.material
     api project(':data_model')
     api project(':common')
+    implementation project(':settings_provider')
     testImplementation libs.junit
     androidTestImplementation libs.androidx.junit
     androidTestImplementation libs.androidx.espresso.core
