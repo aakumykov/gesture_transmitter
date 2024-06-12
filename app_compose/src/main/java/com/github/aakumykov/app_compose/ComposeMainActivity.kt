@@ -65,16 +65,12 @@ class ComposeMainActivity : ComponentActivity() {
     @Inject
     protected lateinit var settingsProvider: SettingsProvider
 
-    @Inject
-    protected lateinit var ktorStateProvider: KtorStateProvider
-
     private val gestureServer: GestureServer by lazy {
         GestureServer(gson, roomGestureLogger, timestampSupplier)
     }
 
-    private val gestureClient: GestureClient by lazy {
-        GestureClient.getInstance(gson, ktorStateProvider)
-    }
+    @Inject
+    private lateinit var gestureClient: GestureClient
 
 
 

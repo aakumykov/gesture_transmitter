@@ -15,13 +15,13 @@ class GestureClientModule {
 
     @Provides
     @ClientScope
-    fun provideClientStateProvider(): ClientStateProvider {
-        return KtorStateProvider
+    fun provideClientStateProvider(ktorStateProvider: KtorStateProvider): ClientStateProvider {
+        return ktorStateProvider
     }
 
     @Provides
     @ClientScope
     fun provideKtorStateProvider(): KtorStateProvider {
-        return KtorStateProvider
+        return KtorStateProvider()
     }
 }
