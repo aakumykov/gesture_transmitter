@@ -13,4 +13,5 @@
     <color name="button_see_journal">#03A9F4</color>
     <color name="info_view_default">#464646</color>
     <color name="error">#D32F2F</color>
+    <color name="log_divider" />
 </resources>
