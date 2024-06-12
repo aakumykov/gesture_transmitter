@@ -68,4 +68,8 @@ dependencies {
     debugImplementation libs.androidx.ui.test.manifest
 
     implementation libs.androidx.lifecycle.runtime.compose
+
+    // Dagger2 я знаю, просто здесь использовал ручное внедрение зависимостей.
+    // Мой проект с Dagger2: https://github.com/aakumykov/cloud_sync/tree/master/app/src/main/java/com/github/aakumykov/sync_dir_to_cloud/di
+    
 }
