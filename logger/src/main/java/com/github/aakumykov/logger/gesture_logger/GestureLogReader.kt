@@ -1,4 +1,4 @@
-package com.github.aakumykov.server.gesture_logger
+package com.github.aakumykov.logger.gesture_logger
 
 import com.github.aakumykov.data_model.LogMessage
 import kotlinx.coroutines.flow.Flow

@@ -1,8 +1,8 @@
-package com.github.aakumykov.server
+package com.github.aakumykov.logger
 
 import android.content.Context
 import androidx.room.Room
-import com.github.aakumykov.server.log_database.LogDatabase
+import com.github.aakumykov.logger.log_database.LogDatabase
 
 object ServerApp {
 

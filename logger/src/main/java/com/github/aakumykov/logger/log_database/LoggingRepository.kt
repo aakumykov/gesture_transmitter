@@ -1,4 +1,4 @@
-package com.github.aakumykov.server.log_database
+package com.github.aakumykov.logger.log_database
 
 import com.github.aakumykov.data_model.LogMessage
 import kotlinx.coroutines.CoroutineDispatcher

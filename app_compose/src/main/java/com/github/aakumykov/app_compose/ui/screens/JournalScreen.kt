@@ -20,7 +20,7 @@ import com.github.aakumykov.app_compose.R
 import com.github.aakumykov.app_compose.ui.gui_elements.client.TextInfoView
 import com.github.aakumykov.app_compose.ui.gui_elements.shared.SimpleButton
 import com.github.aakumykov.data_model.LogMessage
-import com.github.aakumykov.server.gesture_logger.GestureLogReader
+import com.github.aakumykov.logger.gesture_logger.GestureLogReader
 import java.text.SimpleDateFormat
 import java.util.Date
 

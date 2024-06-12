@@ -11,7 +11,7 @@ import com.github.aakumykov.common.constants.TARGET_APP_IS_ACTIVE
 import com.github.aakumykov.common.constants.TARGET_APP_IS_INACTIVE
 import com.github.aakumykov.data_model.LogMessage
 import com.github.aakumykov.kotlin_playground.UserGesture
-import com.github.aakumykov.server.gesture_logger.GestureLogWriter
+import com.github.aakumykov.logger.gesture_logger.GestureLogWriter
 import com.gitlab.aakumykov.exception_utils_module.ExceptionUtils
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException

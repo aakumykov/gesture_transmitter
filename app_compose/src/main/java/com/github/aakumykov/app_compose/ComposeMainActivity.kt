@@ -24,11 +24,11 @@ import com.github.aakumykov.settings_provider.SettingsProvider
 import com.github.aakumykov.data_model.utils.TimestampSupplier
 import com.github.aakumykov.app_compose.ui.screens.SettingsScreen
 import com.github.aakumykov.server.GestureRecorder
-import com.github.aakumykov.server.gesture_logger.RoomGestureLogger
+import com.github.aakumykov.logger.gesture_logger.RoomGestureLogger
 import com.github.aakumykov.server.GestureServer
-import com.github.aakumykov.server.gesture_logger.GestureLogReader
-import com.github.aakumykov.server.logDatabase
-import com.github.aakumykov.server.log_database.LoggingRepository
+import com.github.aakumykov.logger.gesture_logger.GestureLogReader
+import com.github.aakumykov.logger.logDatabase
+import com.github.aakumykov.logger.log_database.LoggingRepository
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import javax.inject.Inject

@@ -4,9 +4,9 @@ import android.app.Application
 import android.content.Context
 import android.widget.Toast
 import com.github.aakumykov.app_compose.di.AppComponent
-import com.github.aakumykov.app_compose.di.modules.AppContextModule
 import com.github.aakumykov.app_compose.di.DaggerAppComponent
-import com.github.aakumykov.server.ServerApp
+import com.github.aakumykov.app_compose.di.modules.AppContextModule
+import com.github.aakumykov.logger.ServerApp
 
 class App : Application() {
 

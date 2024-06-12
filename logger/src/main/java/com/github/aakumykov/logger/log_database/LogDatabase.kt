@@ -1,4 +1,4 @@
-package com.github.aakumykov.server.log_database
+package com.github.aakumykov.logger.log_database
 
 import androidx.room.Database
 import androidx.room.RoomDatabase

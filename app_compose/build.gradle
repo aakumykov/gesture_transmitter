@@ -61,6 +61,7 @@ dependencies {
     implementation project(':server')
     implementation libs.androidx.navigation.compose
     implementation project(':settings_provider')
+    implementation project(':logger')
     testImplementation libs.junit
     androidTestImplementation libs.androidx.junit
     androidTestImplementation libs.androidx.espresso.core

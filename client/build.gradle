@@ -47,6 +47,7 @@ dependencies {
     api project(':data_model')
     api project(':common')
     implementation project(':settings_provider')
+    implementation project(':logger')
     testImplementation libs.junit
     androidTestImplementation libs.androidx.junit
     androidTestImplementation libs.androidx.espresso.core
