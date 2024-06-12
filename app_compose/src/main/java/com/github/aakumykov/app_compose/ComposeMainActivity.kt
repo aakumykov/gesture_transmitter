@@ -59,9 +59,8 @@ class ComposeMainActivity : ComponentActivity() {
     @Inject
     protected lateinit var roomGestureLogger: RoomGestureLogger
 
-    private val gestureLogReader: GestureLogReader by lazy {
-        roomGestureLogger
-    }
+    @Inject
+    protected lateinit var gestureLogReader: GestureLogReader
 
     @Inject
     protected lateinit var settingsProvider: SettingsProvider
