@@ -7,8 +7,7 @@ import com.github.aakumykov.common.di.annotations.ServerScope
 import java.util.Date
 import javax.inject.Inject
 
-@ServerScope
-@ClientScope
+@AppScope
 class TimestampSupplier @Inject constructor() : Supplier<Long> {
     override fun get(): Long = Date().time
 }
