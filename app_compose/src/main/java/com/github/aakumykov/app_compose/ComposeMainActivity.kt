@@ -23,6 +23,7 @@ import com.github.aakumykov.client.gesture_client.GestureClient
 import com.github.aakumykov.common.settings_provider.SettingsProvider
 import com.github.aakumykov.data_model.utils.TimestampSupplier
 import com.github.aakumykov.app_compose.ui.screens.SettingsScreen
+import com.github.aakumykov.common.utils.LocalNetworkAddressDetector
 import com.github.aakumykov.server.GestureRecorder
 import com.github.aakumykov.server.gesture_logger.RoomGestureLogger
 import com.github.aakumykov.server.GestureServer
@@ -71,7 +72,7 @@ class ComposeMainActivity : ComponentActivity() {
     }
 
     private val settingsProvider: SettingsProvider by lazy {
-        SettingsProvider.getInstance(App.appContext)
+        SettingsProvider.getInstance(App.appContext, LocalNetworkAddressDetector)
     }
 
     private val ktorStateProvider by lazy { KtorStateProvider }
@@ -146,7 +147,7 @@ class ComposeMainActivity : ComponentActivity() {
                     //
                     composable(DESTINATION_SETTINGS) {
                         SettingsScreen(
-                            settingsProvider = SettingsProvider.getInstance(App.appContext),
+                            settingsProvider = settingsProvider,
                             onSaveButtonClicked = { navController.popBackStack() },
                             onCancelButtonClicked = { navController.popBackStack() }
                         )

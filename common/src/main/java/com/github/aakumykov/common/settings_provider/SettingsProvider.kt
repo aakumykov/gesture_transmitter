@@ -6,13 +6,17 @@ import android.preference.PreferenceManager
 import com.github.aakumykov.common.config.DEFAULT_SERVER_ADDRESS
 import com.github.aakumykov.common.config.DEFAULT_SERVER_PATH
 import com.github.aakumykov.common.config.DEFAULT_SERVER_PORT
+import com.github.aakumykov.common.utils.NetworkAddressDetector
 
 const val KEY_SERVER_ADDRESS = "SERVER_ADDRESS"
 const val KEY_SERVER_PORT = "SERVER_PORT"
 const val KEY_SERVER_PATH = "SERVER_PATH"
 
 
-class SettingsProvider private constructor(private val applicationContext: Context) {
+class SettingsProvider private constructor(
+    private val applicationContext: Context,
+    private val networkAddressDetector: NetworkAddressDetector
+) {
 
     fun storeIpAddress(value: String) {
         editor().putString(KEY_SERVER_ADDRESS, value).apply()
@@ -27,8 +31,12 @@ class SettingsProvider private constructor(private val applicationContext: Conte
     }
 
 
-    fun getIpAddress(): String
-        = sharedPreferences.getString(KEY_SERVER_ADDRESS, null) ?: DEFAULT_SERVER_ADDRESS
+    fun getIpAddress(): String {
+        return sharedPreferences.getString(KEY_SERVER_ADDRESS, null)
+            ?.let {
+                networkAddressDetector.ipAddressInLocalNetwork()
+            } ?: DEFAULT_SERVER_ADDRESS
+    }
 
     fun getPort(): Int
         = sharedPreferences.getInt(KEY_SERVER_PORT, DEFAULT_SERVER_PORT)
@@ -49,11 +57,13 @@ class SettingsProvider private constructor(private val applicationContext: Conte
 
         private var _ouwInstance: SettingsProvider? = null
 
-        // TODO: передавать контекст через Dagger
         @JvmStatic
-        fun getInstance(applicationContext: Context): SettingsProvider {
+        fun getInstance(
+            applicationContext: Context,
+            networkAddressDetector: NetworkAddressDetector
+        ): SettingsProvider {
             if (null == _ouwInstance)
-                _ouwInstance = SettingsProvider(applicationContext)
+                _ouwInstance = SettingsProvider(applicationContext, networkAddressDetector)
             return _ouwInstance!!
         }
     }
