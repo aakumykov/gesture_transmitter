@@ -48,11 +48,6 @@ class ComposeMainActivity : ComponentActivity() {
 
     private val gestureRecorder by lazy { GestureRecorder }
 
-    private val gson: Gson by lazy { Gson() }
-
-    private val timestampSupplier by lazy { TimestampSupplier }
-
-    private val loggingMessageDAO by lazy { loggingDatabase.getLogMessageDAO() }
 
     private val ioDispatcher by lazy { Dispatchers.IO }
 
@@ -65,9 +60,8 @@ class ComposeMainActivity : ComponentActivity() {
     @Inject
     protected lateinit var settingsProvider: SettingsProvider
 
-    private val gestureServer: GestureServer by lazy {
-        GestureServer(gson, roomGestureLogger, timestampSupplier)
-    }
+    @Inject
+    private lateinit var gestureServer: GestureServer
 
     @Inject
     private lateinit var gestureClient: GestureClient

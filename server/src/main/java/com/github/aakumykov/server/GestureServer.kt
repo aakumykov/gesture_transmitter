@@ -1,7 +1,6 @@
 package com.github.aakumykov.server
 
 import android.util.Log
-import androidx.core.util.Supplier
 import com.github.aakumykov.common.constants.CLIENT_WANTS_TO_DISCONNECT
 import com.github.aakumykov.common.constants.CLIENT_WANTS_TO_PAUSE
 import com.github.aakumykov.common.constants.CLIENT_WANTS_TO_RESUME
@@ -9,6 +8,7 @@ import com.github.aakumykov.common.constants.SERVER_PAUSED
 import com.github.aakumykov.common.constants.SERVER_RESUMED
 import com.github.aakumykov.common.constants.TARGET_APP_IS_ACTIVE
 import com.github.aakumykov.common.constants.TARGET_APP_IS_INACTIVE
+import com.github.aakumykov.common.utils.TimestampSupplier
 import com.github.aakumykov.data_model.LogMessage
 import com.github.aakumykov.kotlin_playground.UserGesture
 import com.github.aakumykov.logger.gesture_logger.GestureLogWriter
@@ -36,13 +36,13 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.time.Duration
 import java.util.UUID
+import javax.inject.Inject
 
-class GestureServer(
+class GestureServer @Inject constructor(
     private val gson: Gson,
     private val gestureLogWriter: GestureLogWriter,
-    private val timestampSupplier: Supplier<Long>
+    private val timestampSupplier: TimestampSupplier
 ) {
-
     private var onPause: Boolean = false
 
     private var targetAppIsActive: Boolean = false

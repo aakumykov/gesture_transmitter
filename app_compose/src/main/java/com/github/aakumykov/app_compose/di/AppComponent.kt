@@ -21,7 +21,7 @@ import dagger.Component
     CoroutinesModule::class,
     DaoModule::class,
     LoggerModule::class,
-    GestureClientModule::class
+    GestureClientModule::class,
 ])
 interface AppComponent {
     fun injectToComposeMainActivity(activity: ComposeMainActivity)

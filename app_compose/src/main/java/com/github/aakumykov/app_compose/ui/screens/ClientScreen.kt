@@ -38,7 +38,7 @@ import kotlinx.coroutines.flow.onEach
 @Composable
 fun ClientScreen(
     gestureClient: GestureClient,
-    settingsProvider: com.github.aakumykov.settings_provider.SettingsProvider,
+    settingsProvider: SettingsProvider,
     coroutineDispatcher: CoroutineDispatcher,
     onSettingsButtonClicked: () -> Unit
 ) {
