@@ -27,7 +27,7 @@ import com.github.aakumykov.server.GestureRecorder
 import com.github.aakumykov.logger.gesture_logger.RoomGestureLogger
 import com.github.aakumykov.server.GestureServer
 import com.github.aakumykov.logger.gesture_logger.GestureLogReader
-import com.github.aakumykov.logger.logDatabase
+import com.github.aakumykov.logger.loggingDatabase
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import javax.inject.Inject
@@ -52,7 +52,7 @@ class ComposeMainActivity : ComponentActivity() {
 
     private val timestampSupplier by lazy { TimestampSupplier }
 
-    private val loggingMessageDAO by lazy { logDatabase.getLogMessageDAO() }
+    private val loggingMessageDAO by lazy { loggingDatabase.getLogMessageDAO() }
 
     private val ioDispatcher by lazy { Dispatchers.IO }
 

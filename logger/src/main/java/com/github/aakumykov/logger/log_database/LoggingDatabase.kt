@@ -8,6 +8,6 @@ import com.github.aakumykov.data_model.LogMessage
     entities = [ LogMessage::class ],
     version = 1
 )
-abstract class LogDatabase: RoomDatabase() {
+abstract class LoggingDatabase: RoomDatabase() {
     abstract fun getLogMessageDAO(): LogMessageDAO
 }

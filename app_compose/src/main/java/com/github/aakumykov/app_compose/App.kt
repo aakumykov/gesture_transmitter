@@ -9,7 +9,7 @@ import com.github.aakumykov.app_compose.di.DaggerAppComponent
 import com.github.aakumykov.app_compose.di.modules.AppContextModule
 import com.github.aakumykov.logger.ServerApp
 import com.github.aakumykov.logger.di.DaoModule
-import com.github.aakumykov.logger.log_database.LogDatabase
+import com.github.aakumykov.logger.log_database.LoggingDatabase
 
 class App : Application() {
 
@@ -24,7 +24,7 @@ class App : Application() {
 
         _loggingDatabase = Room.databaseBuilder(
             this,
-            LogDatabase::class.java,
+            LoggingDatabase::class.java,
             "log_database"
         ).build()
 
@@ -43,8 +43,8 @@ class App : Application() {
         private var _appComponent: AppComponent? = null
         val appComponent: AppComponent get() = _appComponent!!
 
-        private var _loggingDatabase: LogDatabase? = null
-        val loggingDatabase: LogDatabase get() = _loggingDatabase!!
+        private var _loggingDatabase: LoggingDatabase? = null
+        val loggingDatabase: LoggingDatabase get() = _loggingDatabase!!
     }
 }
 
