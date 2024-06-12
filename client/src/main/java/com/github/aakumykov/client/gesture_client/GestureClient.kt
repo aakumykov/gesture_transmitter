@@ -37,6 +37,7 @@ import javax.inject.Inject
 class GestureClient @Inject constructor(
     private val gson: Gson,
     private val clientStateProvider: ClientStateProvider,
+    private val timestampSupplier: TimestampSupplier
 )
     : ClientStateProvider by clientStateProvider
 {
@@ -176,14 +177,14 @@ class GestureClient @Inject constructor(
 
     private suspend fun logErrorToServer(e: Exception) {
         sendLogMessage(
-            LogMessage.create("ОШИБКА РАЗБОРА ЖЕСТА: "+ExceptionUtils.getErrorMessage(e), TimestampSupplier.get())
+            LogMessage.create("ОШИБКА РАЗБОРА ЖЕСТА: "+ExceptionUtils.getErrorMessage(e), timestampSupplier.get())
         )
     }
 
 
     private suspend fun logUserGestureToServer(userGesture: UserGesture) {
         sendLogMessage(
-            LogMessage.create("Клиент получил жест: $userGesture", TimestampSupplier.get())
+            LogMessage.create("Клиент получил жест: $userGesture", timestampSupplier.get())
         )
     }
 
