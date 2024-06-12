@@ -46,8 +46,8 @@ class ComposeMainActivity : ComponentActivity() {
     // Демонстрация владения технологией здесь: https://github.com/aakumykov/cloud_sync/tree/master/app/src/main/java/com/github/aakumykov/sync_dir_to_cloud/di
     //
 
-    private val gestureRecorder by lazy { GestureRecorder }
-
+    @Inject
+    private lateinit var gestureRecorder: GestureRecorder
 
     private val ioDispatcher by lazy { Dispatchers.IO }
 
