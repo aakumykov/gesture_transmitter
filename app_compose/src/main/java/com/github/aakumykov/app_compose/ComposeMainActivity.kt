@@ -24,7 +24,7 @@ import com.github.aakumykov.settings_provider.SettingsProvider
 import com.github.aakumykov.data_model.utils.TimestampSupplier
 import com.github.aakumykov.app_compose.ui.screens.SettingsScreen
 import com.github.aakumykov.server.GestureRecorder
-import com.github.aakumykov.server.gesture_logger.RoomGestureLogWriter
+import com.github.aakumykov.server.gesture_logger.RoomGestureLogger
 import com.github.aakumykov.server.GestureServer
 import com.github.aakumykov.server.gesture_logger.GestureLogReader
 import com.github.aakumykov.server.logDatabase
@@ -63,7 +63,7 @@ class ComposeMainActivity : ComponentActivity() {
     }
 
     private val roomGestureLogger by lazy {
-        RoomGestureLogWriter(loggingRepository)
+        RoomGestureLogger(loggingRepository)
     }
 
     private val gestureLogReader: GestureLogReader by lazy {

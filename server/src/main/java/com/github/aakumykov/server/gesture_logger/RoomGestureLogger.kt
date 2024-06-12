@@ -4,7 +4,7 @@ import com.github.aakumykov.data_model.LogMessage
 import com.github.aakumykov.server.log_database.LoggingRepository
 import kotlinx.coroutines.flow.Flow
 
-class RoomGestureLogWriter(
+class RoomGestureLogger(
     private val loggingRepository: LoggingRepository,
 ) : GestureLogWriter, GestureLogReader {
 
