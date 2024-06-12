@@ -32,10 +32,11 @@ class SettingsProvider private constructor(
 
 
     fun getIpAddress(): String {
-        return sharedPreferences.getString(KEY_SERVER_ADDRESS, null)
-            ?.let {
-                networkAddressDetector.ipAddressInLocalNetwork()
-            } ?: DEFAULT_SERVER_ADDRESS
+        val storedIpAddress: String? = sharedPreferences.getString(KEY_SERVER_ADDRESS, null)
+        val detectedIpAddress: String? = networkAddressDetector.ipAddressInLocalNetwork()
+        val defaultIpAddress = DEFAULT_SERVER_ADDRESS
+
+        return storedIpAddress ?: detectedIpAddress ?: defaultIpAddress
     }
 
     fun getPort(): Int
