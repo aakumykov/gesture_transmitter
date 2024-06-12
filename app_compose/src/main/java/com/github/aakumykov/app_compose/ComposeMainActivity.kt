@@ -49,11 +49,11 @@ class ComposeMainActivity : ComponentActivity() {
     //
 
     @Inject
-    private lateinit var gestureRecorder: GestureRecorder
+    protected lateinit var gestureRecorder: GestureRecorder
 
     @Inject
     @IODispatcher
-    private lateinit var ioDispatcher: CoroutineDispatcher
+    protected lateinit var ioDispatcher: CoroutineDispatcher
 
     @Inject
     protected lateinit var roomGestureLogger: RoomGestureLogger
@@ -65,10 +65,10 @@ class ComposeMainActivity : ComponentActivity() {
     protected lateinit var settingsProvider: SettingsProvider
 
     @Inject
-    private lateinit var gestureServer: GestureServer
+    protected lateinit var gestureServer: GestureServer
 
     @Inject
-    private lateinit var gestureClient: GestureClient
+    protected lateinit var gestureClient: GestureClient
 
 
 
