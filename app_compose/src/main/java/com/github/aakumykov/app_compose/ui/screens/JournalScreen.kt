@@ -1,7 +1,8 @@
 package com.github.aakumykov.app_compose.ui.screens
 
-import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -17,12 +18,9 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.aakumykov.app_compose.R
-import com.github.aakumykov.app_compose.ui.gui_elements.client.TextInfoView
 import com.github.aakumykov.app_compose.ui.gui_elements.shared.SimpleButton
 import com.github.aakumykov.data_model.LogMessage
 import com.github.aakumykov.server.gesture_logger.GestureLogReader
-import java.text.SimpleDateFormat
-import java.util.Date
 
 @Composable
 fun JournalScreen(
@@ -30,10 +28,13 @@ fun JournalScreen(
     onBackButtonClicked: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val LOG_TAG = "JournalScreen"
     val content = remember { mutableStateListOf<LogMessage>() }
 
     LaunchedEffect(Unit) {
-        gestureLogReader.getLogMessages().collect { content.add(it) }
+        gestureLogReader.getLogMessagesAsList().also {
+            content.addAll(it)
+        }
     }
 
     Column(modifier = modifier) {
@@ -48,15 +49,18 @@ fun JournalScreen(
 }
 
 @Composable
-fun LogLines(content: SnapshotStateList<LogMessage>) {
+fun LogLines(
+    content: SnapshotStateList<LogMessage>,
+    modifier: Modifier = Modifier
+) {
     LazyColumn(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxSize(),
     ) {
         items(content.size) { index ->
             val logMessage: LogMessage? = if (content.size > index) content[index] else null
-            logMessage?.also {
+            logMessage?.also { logMessage ->
                 Text(
-                    text = rowText(it),
+                    text = logMessage.toString(),
                     fontSize = 16.sp,
                     modifier = Modifier
                         .fillMaxWidth()
@@ -66,14 +70,4 @@ fun LogLines(content: SnapshotStateList<LogMessage>) {
             }
         }
     }
-}
-
-fun rowText(logMessage: LogMessage): String {
-    return "${timestampToTime(logMessage.timestamp)}, ${logMessage.message}"
-}
-
-@SuppressLint("SimpleDateFormat")
-fun timestampToTime(ts: Long): String {
-    return SimpleDateFormat("dd.MM.LL hh:mm:ss")
-        .format(Date(ts))
 }
