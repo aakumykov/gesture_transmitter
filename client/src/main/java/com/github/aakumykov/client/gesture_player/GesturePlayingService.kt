@@ -5,24 +5,31 @@ import android.util.Log
 import android.view.accessibility.AccessibilityEvent
 import com.github.aakumykov.client.di.assisted_factories.GesturePlayerAssistedFactory
 import com.github.aakumykov.client.di.interfaces.GestureClientComponentProvider
+import com.github.aakumykov.client.gesture_client.GestureClient
 import com.github.aakumykov.common.config.GOOGLE_CHROME_PACKAGE_NAME
 import com.github.aakumykov.kotlin_playground.UserGesture
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 
 class GesturePlayingService : AccessibilityService() {
 
-    private var chromeIsLaunched: Boolean = false
-
     @Inject
     protected lateinit var gesturePlayerFactory: GesturePlayerAssistedFactory
+
+
+    @Inject
+    protected lateinit var gestureClient: GestureClient
+
 
     private val gesturePlayer: GesturePlayer
         get() = gesturePlayerFactory.get(this)
 
 
-//    @Inject
-//    private lateinit var gestureClient: GestureClient
+    private var chromeIsLaunched: Boolean = false
 
 
     override fun onCreate() {
@@ -42,16 +49,15 @@ class GesturePlayingService : AccessibilityService() {
         debugLog("Служба доступности, onDestroy()")
     }
 
-
     override fun onInterrupt() {}
 
 
     private fun prepareGestureClient() {
-        /*CoroutineScope(Dispatchers.IO).launch {
+        CoroutineScope(Dispatchers.IO).launch {
             gestureClient.userGestures
                 .filterNotNull()
                 .collect(::onNewUserGesture)
-        }*/
+        }
     }
 
 
@@ -85,10 +91,10 @@ class GesturePlayingService : AccessibilityService() {
     }
 
     private fun reportServerChromeIsActive(isActive: Boolean) {
-        /*Log.d(TAG, "reportServerChromeLaunched($isActive)")
+        Log.d(TAG, "reportServerChromeLaunched($isActive)")
         CoroutineScope(Dispatchers.IO).launch {
             gestureClient.reportServerTargetAppIsActive(isActive)
-        }*/
+        }
     }
 
     private fun currentWindowIsChromeWindow(): Boolean {
