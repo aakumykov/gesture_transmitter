@@ -3,6 +3,8 @@ package com.github.aakumykov.app_compose.di
 import com.github.aakumykov.app_compose.ComposeMainActivity
 import com.github.aakumykov.app_compose.di.modules.AppContextModule
 import com.github.aakumykov.client.di.GestureClientModule
+import com.github.aakumykov.client.di.interfaces.GestureClientComponent
+import com.github.aakumykov.client.gesture_player.GesturePlayingService
 import com.github.aakumykov.common.di.annotations.AppScope
 import com.github.aakumykov.common.di.annotations.ClientScope
 import com.github.aakumykov.common.di.annotations.ServerScope
@@ -25,6 +27,7 @@ import dagger.Component
     LoggerModule::class,
     GestureClientModule::class,
 ])
-interface AppComponent {
+interface AppComponent : GestureClientComponent {
     fun injectToComposeMainActivity(activity: ComposeMainActivity)
+    override fun injectToGesturePlayingService(gpService: GesturePlayingService)
 }

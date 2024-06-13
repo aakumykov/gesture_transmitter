@@ -7,11 +7,13 @@ import androidx.room.Room
 import com.github.aakumykov.app_compose.di.AppComponent
 import com.github.aakumykov.app_compose.di.DaggerAppComponent
 import com.github.aakumykov.app_compose.di.modules.AppContextModule
+import com.github.aakumykov.client.di.interfaces.GestureClientComponent
+import com.github.aakumykov.client.di.interfaces.GestureClientComponentProvider
 import com.github.aakumykov.logger.ServerApp
 import com.github.aakumykov.logger.di.DaoModule
 import com.github.aakumykov.logger.log_database.LoggingDatabase
 
-class App : Application() {
+class App : Application(), GestureClientComponentProvider {
 
     override fun onCreate() {
         super.onCreate()
@@ -32,6 +34,10 @@ class App : Application() {
             .appContextModule(AppContextModule(this))
             .daoModule(DaoModule(loggingDatabase))
             .build()
+    }
+
+    override fun getGestureClientComponent(): GestureClientComponent {
+        return appComponent
     }
 
     companion object {

@@ -3,36 +3,38 @@ package com.github.aakumykov.client.gesture_player
 import android.accessibilityservice.AccessibilityService
 import android.util.Log
 import android.view.accessibility.AccessibilityEvent
-import com.github.aakumykov.client.gesture_client.GestureClient
-import com.github.aakumykov.client.client_state_provider.KtorStateProvider
+import com.github.aakumykov.client.di.assisted_factories.GesturePlayerAssistedFactory
+import com.github.aakumykov.client.di.interfaces.GestureClientComponentProvider
 import com.github.aakumykov.common.config.GOOGLE_CHROME_PACKAGE_NAME
 import com.github.aakumykov.kotlin_playground.UserGesture
-import com.gitlab.aakumykov.exception_utils_module.ExceptionUtils
-import com.google.gson.Gson
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.launch
-import java.util.concurrent.atomic.AtomicBoolean
+import javax.inject.Inject
 
 
 class GesturePlayingService : AccessibilityService() {
 
     private var chromeIsLaunched: Boolean = false
 
-    private val gesturePlayer: GesturePlayer by lazy {
-        GesturePlayer(this)
-    }
+    @Inject
+    protected lateinit var gesturePlayerFactory: GesturePlayerAssistedFactory
 
-    private val gestureClient: GestureClient by lazy {
-        GestureClient.getInstance(Gson(), KtorStateProvider)
-    }
+    private val gesturePlayer: GesturePlayer
+        get() = gesturePlayerFactory.get(this)
+
+
+//    @Inject
+//    private lateinit var gestureClient: GestureClient
 
 
     override fun onCreate() {
         super.onCreate()
         debugLog("Служба доступности, onCreate()")
+
+        (application as GestureClientComponentProvider)
+            .getGestureClientComponent()
+            .injectToGesturePlayingService(this)
+
         prepareGestureClient()
+
     }
 
     override fun onDestroy() {
@@ -45,11 +47,11 @@ class GesturePlayingService : AccessibilityService() {
 
 
     private fun prepareGestureClient() {
-        CoroutineScope(Dispatchers.IO).launch {
+        /*CoroutineScope(Dispatchers.IO).launch {
             gestureClient.userGestures
                 .filterNotNull()
                 .collect(::onNewUserGesture)
-        }
+        }*/
     }
 
 
@@ -83,10 +85,10 @@ class GesturePlayingService : AccessibilityService() {
     }
 
     private fun reportServerChromeIsActive(isActive: Boolean) {
-        Log.d(TAG, "reportServerChromeLaunched($isActive)")
+        /*Log.d(TAG, "reportServerChromeLaunched($isActive)")
         CoroutineScope(Dispatchers.IO).launch {
             gestureClient.reportServerTargetAppIsActive(isActive)
-        }
+        }*/
     }
 
     private fun currentWindowIsChromeWindow(): Boolean {
