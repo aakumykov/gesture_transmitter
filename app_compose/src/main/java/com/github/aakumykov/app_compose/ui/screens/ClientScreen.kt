@@ -24,6 +24,7 @@ import com.github.aakumykov.app_compose.funstions.ui.pauseButtonText
 import com.github.aakumykov.app_compose.ui.gui_elements.client.ClientErrorView
 import com.github.aakumykov.app_compose.ui.gui_elements.client.ClientStateView
 import com.github.aakumykov.app_compose.ui.gui_elements.client.accessibilityButtonText
+import com.github.aakumykov.app_compose.ui.gui_elements.shared.IpAddressView
 import com.github.aakumykov.app_compose.ui.gui_elements.shared.SimpleButton
 import com.github.aakumykov.client.client_state_provider.ClientState
 import com.github.aakumykov.client.extensions.isAccessibilityServiceEnabled
@@ -113,11 +114,19 @@ fun ClientScreen(
             context.openAccessibilitySettings()
         }
 
+
         SimpleButton(
             text = "Настройки",
             bgColor = Color.Blue,
             onClick = onSettingsButtonClicked
         )
+
+
+        IpAddressView(
+            messagePrefix = "Настроенный IP-адрес",
+            settingsProvider = settingsProvider
+        )
+
 
         SimpleButton(
             text = "Старт",
@@ -130,6 +139,7 @@ fun ClientScreen(
             }
         )
 
+
         SimpleButton(
             text = stringResource(pauseButtonText(clientCurrentState)),
             bgColor = colorResource(com.github.aakumykov.client.R.color.button_pause),
@@ -137,6 +147,7 @@ fun ClientScreen(
                 pauseResumeServerInteraction(gestureClient, coroutineScope, coroutineDispatcher)
             }
         )
+
 
         SimpleButton(
             text = "Стоп",
