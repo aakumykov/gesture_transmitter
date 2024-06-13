@@ -28,6 +28,7 @@ import com.github.aakumykov.app_compose.ui.gui_elements.client.TextInfoView
 import com.github.aakumykov.app_compose.ui.gui_elements.shared.IpAddressView
 import com.github.aakumykov.app_compose.ui.gui_elements.shared.SimpleButton
 import com.github.aakumykov.common.settings_provider.SettingsProvider
+import com.github.aakumykov.common.utils.NetworkAddressDetector
 import com.github.aakumykov.common.utils.inMainThread
 import com.github.aakumykov.server.GestureRecorder
 import com.github.aakumykov.server.GestureServer
@@ -36,6 +37,7 @@ import com.gitlab.aakumykov.exception_utils_module.ExceptionUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @SuppressLint("ClickableViewAccessibility")
 @Composable
@@ -43,6 +45,7 @@ fun ServerScreen(
     onSettingsButtonClicked: () -> Unit,
     onJournalButtonClicked: () -> Unit,
     settingsProvider: SettingsProvider,
+    networkAddressDetector: NetworkAddressDetector,
     gestureServer: GestureServer,
     gestureRecorder: GestureRecorder
 ) {
@@ -94,8 +97,9 @@ fun ServerScreen(
         )
 
         IpAddressView(
-            messagePrefix = "Сохранённый IP-адрес: ",
+            messagePrefix = "сохранённый ip-адрес: ",
             settingsProvider = settingsProvider,
+            networkAddressDetector = networkAddressDetector
         )
 
         TextInfoView("Статус сервера: ${serverStateToString(serverState.value)}",)
@@ -104,17 +108,19 @@ fun ServerScreen(
             text = "Запустить сервер",
             bgColor = colorResource(R.color.button_start_server),
             onClick = {
-                scope.launch(Dispatchers.IO) {
-                    try {
-                        gestureServer.start(
-                            settingsProvider.getIpAddress(),
-                            settingsProvider.getPort(),
-                            settingsProvider.getPath()
-                        )
-                    } catch (e: Exception) {
-                        ExceptionUtils.getErrorMessage(e).also {
-                            inMainThread { showToast(context, it) }
-                            Log.e(LOG_TAG, it, e);
+                scope.launch {
+                    withContext((Dispatchers.IO)) {
+                        try {
+                            gestureServer.start(
+                                settingsProvider.getIpAddress(),
+                                settingsProvider.getPort(),
+                                settingsProvider.getPath()
+                            )
+                        } catch (e: Exception) {
+                            ExceptionUtils.getErrorMessage(e).also {
+                                inMainThread { showToast(context, it) }
+                                Log.e(LOG_TAG, it, e);
+                            }
                         }
                     }
                 }

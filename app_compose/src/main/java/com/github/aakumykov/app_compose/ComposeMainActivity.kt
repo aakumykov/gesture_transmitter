@@ -22,6 +22,7 @@ import com.github.aakumykov.app_compose.ui.screens.WelcomeScreen
 import com.github.aakumykov.client.gesture_client.GestureClient
 import com.github.aakumykov.common.di.annotations.IODispatcher
 import com.github.aakumykov.common.settings_provider.SettingsProvider
+import com.github.aakumykov.common.utils.NetworkAddressDetector
 import com.github.aakumykov.logger.gesture_logger.GestureLogReader
 import com.github.aakumykov.logger.gesture_logger.RoomGestureLogger
 import com.github.aakumykov.server.GestureRecorder
@@ -53,6 +54,9 @@ class ComposeMainActivity : ComponentActivity() {
 
     @Inject
     protected lateinit var settingsProvider: SettingsProvider
+
+    @Inject
+    protected lateinit var networkAddressDetector: NetworkAddressDetector
 
     @Inject
     protected lateinit var gestureServer: GestureServer
@@ -114,6 +118,7 @@ class ComposeMainActivity : ComponentActivity() {
                             onSettingsButtonClicked = { navigateToSettings(navController) },
                             onJournalButtonClicked = { navController.navigate(DESTINATION_JOURNAL) },
                             settingsProvider = settingsProvider,
+                            networkAddressDetector = networkAddressDetector,
                             gestureServer = gestureServer,
                             gestureRecorder = gestureRecorder
                         )

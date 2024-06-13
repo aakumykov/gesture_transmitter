@@ -118,8 +118,8 @@ fun ClientScreen(
 
 
         IpAddressView(
-            messagePrefix = "Настроенный IP-адрес",
-            settingsProvider = settingsProvider
+            messagePrefix = "сохранённый ip-адрес",
+            settingsProvider = settingsProvider,
         )
 
 
