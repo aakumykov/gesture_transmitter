@@ -2,6 +2,7 @@ package com.github.aakumykov.server
 
 import android.util.Log
 import android.view.MotionEvent
+import com.github.aakumykov.common.di.annotations.ServerScope
 import com.github.aakumykov.kotlin_playground.UserGesturePoint
 import com.github.aakumykov.kotlin_playground.UserGesture
 import kotlinx.coroutines.CoroutineScope
@@ -9,8 +10,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-object GestureRecorder {
+@ServerScope
+class GestureRecorder @Inject constructor() {
 
     private val TAG: String = GestureRecorder::class.java.simpleName
     private var initialEvent: MotionEvent? = null

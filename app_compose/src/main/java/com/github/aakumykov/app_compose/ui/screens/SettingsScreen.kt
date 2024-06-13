@@ -5,6 +5,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -20,7 +23,6 @@ import com.github.aakumykov.app_compose.ui.gui_elements.settings.InputField
 import com.github.aakumykov.app_compose.ui.gui_elements.shared.SimpleButton
 import com.github.aakumykov.app_compose.ui.theme.Gesture_transmitterTheme
 import com.github.aakumykov.common.settings_provider.SettingsProvider
-import com.github.aakumykov.common.utils.FakeNetworkAddressDetector
 
 @Composable
 fun SettingsScreen(
@@ -105,18 +107,16 @@ fun SettingsScreen(
     }
 }
 
+/*
 
 @Preview(showBackground = true)
 @Composable
 fun SettingsScreenPreview() {
     Gesture_transmitterTheme {
         SettingsScreen(
-            settingsProvider = SettingsProvider.getInstance(
-                LocalContext.current,
-                FakeNetworkAddressDetector
-            ),
+            settingsProvider = SettingsProvider.getInstance(LocalContext.current),
             onSaveButtonClicked = {},
             onCancelButtonClicked = {}
         )
     }
-}
+}*/

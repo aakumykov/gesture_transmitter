@@ -3,7 +3,6 @@ package com.github.aakumykov.client.gesture_client
 import android.util.Log
 import com.github.aakumykov.client.client_state_provider.ClientState
 import com.github.aakumykov.client.client_state_provider.ClientStateProvider
-import com.github.aakumykov.client.client_state_provider.KtorStateProvider
 import com.github.aakumykov.common.constants.CLIENT_WANTS_TO_DISCONNECT
 import com.github.aakumykov.common.constants.CLIENT_WANTS_TO_PAUSE
 import com.github.aakumykov.common.constants.CLIENT_WANTS_TO_RESUME
@@ -11,8 +10,8 @@ import com.github.aakumykov.common.constants.SERVER_PAUSED
 import com.github.aakumykov.common.constants.SERVER_RESUMED
 import com.github.aakumykov.common.constants.TARGET_APP_IS_ACTIVE
 import com.github.aakumykov.common.constants.TARGET_APP_IS_INACTIVE
+import com.github.aakumykov.common.utils.TimestampSupplier
 import com.github.aakumykov.data_model.LogMessage
-import com.github.aakumykov.data_model.utils.TimestampSupplier
 import com.github.aakumykov.kotlin_playground.UserGesture
 import com.gitlab.aakumykov.exception_utils_module.ExceptionUtils
 import com.google.gson.Gson
@@ -29,16 +28,19 @@ import kotlinx.coroutines.channels.ClosedReceiveChannelException
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
+import javax.inject.Inject
 
 /**
  * Получает [UserGesture] от GestureServer-а,
  * публикует их для своих пользователей.
  */
-class GestureClient private constructor(
+class GestureClient @Inject constructor(
     private val gson: Gson,
-    private val ktorStateProvider: KtorStateProvider,
-): ClientStateProvider by ktorStateProvider {
-
+    private val clientStateProvider: ClientStateProvider,
+    private val timestampSupplier: TimestampSupplier
+)
+    : ClientStateProvider by clientStateProvider
+{
     private var currentSession: ClientWebSocketSession? = null
 
 
@@ -46,9 +48,9 @@ class GestureClient private constructor(
     val userGestures: SharedFlow<UserGesture?> = _userGestureFlow
 
 
-    val currentState: ClientState get() = KtorStateProvider.getState()
+    val currentState: ClientState get() = clientStateProvider.getState()
 
-    val currentError: Exception? get() = KtorStateProvider.getError()
+    val currentError: Exception? get() = clientStateProvider.getError()
 
 
     private val client by lazy {
@@ -173,14 +175,14 @@ class GestureClient private constructor(
 
     private suspend fun logErrorToServer(e: Exception) {
         sendLogMessage(
-            LogMessage.create("ОШИБКА РАЗБОРА ЖЕСТА: "+ExceptionUtils.getErrorMessage(e), TimestampSupplier.get())
+            LogMessage.create("ОШИБКА РАЗБОРА ЖЕСТА: "+ExceptionUtils.getErrorMessage(e), timestampSupplier.get())
         )
     }
 
 
     private suspend fun logUserGestureToServer(userGesture: UserGesture) {
         sendLogMessage(
-            LogMessage.create("Клиент получил жест: $userGesture", TimestampSupplier.get())
+            LogMessage.create("Клиент получил жест: $userGesture", timestampSupplier.get())
         )
     }
 
@@ -195,13 +197,13 @@ class GestureClient private constructor(
 
 
     private suspend fun publishState(clientState: ClientState) {
-        KtorStateProvider.setState(clientState)
+        clientStateProvider.setState(clientState)
     }
 
 
     private suspend fun publishError(e: Exception) {
-        KtorStateProvider.setState(ClientState.ERROR)
-        KtorStateProvider.setError(e)
+        clientStateProvider.setState(ClientState.ERROR)
+        clientStateProvider.setError(e)
     }
 
 
@@ -226,17 +228,7 @@ class GestureClient private constructor(
         }
     }
 
-
     companion object {
         val TAG: String = GestureClient::class.java.simpleName
-
-        private var _ourInstance: GestureClient? = null
-
-        // TODO: заменить на встроенную реализацию Singleton или сделать её через Dagger.
-        fun getInstance(gson: Gson, ktorStateProvider: KtorStateProvider): GestureClient {
-            if (null == _ourInstance)
-                _ourInstance = GestureClient(gson, ktorStateProvider)
-            return _ourInstance!!
-        }
     }
 }

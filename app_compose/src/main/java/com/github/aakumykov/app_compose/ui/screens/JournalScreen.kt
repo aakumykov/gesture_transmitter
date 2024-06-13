@@ -1,8 +1,7 @@
 package com.github.aakumykov.app_compose.ui.screens
 
-import android.util.Log
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -70,4 +69,14 @@ fun LogLines(
             }
         }
     }
+}
+
+fun rowText(logMessage: LogMessage): String {
+    return "${timestampToTime(logMessage.timestamp)}, ${logMessage.message}"
+}
+
+@SuppressLint("SimpleDateFormat")
+fun timestampToTime(ts: Long): String {
+    return SimpleDateFormat("dd.MM.LL hh:mm:ss")
+        .format(Date(ts))
 }

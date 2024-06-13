@@ -29,7 +29,7 @@ import com.github.aakumykov.client.client_state_provider.ClientState
 import com.github.aakumykov.client.extensions.isAccessibilityServiceEnabled
 import com.github.aakumykov.client.extensions.openAccessibilitySettings
 import com.github.aakumykov.client.gesture_client.GestureClient
-import com.github.aakumykov.common.settings_provider.SettingsProvider
+import com.github.aakumykov.settings_provider.SettingsProvider
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNotNull

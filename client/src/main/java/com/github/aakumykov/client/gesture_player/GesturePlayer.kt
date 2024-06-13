@@ -4,9 +4,13 @@ import android.accessibilityservice.AccessibilityService
 import android.accessibilityservice.GestureDescription
 import android.util.Log
 import com.github.aakumykov.kotlin_playground.UserGesture
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
 
-class GesturePlayer(private val accessibilityService: AccessibilityService) {
-
+// TODO: сюда тоже добавить GestureLogger...
+class GesturePlayer @AssistedInject constructor(
+    @Assisted private val accService: AccessibilityService
+) {
     private var lastGesture: UserGesture? = null
 
     fun playGesture(userGesture: UserGesture) {
@@ -16,7 +20,7 @@ class GesturePlayer(private val accessibilityService: AccessibilityService) {
         lastGesture = userGesture
 
         userGesture.createGestureDescription()?.also { gestureDescription ->
-            accessibilityService.dispatchGesture(
+            accService.dispatchGesture(
                 gestureDescription,
                 gestureResultCallback,
                 null

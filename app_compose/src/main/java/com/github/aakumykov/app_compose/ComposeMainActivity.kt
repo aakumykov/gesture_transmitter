@@ -20,19 +20,19 @@ import com.github.aakumykov.app_compose.ui.screens.ServerScreen
 import com.github.aakumykov.app_compose.ui.screens.WelcomeScreen
 import com.github.aakumykov.client.client_state_provider.KtorStateProvider
 import com.github.aakumykov.client.gesture_client.GestureClient
-import com.github.aakumykov.common.settings_provider.SettingsProvider
-import com.github.aakumykov.data_model.utils.TimestampSupplier
+import com.github.aakumykov.settings_provider.SettingsProvider
+import com.github.aakumykov.common.utils.TimestampSupplier
 import com.github.aakumykov.app_compose.ui.screens.SettingsScreen
-import com.github.aakumykov.common.utils.LocalNetworkAddressDetector
+import com.github.aakumykov.common.di.annotations.IODispatcher
 import com.github.aakumykov.server.GestureRecorder
-import com.github.aakumykov.server.gesture_logger.RoomGestureLogger
+import com.github.aakumykov.logger.gesture_logger.RoomGestureLogger
 import com.github.aakumykov.server.GestureServer
-import com.github.aakumykov.server.gesture_logger.GestureLogReader
-import com.github.aakumykov.server.gesture_logger.GestureLogger
-import com.github.aakumykov.server.logDatabase
-import com.github.aakumykov.server.log_database.LoggingRepository
+import com.github.aakumykov.logger.gesture_logger.GestureLogReader
+import com.github.aakumykov.logger.loggingDatabase
 import com.google.gson.Gson
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
+import javax.inject.Inject
 
 const val DESTINATION_WELCOME = "DESTINATION_WELCOME"
 const val DESTINATION_CLIENT = "DESTINATION_CLIENT"
@@ -48,48 +48,35 @@ class ComposeMainActivity : ComponentActivity() {
     // Демонстрация владения технологией здесь: https://github.com/aakumykov/cloud_sync/tree/master/app/src/main/java/com/github/aakumykov/sync_dir_to_cloud/di
     //
 
-    private val gestureRecorder by lazy { GestureRecorder }
+    @Inject
+    protected lateinit var gestureRecorder: GestureRecorder
 
-    private val gson: Gson by lazy { Gson() }
+    @Inject
+    @IODispatcher
+    protected lateinit var ioDispatcher: CoroutineDispatcher
 
-    private val timestampSupplier by lazy { TimestampSupplier }
+    @Inject
+    protected lateinit var roomGestureLogger: RoomGestureLogger
 
-    private val loggingMessageDAO by lazy { logDatabase.getLogMessageDAO() }
+    @Inject
+    protected lateinit var gestureLogReader: GestureLogReader
 
-    private val ioDispatcher by lazy { Dispatchers.IO }
+    @Inject
+    protected lateinit var settingsProvider: SettingsProvider
 
+    @Inject
+    protected lateinit var gestureServer: GestureServer
 
-    private val loggingRepository by lazy {
-        LoggingRepository(loggingMessageDAO, ioDispatcher)
-    }
-
-    private val roomGestureLogger by lazy {
-        RoomGestureLogger(loggingRepository)
-    }
-
-    private val gestureLogReader: GestureLogReader by lazy {
-        roomGestureLogger
-    }
-
-    private val settingsProvider: SettingsProvider by lazy {
-        SettingsProvider.getInstance(App.appContext, LocalNetworkAddressDetector)
-    }
-
-    private val ktorStateProvider by lazy { KtorStateProvider }
-
-    private val gestureServer: GestureServer by lazy {
-        GestureServer(gson, roomGestureLogger, timestampSupplier)
-    }
-
-    private val gestureClient: GestureClient by lazy {
-        GestureClient.getInstance(gson, ktorStateProvider)
-    }
+    @Inject
+    protected lateinit var gestureClient: GestureClient
 
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+        App.appComponent.injectToComposeMainActivity(this)
 
         setContent {
 

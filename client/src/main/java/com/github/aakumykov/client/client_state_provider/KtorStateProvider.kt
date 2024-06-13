@@ -8,13 +8,15 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 
 interface ClientStateProvider {
+    fun getState(): ClientState
+    fun getError(): Exception?
     suspend fun setError(e: Exception)
     suspend fun setState(clientState: ClientState)
     val state: SharedFlow<ClientState>
     val errorsFlow: SharedFlow<Exception?>
 }
 
-object KtorStateProvider : ClientStateProvider {
+class KtorStateProvider : ClientStateProvider {
 
     private val _stateFlow: MutableSharedFlow<ClientState> = MutableStateFlow(ClientState.INACTIVE)
     private val _errorFlow: MutableSharedFlow<Exception?> = MutableStateFlow(null)
@@ -30,13 +32,13 @@ object KtorStateProvider : ClientStateProvider {
         _errorFlow.emit(e)
     }
 
-    fun getState(): ClientState {
+    override fun getState(): ClientState {
         return runBlocking(Dispatchers.IO) {
             state.first()
         }
     }
 
-    fun getError(): Exception? {
+    override fun getError(): Exception? {
         return runBlocking(Dispatchers.IO) {
             errorsFlow.first()
         }

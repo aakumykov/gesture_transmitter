@@ -36,17 +36,13 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.time.Duration
 import java.util.UUID
+import javax.inject.Inject
 
-//
-// В сервер нужно добавить подключаемые обработчикии 
-// входящих сообщений. Это сделает его гибким.
-//
-class GestureServer(
+class GestureServer @Inject constructor(
     private val gson: Gson,
-    private val gestureLogger: GestureLogger,
-    private val timestampSupplier: Supplier<Long>
+    private val gestureLogWriter: GestureLogWriter,
+    private val timestampSupplier: TimestampSupplier
 ) {
-
     private var onPause: Boolean = false
 
     private var targetAppIsActive: Boolean = false
