@@ -14,7 +14,7 @@ class RoomGestureLogger @Inject constructor(
         loggingRepository.addLogMessage(logMessage)
     }
 
-    override suspend fun getLogMessages(): Flow<LogMessage> {
+    override suspend fun getLogMessages(): List<LogMessage> {
         return loggingRepository.getLogMessages()
     }
 }

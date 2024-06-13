@@ -34,7 +34,7 @@ fun JournalScreen(
 
     LaunchedEffect(Unit) {
         gestureLogReader.getLogMessages().also {
-//            content.addAll(it)
+            content.addAll(it)
         }
     }
 

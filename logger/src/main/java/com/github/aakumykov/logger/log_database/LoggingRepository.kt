@@ -17,7 +17,7 @@ class LoggingRepository @Inject constructor(
         }
     }
 
-    suspend fun getLogMessages(): Flow<LogMessage> {
+    suspend fun getLogMessages(): List<LogMessage> {
         return withContext(executionDispatcher) {
             logMessageDAO.getLogMessages()
         }

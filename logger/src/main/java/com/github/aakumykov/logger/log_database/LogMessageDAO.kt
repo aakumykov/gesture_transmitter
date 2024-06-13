@@ -13,10 +13,7 @@ interface LogMessageDAO {
     suspend fun addLogMessage(logMessage: LogMessage)
 
     @Query("SELECT * FROM log_messages")
-    fun getLogMessages(): Flow<LogMessage>
-
-    @Query("SELECT * FROM log_messages")
-    fun getLogMessagesAsList(): List<LogMessage>
+    fun getLogMessages(): List<LogMessage>
 
     @Query("DELETE FROM log_messages")
     suspend fun deleteAll()
