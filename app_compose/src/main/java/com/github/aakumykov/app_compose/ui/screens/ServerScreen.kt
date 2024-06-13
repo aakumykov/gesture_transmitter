@@ -13,6 +13,9 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -21,12 +24,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.github.aakumykov.app_compose.R
 import com.github.aakumykov.app_compose.funstions.notifications.showToast
+import com.github.aakumykov.app_compose.ui.gui_elements.client.TextInfoView
 import com.github.aakumykov.app_compose.ui.gui_elements.shared.IpAddressView
 import com.github.aakumykov.app_compose.ui.gui_elements.shared.SimpleButton
 import com.github.aakumykov.common.settings_provider.SettingsProvider
 import com.github.aakumykov.common.utils.inMainThread
 import com.github.aakumykov.server.GestureRecorder
 import com.github.aakumykov.server.GestureServer
+import com.github.aakumykov.server.state.ServerState
 import com.gitlab.aakumykov.exception_utils_module.ExceptionUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.filterNotNull
@@ -63,6 +68,18 @@ fun ServerScreen(
         }
     }
 
+
+    val serverState: MutableState<ServerState> = remember { mutableStateOf(ServerState.Unknown) }
+
+    LaunchedEffect(Unit) {
+        scope.launch(Dispatchers.IO) {
+            gestureServer.state.collect {
+                serverState.value = it
+            }
+        }
+    }
+
+
     Column {
 
         SimpleButton(
@@ -77,9 +94,11 @@ fun ServerScreen(
         )
 
         IpAddressView(
-            messagePrefix = "IP-адрес сервера",
-            settingsProvider = settingsProvider
+            messagePrefix = "Сохранённый IP-адрес: ",
+            settingsProvider = settingsProvider,
         )
+
+        TextInfoView("Статус сервера: ${serverStateToString(serverState.value)}",)
 
         SimpleButton(
             text = "Запустить сервер",
@@ -136,5 +155,18 @@ fun ServerScreen(
 
             }
         )
+    }
+}
+
+
+fun serverStateToString(state: ServerState): String {
+    return when(state) {
+        ServerState.Unknown -> "неизвестен"
+        ServerState.Stopped -> "остановлен"
+        ServerState.Running -> "запущён"
+        ServerState.Paused -> "приостановлен"
+        is ServerState.Error -> {
+            "ОШИБКА: ${ExceptionUtils.getErrorMessage(state.error)}"
+        }
     }
 }

@@ -12,6 +12,7 @@ import com.github.aakumykov.common.utils.TimestampSupplier
 import com.github.aakumykov.data_model.LogMessage
 import com.github.aakumykov.kotlin_playground.UserGesture
 import com.github.aakumykov.logger.gesture_logger.GestureLogWriter
+import com.github.aakumykov.server.state.ServerState
 import com.gitlab.aakumykov.exception_utils_module.ExceptionUtils
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
@@ -33,6 +34,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.ClosedReceiveChannelException
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import java.time.Duration
 import java.util.Collections
@@ -44,6 +47,13 @@ class GestureServer @Inject constructor(
     private val gestureLogWriter: GestureLogWriter,
     private val timestampSupplier: TimestampSupplier
 ) {
+    val state: StateFlow<ServerState> get() = _state
+    private val _state: MutableStateFlow<ServerState> = MutableStateFlow(ServerState.Stopped)
+
+    private suspend fun publishState(serverState: ServerState) {
+        _state.emit(serverState)
+    }
+
     private var onPause: Boolean = false
 
     private var targetAppIsActive: Boolean = false
@@ -108,7 +118,9 @@ class GestureServer @Inject constructor(
                     }
                 }
             }
-        }.start(wait = true)
+        }.start(wait = false)
+
+        publishState(ServerState.Running)
     }
 
     private suspend fun closeSession(connectionId: String, reasonMessage: String) {
@@ -166,11 +178,13 @@ class GestureServer @Inject constructor(
     private suspend fun processResumeRequest() {
         onPause = false
         sendText(SERVER_RESUMED)
+        publishState(ServerState.Running)
     }
 
     private suspend fun processPauseRequest() {
         onPause = true
         sendText(SERVER_PAUSED)
+        publishState(ServerState.Paused)
     }
 
     private suspend fun sendText(text: String) {
