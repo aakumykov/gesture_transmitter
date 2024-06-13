@@ -25,9 +25,7 @@ import io.ktor.server.websocket.WebSockets
 import io.ktor.server.websocket.pingPeriod
 import io.ktor.server.websocket.timeout
 import io.ktor.server.websocket.webSocketRaw
-import io.ktor.websocket.CloseReason
 import io.ktor.websocket.Frame
-import io.ktor.websocket.close
 import io.ktor.websocket.readText
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -35,6 +33,7 @@ import kotlinx.coroutines.channels.ClosedReceiveChannelException
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.time.Duration
+import java.util.Collections
 import java.util.UUID
 import javax.inject.Inject
 
@@ -52,10 +51,7 @@ class GestureServer @Inject constructor(
 
     private var runningServer: ApplicationEngine? = null
 
-    private var serverSession: WebSocketServerSession? = null
-
-    private val sessionHashCode: String
-        get() = "session.hashCode: [${(serverSession?.hashCode() ?: "нет сессии")}]"
+    private val sessions = Collections.synchronizedList<WebSocketServerSession>(ArrayList())
 
 
     suspend fun start(address: String, port: Int, path: String) {
@@ -83,8 +79,8 @@ class GestureServer @Inject constructor(
             routing {
                 webSocketRaw(path = path) {
 
-                    serverSession = this
-                    Log.d(TAG, "Новое подключение $sessionHashCode")
+                    sessions.add(this)
+                    Log.d(TAG, "Новое подключение (hashCode: ${this.hashCode()})")
 
                     try {
                         for (frame in incoming) {
@@ -111,8 +107,8 @@ class GestureServer @Inject constructor(
 
     private suspend fun closeSession(reasonMessage: String) {
         Log.d(TAG, "closeSession('$reasonMessage')")
-        serverSession?.close(CloseReason(CloseReason.Codes.NORMAL, reasonMessage))
-        serverSession = null
+//        serverSession?.close(CloseReason(CloseReason.Codes.NORMAL, reasonMessage))
+//        serverSession = null
     }
 
 
@@ -169,23 +165,25 @@ class GestureServer @Inject constructor(
     }
 
     private suspend fun sendText(text: String) {
-        try {
-            serverSession?.outgoing?.send(Frame.Text(text))
-                ?: throw IllegalStateException("serverSession == null")
-        }
-        catch (e: Exception) {
-            Log.e(TAG, ExceptionUtils.getErrorMessage(e), e)
+        sessions.forEach {
+            try {
+                it?.outgoing?.send(Frame.Text(text))
+                    ?: throw IllegalStateException("serverSession == null")
+            }
+            catch (e: Exception) {
+                Log.e(TAG, ExceptionUtils.getErrorMessage(e), e)
+            }
         }
     }
 
 
     suspend fun sendUserGesture(gesture: UserGesture) {
-        Log.d(TAG, "sendUserGesture() [$sessionHashCode], $gesture")
+        Log.d(TAG, "sendUserGesture(), $gesture")
 
         if (shouldTransmitGestures) {
             val gestureJson = gson.toJson(gesture)
 
-            if (null != serverSession) {
+            if (0 == sessions.size) {
                 sendText(gestureJson)
                 Log.d(TAG, "Жест отправлен: $gesture")
             } else {
