@@ -38,11 +38,6 @@ const val DESTINATION_JOURNAL = "DESTINATION_JOURNAL"
 
 class ComposeMainActivity : ComponentActivity() {
 
-    //
-    // Монструозное ручное внедрение зависимостей, так как перейти на Dagger2 я не успел.
-    // Демонстрация владения технологией здесь: https://github.com/aakumykov/cloud_sync/tree/master/app/src/main/java/com/github/aakumykov/sync_dir_to_cloud/di
-    //
-
     @Inject
     protected lateinit var gestureRecorder: GestureRecorder
 
