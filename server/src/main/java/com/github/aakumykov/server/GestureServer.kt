@@ -36,7 +36,9 @@ import kotlinx.coroutines.channels.ClosedReceiveChannelException
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.time.Duration
 import java.util.Collections
 import java.util.UUID
@@ -231,6 +233,11 @@ class GestureServer @Inject constructor(
         Log.d(TAG, "...сервер, вероятно, остановлен.")
     }
 
+    suspend fun isRunning(): Boolean {
+        return runBlocking {
+            state.firstOrNull() is ServerState.Running
+        }
+    }
 
 
     companion object {

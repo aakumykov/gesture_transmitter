@@ -1,6 +1,7 @@
 package com.github.aakumykov.app_compose.ui.screens
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.util.Log
 import android.view.Gravity
 import android.view.MotionEvent
@@ -34,10 +35,11 @@ import com.github.aakumykov.server.GestureRecorder
 import com.github.aakumykov.server.GestureServer
 import com.github.aakumykov.server.state.ServerState
 import com.gitlab.aakumykov.exception_utils_module.ExceptionUtils
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 @SuppressLint("ClickableViewAccessibility")
 @Composable
@@ -107,24 +109,7 @@ fun ServerScreen(
         SimpleButton(
             text = "Запустить сервер",
             bgColor = colorResource(R.color.button_start_server),
-            onClick = {
-                scope.launch {
-                    withContext((Dispatchers.IO)) {
-                        try {
-                            gestureServer.start(
-                                settingsProvider.getIpAddress(),
-                                settingsProvider.getPort(),
-                                settingsProvider.getPath()
-                            )
-                        } catch (e: Exception) {
-                            ExceptionUtils.getErrorMessage(e).also {
-                                inMainThread { showToast(context, it) }
-                                Log.e(LOG_TAG, it, e);
-                            }
-                        }
-                    }
-                }
-            }
+            onClick = { startServer(context, scope, gestureServer, settingsProvider, LOG_TAG) }
         )
 
         SimpleButton(
@@ -161,6 +146,38 @@ fun ServerScreen(
 
             }
         )
+    }
+}
+
+fun startServer(
+    context: Context,
+    scope: CoroutineScope,
+    gestureServer: GestureServer,
+    settingsProvider: SettingsProvider,
+    loggingTag: String
+) {
+    scope.launch {
+        coroutineScope {
+            launch(Dispatchers.IO) {
+                try {
+                    if (gestureServer.isRunning()) {
+                        showToast(context, "уже запущен")
+                    }
+                    else {
+                        gestureServer.start(
+                            settingsProvider.getIpAddress(),
+                            settingsProvider.getPort(),
+                            settingsProvider.getPath()
+                        )
+                    }
+                } catch (e: Exception) {
+                    ExceptionUtils.getErrorMessage(e).also {
+                        inMainThread { showToast(context, it) }
+                        Log.e(loggingTag, it, e);
+                    }
+                }
+            }
+        }
     }
 }
 
