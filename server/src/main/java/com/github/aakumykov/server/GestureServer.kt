@@ -30,14 +30,11 @@ import io.ktor.websocket.CloseReason
 import io.ktor.websocket.Frame
 import io.ktor.websocket.close
 import io.ktor.websocket.readText
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.ClosedReceiveChannelException
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.time.Duration
 import java.util.Collections
@@ -56,16 +53,18 @@ class GestureServer @Inject constructor(
         _state.emit(serverState)
     }
 
-    private var onPause: Boolean = false
-
-    private var targetAppIsActive: Boolean = false
-
-    private val shouldTransmitGestures: Boolean
-        get() = (!onPause && targetAppIsActive)
+    private val sessionsMap = Collections.synchronizedMap(HashMap<String,WebSocketServerSession>())
+    private val clientIsOnPauseMap = Collections.synchronizedMap(HashMap<String,Boolean>())
+    private val scrolledAppIsActiveOnClientMap = Collections.synchronizedMap(HashMap<String,Boolean>())
+    
+    private fun shouldTransmitGestures(clientId: String): Boolean {
+        val clientIsPaused = clientIsOnPauseMap[clientId] ?: false
+        val scrolledAppIsActive = scrolledAppIsActiveOnClientMap[clientId] ?: false
+        return !clientIsPaused && scrolledAppIsActive
+    }
 
     private var runningServer: ApplicationEngine? = null
 
-    private val sessionsMap = Collections.synchronizedMap(HashMap<String,WebSocketServerSession>())
 
     suspend fun start(address: String, port: Int, path: String) {
 
@@ -116,7 +115,7 @@ class GestureServer @Inject constructor(
                         Log.d(TAG, "Закрытие соединения")
                     }
                     catch (t: Throwable) {
-                        Log.e(TAG, "ОШИБКА: "+ExceptionUtils.getErrorMessage(t), t);
+                        Log.e(TAG, "ОШИБКА: "+ExceptionUtils.getErrorMessage(t), t)
                     }
                 }
             }
@@ -135,20 +134,20 @@ class GestureServer @Inject constructor(
     }
 
 
-    private suspend fun processTextFrame(connectionId: String, textFrame: Frame.Text) {
+    private suspend fun processTextFrame(clientId: String, textFrame: Frame.Text) {
         textFrame.readText().also { text ->
             when(text) {
-                CLIENT_WANTS_TO_DISCONNECT -> closeSession(connectionId, CLIENT_WANTS_TO_DISCONNECT)
-                CLIENT_WANTS_TO_PAUSE -> { processPauseRequest() }
-                CLIENT_WANTS_TO_RESUME -> { processResumeRequest() }
-                TARGET_APP_IS_ACTIVE -> { onTargetAppActivated() }
-                TARGET_APP_IS_INACTIVE -> { onTargetAppDeactivated() }
+                CLIENT_WANTS_TO_DISCONNECT -> closeSession(clientId, CLIENT_WANTS_TO_DISCONNECT)
+                CLIENT_WANTS_TO_PAUSE -> { processPauseRequest(clientId) }
+                CLIENT_WANTS_TO_RESUME -> { processResumeRequest(clientId) }
+                TARGET_APP_IS_ACTIVE -> { onScrolledAppActivated(clientId) }
+                TARGET_APP_IS_INACTIVE -> { onScrolledAppDeactivated(clientId) }
                 else -> { processLogMessage(text) }
             }
         }
     }
 
-    private fun processLogMessage(text: String) {
+    private suspend fun processLogMessage(text: String) {
 
         val logMessage: LogMessage = try {
             gson.fromJson(text, LogMessage::class.java)
@@ -162,40 +161,36 @@ class GestureServer @Inject constructor(
             )
         }
 
-        CoroutineScope(Dispatchers.IO).launch {
-            gestureLogWriter.writeToLog(logMessage)
-        }
+        gestureLogWriter.writeToLog(logMessage)
     }
 
-    private fun onTargetAppActivated() {
+    private fun onScrolledAppActivated(clientId: String) {
         Log.d(TAG, "onTargetAppActivated()")
-        targetAppIsActive = true
+        scrolledAppIsActiveOnClientMap[clientId] = true
     }
 
-    private fun onTargetAppDeactivated() {
+    private fun onScrolledAppDeactivated(clientId: String) {
         Log.d(TAG, "onTargetAppDeactivated()")
-        targetAppIsActive = false
+        scrolledAppIsActiveOnClientMap[clientId] = false
     }
 
-    private suspend fun processResumeRequest() {
-        onPause = false
-        sendText(SERVER_RESUMED)
+    private suspend fun processResumeRequest(clientId: String) {
+        clientIsOnPauseMap[clientId] = false
+        sendText(clientId, SERVER_RESUMED)
         publishState(ServerState.Started)
     }
 
-    private suspend fun processPauseRequest() {
-        onPause = true
-        sendText(SERVER_PAUSED)
+    private suspend fun processPauseRequest(clientId: String) {
+        clientIsOnPauseMap[clientId] = true
+        sendText(clientId, SERVER_PAUSED)
         publishState(ServerState.Paused)
     }
 
-    private suspend fun sendText(text: String) {
-        sessionsMap.values.forEach {
+    private suspend fun sendText(clientId: String, text: String) {
+        sessionsMap[clientId]?.apply {
             try {
-                it?.outgoing?.send(Frame.Text(text))
-                    ?: throw IllegalStateException("serverSession == null")
-            }
-            catch (e: Exception) {
+               outgoing.send(Frame.Text(text))
+            } catch (e: Exception) {
                 Log.e(TAG, ExceptionUtils.getErrorMessage(e), e)
             }
         }
@@ -205,34 +200,35 @@ class GestureServer @Inject constructor(
     suspend fun sendUserGesture(gesture: UserGesture) {
         Log.d(TAG, "sendUserGesture(), $gesture")
 
-        if (shouldTransmitGestures) {
-            val gestureJson = gson.toJson(gesture)
-
-            if (sessionsMap.isNotEmpty()) {
-                sendText(gestureJson)
-                Log.d(TAG, "Жест отправлен: $gesture")
-            } else {
-                Log.e(TAG, "Жест не отправлен: некому отправлять.")
+        sessionsMap.keys.forEach { clientId ->  
+            if (shouldTransmitGestures(clientId)) {
+                sendText(clientId, gson.toJson(gesture))
+                Log.d(TAG, "Жест отправлен клиенту $clientId")
             }
-        }
-        else {
-            // TODO: писать в журнал
-            Log.d(TAG, "Нет условий для передачи жеста: targetAppIsActive=$targetAppIsActive, onPause=$onPause")
         }
     }
 
 
+    // TODO: что с сессиями?
     suspend fun stop(gracePeriodMillis: Long = 1000, timeoutMillis: Long = 2000) {
 
         publishState(ServerState.StoppingNow)
-        Log.d(TAG, "Останов сервера с ожиданием ${timeoutMillis} мс...")
+        Log.d(TAG, "Останов сервера с ожиданием $timeoutMillis мс...")
+
+        closeAllSessions()
 
         runningServer?.stop(gracePeriodMillis, timeoutMillis)
         delay(gracePeriodMillis + timeoutMillis)
         runningServer = null
 
         publishState(ServerState.Stopped)
-        Log.d(TAG, "...сервер, вероятно, остановлен.")
+        Log.d(TAG, "...сервер остановлен.")
+    }
+
+    private suspend fun closeAllSessions() {
+        sessionsMap.values.forEach { session ->
+            session.close(CloseReason(CloseReason.Codes.GOING_AWAY, "Сервер завершает работу"))
+        }
     }
 
     suspend fun notRunningNow(): Boolean {
