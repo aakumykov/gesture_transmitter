@@ -9,7 +9,7 @@ android {
     compileSdk 34
 
     defaultConfig {
-        applicationId "com.github.aakumykov.app_compose"
+        applicationId "com.github.aakumykov.gesture_transmitter"
         minSdk 26
         targetSdk 34
         versionCode 1
