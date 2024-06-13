@@ -183,7 +183,7 @@ class GestureServer @Inject constructor(
         if (shouldTransmitGestures) {
             val gestureJson = gson.toJson(gesture)
 
-            if (0 == sessions.size) {
+            if (sessions.size > 0) {
                 sendText(gestureJson)
                 Log.d(TAG, "Жест отправлен: $gesture")
             } else {
