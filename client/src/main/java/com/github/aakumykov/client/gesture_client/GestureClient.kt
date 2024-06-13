@@ -10,6 +10,7 @@ import com.github.aakumykov.common.constants.SERVER_PAUSED
 import com.github.aakumykov.common.constants.SERVER_RESUMED
 import com.github.aakumykov.common.constants.TARGET_APP_IS_ACTIVE
 import com.github.aakumykov.common.constants.TARGET_APP_IS_INACTIVE
+import com.github.aakumykov.common.di.annotations.ClientScope
 import com.github.aakumykov.common.utils.TimestampSupplier
 import com.github.aakumykov.data_model.LogMessage
 import com.github.aakumykov.kotlin_playground.UserGesture
@@ -34,6 +35,7 @@ import javax.inject.Inject
  * Получает [UserGesture] от GestureServer-а,
  * публикует их для своих пользователей.
  */
+@ClientScope
 class GestureClient @Inject constructor(
     private val gson: Gson,
     private val clientStateProvider: ClientStateProvider,
