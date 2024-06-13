@@ -42,7 +42,7 @@ class UserGesture private constructor(
     }
 
     override fun toString(): String {
-        return UserGesture::class.java.simpleName + " { ${pointList.size} точек, длительность ${endingTime-startingTime} мс }"
+        return UserGesture::class.java.simpleName + " { ${pointList.size} точек, длительностью ${endingTime-startingTime} мс }"
     }
 
     companion object {
