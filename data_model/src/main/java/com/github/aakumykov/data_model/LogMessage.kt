@@ -1,9 +1,7 @@
 package com.github.aakumykov.data_model
 
-import android.annotation.SuppressLint
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.github.aakumykov.data_model.utils.TimestampSupplier
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.UUID

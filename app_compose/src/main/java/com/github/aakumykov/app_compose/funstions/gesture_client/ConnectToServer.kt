@@ -5,13 +5,13 @@ import com.github.aakumykov.app_compose.funstions.notifications.showToast
 import com.github.aakumykov.client.R
 import com.github.aakumykov.client.client_state_provider.ClientState
 import com.github.aakumykov.client.gesture_client.GestureClient
-import com.github.aakumykov.settings_provider.SettingsProvider
+import com.github.aakumykov.common.settings_provider.SettingsProvider
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 
 fun connectToServer(
     gestureClient: GestureClient,
-    settingsProvider: com.github.aakumykov.settings_provider.SettingsProvider,
+    settingsProvider: SettingsProvider,
     coroutineScope: CoroutineScope,
     coroutineDispatcher: CoroutineDispatcher
 ) {

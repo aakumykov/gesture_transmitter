@@ -2,6 +2,7 @@ package com.github.aakumykov.app_compose.ui.screens
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -19,7 +20,9 @@ import androidx.compose.ui.unit.sp
 import com.github.aakumykov.app_compose.R
 import com.github.aakumykov.app_compose.ui.gui_elements.shared.SimpleButton
 import com.github.aakumykov.data_model.LogMessage
-import com.github.aakumykov.server.gesture_logger.GestureLogReader
+import com.github.aakumykov.logger.gesture_logger.GestureLogReader
+import java.text.SimpleDateFormat
+import java.util.Date
 
 @Composable
 fun JournalScreen(
@@ -27,12 +30,11 @@ fun JournalScreen(
     onBackButtonClicked: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val LOG_TAG = "JournalScreen"
     val content = remember { mutableStateListOf<LogMessage>() }
 
     LaunchedEffect(Unit) {
-        gestureLogReader.getLogMessagesAsList().also {
-            content.addAll(it)
+        gestureLogReader.getLogMessages().also {
+//            content.addAll(it)
         }
     }
 

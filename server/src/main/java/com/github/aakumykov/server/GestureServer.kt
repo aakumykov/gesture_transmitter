@@ -1,7 +1,6 @@
 package com.github.aakumykov.server
 
 import android.util.Log
-import androidx.core.util.Supplier
 import com.github.aakumykov.common.constants.CLIENT_WANTS_TO_DISCONNECT
 import com.github.aakumykov.common.constants.CLIENT_WANTS_TO_PAUSE
 import com.github.aakumykov.common.constants.CLIENT_WANTS_TO_RESUME
@@ -9,9 +8,10 @@ import com.github.aakumykov.common.constants.SERVER_PAUSED
 import com.github.aakumykov.common.constants.SERVER_RESUMED
 import com.github.aakumykov.common.constants.TARGET_APP_IS_ACTIVE
 import com.github.aakumykov.common.constants.TARGET_APP_IS_INACTIVE
+import com.github.aakumykov.common.utils.TimestampSupplier
 import com.github.aakumykov.data_model.LogMessage
 import com.github.aakumykov.kotlin_playground.UserGesture
-import com.github.aakumykov.server.gesture_logger.GestureLogger
+import com.github.aakumykov.logger.gesture_logger.GestureLogWriter
 import com.gitlab.aakumykov.exception_utils_module.ExceptionUtils
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
@@ -144,7 +144,7 @@ class GestureServer @Inject constructor(
         }
 
         CoroutineScope(Dispatchers.IO).launch {
-            gestureLogger.log(logMessage)
+            gestureLogWriter.writeToLog(logMessage)
         }
     }
 

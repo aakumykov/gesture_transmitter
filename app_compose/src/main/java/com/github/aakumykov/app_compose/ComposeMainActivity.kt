@@ -17,21 +17,16 @@ import androidx.navigation.compose.rememberNavController
 import com.github.aakumykov.app_compose.ui.screens.ClientScreen
 import com.github.aakumykov.app_compose.ui.screens.JournalScreen
 import com.github.aakumykov.app_compose.ui.screens.ServerScreen
-import com.github.aakumykov.app_compose.ui.screens.WelcomeScreen
-import com.github.aakumykov.client.client_state_provider.KtorStateProvider
-import com.github.aakumykov.client.gesture_client.GestureClient
-import com.github.aakumykov.settings_provider.SettingsProvider
-import com.github.aakumykov.common.utils.TimestampSupplier
 import com.github.aakumykov.app_compose.ui.screens.SettingsScreen
+import com.github.aakumykov.app_compose.ui.screens.WelcomeScreen
+import com.github.aakumykov.client.gesture_client.GestureClient
 import com.github.aakumykov.common.di.annotations.IODispatcher
-import com.github.aakumykov.server.GestureRecorder
-import com.github.aakumykov.logger.gesture_logger.RoomGestureLogger
-import com.github.aakumykov.server.GestureServer
+import com.github.aakumykov.common.settings_provider.SettingsProvider
 import com.github.aakumykov.logger.gesture_logger.GestureLogReader
-import com.github.aakumykov.logger.loggingDatabase
-import com.google.gson.Gson
+import com.github.aakumykov.logger.gesture_logger.RoomGestureLogger
+import com.github.aakumykov.server.GestureRecorder
+import com.github.aakumykov.server.GestureServer
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
 import javax.inject.Inject
 
 const val DESTINATION_WELCOME = "DESTINATION_WELCOME"

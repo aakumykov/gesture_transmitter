@@ -10,7 +10,7 @@ class RoomGestureLogger @Inject constructor(
 )
     : GestureLogWriter, GestureLogReader
 {
-    override suspend fun writeToLoca(logMessage: LogMessage) {
+    override suspend fun writeToLog(logMessage: LogMessage) {
         loggingRepository.addLogMessage(logMessage)
     }
 

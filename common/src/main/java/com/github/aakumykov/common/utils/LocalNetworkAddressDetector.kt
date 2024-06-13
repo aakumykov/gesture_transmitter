@@ -1,19 +1,11 @@
 package com.github.aakumykov.common.utils
 
-import com.github.aakumykov.common.config.DEFAULT_SERVER_ADDRESS
 import java.net.NetworkInterface
+import javax.inject.Inject
 
-interface NetworkAddressDetector {
-    fun ipAddressInLocalNetwork(): String?
-}
+class NetworkAddressDetector @Inject constructor() {
 
-object FakeNetworkAddressDetector : NetworkAddressDetector {
-    override fun ipAddressInLocalNetwork(): String = DEFAULT_SERVER_ADDRESS
-}
-
-object LocalNetworkAddressDetector : NetworkAddressDetector {
-
-    override fun ipAddressInLocalNetwork(): String? {
+    fun ipAddressInLocalNetwork(): String? {
         return NetworkInterface.getNetworkInterfaces()
             .iterator()
             .asSequence()

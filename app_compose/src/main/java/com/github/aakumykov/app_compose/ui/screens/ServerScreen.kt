@@ -22,7 +22,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import com.github.aakumykov.app_compose.R
 import com.github.aakumykov.app_compose.funstions.notifications.showToast
 import com.github.aakumykov.app_compose.ui.gui_elements.shared.SimpleButton
-import com.github.aakumykov.settings_provider.SettingsProvider
+import com.github.aakumykov.common.settings_provider.SettingsProvider
 import com.github.aakumykov.common.utils.inMainThread
 import com.github.aakumykov.server.GestureRecorder
 import com.github.aakumykov.server.GestureServer
@@ -36,7 +36,7 @@ import kotlinx.coroutines.launch
 fun ServerScreen(
     onSettingsButtonClicked: () -> Unit,
     onJournalButtonClicked: () -> Unit,
-    settingsProvider: com.github.aakumykov.settings_provider.SettingsProvider,
+    settingsProvider: SettingsProvider,
     gestureServer: GestureServer,
     gestureRecorder: GestureRecorder
 ) {
