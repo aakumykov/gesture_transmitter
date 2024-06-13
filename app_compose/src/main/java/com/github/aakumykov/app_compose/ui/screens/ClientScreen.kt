@@ -1,6 +1,7 @@
 package com.github.aakumykov.app_compose.ui.screens
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -10,11 +11,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import com.github.aakumykov.app_compose.funstions.app_launching.launchGoogleChrome
 import com.github.aakumykov.app_compose.funstions.gesture_client.connectToServer
@@ -108,14 +111,6 @@ fun ClientScreen(
     Column {
 
         SimpleButton(
-            text = accessibilityButtonText(accessibilityButtonText),
-            bgColor = colorResource(com.github.aakumykov.client.R.color.button_acc_service),
-        ) {
-            context.openAccessibilitySettings()
-        }
-
-
-        SimpleButton(
             text = "Настройки",
             bgColor = Color.Blue,
             onClick = onSettingsButtonClicked
@@ -126,6 +121,18 @@ fun ClientScreen(
             messagePrefix = "Настроенный IP-адрес",
             settingsProvider = settingsProvider
         )
+
+
+        //
+        // Кнопка доступа к настройкам поддержки доступности
+        //
+        SimpleButton(
+            text = accessibilityButtonText(accessibilityButtonText),
+            bgColor = colorResource(com.github.aakumykov.client.R.color.button_acc_service),
+            modifier = Modifier.padding(0.dp, 0.dp, 0.dp, bottom = 16.dp)
+        ) {
+            context.openAccessibilitySettings()
+        }
 
 
         SimpleButton(
