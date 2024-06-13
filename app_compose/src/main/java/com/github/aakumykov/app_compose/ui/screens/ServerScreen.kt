@@ -160,10 +160,7 @@ fun startServer(
         coroutineScope {
             launch(Dispatchers.IO) {
                 try {
-                    if (gestureServer.isRunning()) {
-                        showToast(context, "уже запущен")
-                    }
-                    else {
+                    if (gestureServer.notRunningNow()) {
                         gestureServer.start(
                             settingsProvider.getIpAddress(),
                             settingsProvider.getPort(),
@@ -185,8 +182,9 @@ fun startServer(
 fun serverStateToString(state: ServerState): String {
     return when(state) {
         ServerState.Unknown -> "неизвестен"
+        ServerState.StoppingNow -> "останавливается..."
         ServerState.Stopped -> "остановлен"
-        ServerState.Running -> "запущён"
+        ServerState.Started -> "запущён"
         ServerState.Paused -> "приостановлен"
         is ServerState.Error -> {
             "ОШИБКА: ${ExceptionUtils.getErrorMessage(state.error)}"

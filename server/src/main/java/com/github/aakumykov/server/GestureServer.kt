@@ -122,7 +122,7 @@ class GestureServer @Inject constructor(
             }
         }.start(wait = false)
 
-        publishState(ServerState.Running)
+        publishState(ServerState.Started)
     }
 
     private suspend fun closeSession(connectionId: String, reasonMessage: String) {
@@ -180,7 +180,7 @@ class GestureServer @Inject constructor(
     private suspend fun processResumeRequest() {
         onPause = false
         sendText(SERVER_RESUMED)
-        publishState(ServerState.Running)
+        publishState(ServerState.Started)
     }
 
     private suspend fun processPauseRequest() {
@@ -224,18 +224,20 @@ class GestureServer @Inject constructor(
 
     suspend fun stop(gracePeriodMillis: Long = 1000, timeoutMillis: Long = 2000) {
 
+        publishState(ServerState.StoppingNow)
         Log.d(TAG, "Останов сервера с ожиданием ${timeoutMillis} мс...")
 
         runningServer?.stop(gracePeriodMillis, timeoutMillis)
         delay(gracePeriodMillis + timeoutMillis)
         runningServer = null
 
+        publishState(ServerState.Stopped)
         Log.d(TAG, "...сервер, вероятно, остановлен.")
     }
 
-    suspend fun isRunning(): Boolean {
+    suspend fun notRunningNow(): Boolean {
         return runBlocking {
-            state.firstOrNull() is ServerState.Running
+            state.firstOrNull() !is ServerState.Started
         }
     }
 
