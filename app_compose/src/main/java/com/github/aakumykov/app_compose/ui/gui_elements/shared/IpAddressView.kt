@@ -31,9 +31,9 @@ fun IpAddressView(
         }
     }
 
-    val deviceIp: String = deviceIpAddress.value?.let { "ip-адрес устройства: ${it}\n" } ?: ""
+    val deviceIp: String = "ip-адрес устройства: " + (deviceIpAddress.value ?: "НЕ ОПРЕДЕЛЁН")
     val savedIp: String = "${messagePrefix}: ${savedIpAddress.value}"
-    val ipInfo = "${deviceIp}${savedIp}"
+    val ipInfo = "${deviceIp}\n${savedIp}"
 
     TextInfoView(
         text = ipInfo,
