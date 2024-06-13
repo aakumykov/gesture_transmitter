@@ -13,7 +13,9 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
@@ -21,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.github.aakumykov.app_compose.R
 import com.github.aakumykov.app_compose.funstions.notifications.showToast
+import com.github.aakumykov.app_compose.ui.gui_elements.client.TextInfoView
 import com.github.aakumykov.app_compose.ui.gui_elements.shared.SimpleButton
 import com.github.aakumykov.common.settings_provider.SettingsProvider
 import com.github.aakumykov.common.utils.inMainThread
@@ -44,6 +47,8 @@ fun ServerScreen(
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
 
+    var ipAddress = rememberSaveable { mutableStateOf("0.0.0.0") }
+
     val gestureViewTouchListener = View.OnTouchListener { _, event ->
         when(event?.action) {
             MotionEvent.ACTION_DOWN -> gestureRecorder.startRecording(event)
@@ -62,6 +67,12 @@ fun ServerScreen(
         }
     }
 
+    LaunchedEffect(Unit) {
+        scope.launch {
+            ipAddress.value = settingsProvider.getIpAddress()
+        }
+    }
+
     Column {
 
         SimpleButton(
@@ -74,6 +85,8 @@ fun ServerScreen(
             bgColor = colorResource(R.color.button_see_journal),
             onClick = onJournalButtonClicked
         )
+
+        TextInfoView("IP-адрес сервера: ${ipAddress.value}")
 
         SimpleButton(
             text = "Запустить сервер",
