@@ -44,6 +44,7 @@ import java.util.Collections
 import java.util.UUID
 import javax.inject.Inject
 
+// TODO: подключаемые обработчики сообщений
 class GestureServer @Inject constructor(
     private val gson: Gson,
     private val gestureLogWriter: GestureLogWriter,
