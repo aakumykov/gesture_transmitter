@@ -118,7 +118,7 @@ fun ClientScreen(
 
 
         IpAddressView(
-            messagePrefix = "сохранённый ip-адрес",
+            isServer = false,
             settingsProvider = settingsProvider,
         )
 
