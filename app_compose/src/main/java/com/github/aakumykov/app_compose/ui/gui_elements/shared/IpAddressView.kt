@@ -14,7 +14,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun IpAddressView(
-    messagePrefix: String,
+    isServer: Boolean,
     settingsProvider: SettingsProvider,
     modifier: Modifier = Modifier,
     networkAddressDetector: NetworkAddressDetector? = null
@@ -32,8 +32,12 @@ fun IpAddressView(
     }
 
     val deviceIp: String = "ip-адрес устройства: " + (deviceIpAddress.value ?: "НЕ ОПРЕДЕЛЁН")
-    val savedIp: String = "${messagePrefix}: ${savedIpAddress.value}"
-    val ipInfo = "${deviceIp}\n${savedIp}"
+    val savedIp = "сохранённый ip-адрес: ${savedIpAddress.value}"
+
+    var ipInfo = savedIp
+
+    if (isServer)
+        ipInfo = "${deviceIp}\n${savedIp}"
 
     TextInfoView(
         text = ipInfo,

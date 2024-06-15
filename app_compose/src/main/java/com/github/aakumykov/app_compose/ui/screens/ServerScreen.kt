@@ -99,7 +99,7 @@ fun ServerScreen(
         )
 
         IpAddressView(
-            messagePrefix = "сохранённый ip-адрес: ",
+            isServer = true,
             settingsProvider = settingsProvider,
             networkAddressDetector = networkAddressDetector
         )
