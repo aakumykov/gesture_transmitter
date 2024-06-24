@@ -79,12 +79,12 @@ class GesturePlayingService : AccessibilityService() {
             if (currentWindowIsChromeWindow()) {
                 if (!chromeIsLaunched) {
                     chromeIsLaunched = true
-                    reportServerChromeIsActive(chromeIsLaunched)
+                    reportServerChromeIsActive(true)
                 }
             } else {
                 if (chromeIsLaunched) {
                     chromeIsLaunched = false
-                    reportServerChromeIsActive(chromeIsLaunched)
+                    reportServerChromeIsActive(false)
                 }
             }
         }
